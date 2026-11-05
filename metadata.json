@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Versión 1.4 Emprendedorismo APP",
+  "description": "Copiloto de estudio con IA que transforma textos escolares en artefactos de aprendizaje activo dentro de un entorno blindado contra distracciones.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
