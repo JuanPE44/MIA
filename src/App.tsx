@@ -1,25 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  MainSegment,
-  Notebook,
-  Folder,
-  UserStudyStats,
-  UserType,
-  SourceItem,
-  SourceType,
-  SourceAnalysis,
-  StudyArtifact,
-  ChatMessage,
-  ChatThread,
-  ArtifactType,
-  StudentProfile
-} from './types';
-import {
-  INITIAL_FOLDERS,
-  INITIAL_NOTEBOOKS,
-  INITIAL_USER_STATS,
-  INITIAL_STUDENT_PROFILE
-} from './data/initialData';
+import { Navigate } from 'react-router';
 import { useTheme } from './app/providers/ThemeProvider';
 import { LoginScreen } from './components/LoginScreen';
 import { Navbar } from './components/Navbar';
@@ -31,674 +11,84 @@ import { NotebookMethods } from './components/NotebookMethods';
 import { SupportAgentChatbot } from './components/SupportAgentChatbot';
 import { GoogleSearchAgent } from './components/GoogleSearchAgent';
 import { StudentProfileModal } from './components/StudentProfileModal';
-import { soundManager } from './services/audioSynthesizer';
+import { useAppState } from './app/AppStateContext';
+import { NotFound, paths } from './app/routes';
 import juanAvatar from './assets/images/juan_profile_avatar_1791724553271.jpg';
 import { BookOpen, ShieldCheck, AlertCircle, MessageSquare, Plus, Trash2, Sparkles, Layers, Globe, X } from 'lucide-react';
 
 export default function App() {
-  // Authentication State: Always starts on the Login Screen
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [userType, setUserType] = useState<UserType>('frecuente');
-
-  // Student Profile state
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [studentProfile, setStudentProfile] = useState<StudentProfile>(() => {
-    try {
-      const saved = localStorage.getItem('mia_student_profile');
-      return saved ? JSON.parse(saved) : INITIAL_STUDENT_PROFILE;
-    } catch {
-      return INITIAL_STUDENT_PROFILE;
-    }
-  });
-
-  const handleUpdateProfile = (updated: StudentProfile) => {
-    setStudentProfile(updated);
-    try {
-      localStorage.setItem('mia_student_profile', JSON.stringify(updated));
-    } catch {
-      // ignore
-    }
-  };
+  // App state and handlers live in AppStateContext; view / notebook / segment /
+  // thread are derived from the URL there (see src/app/routes.tsx).
+  const {
+    route,
+    isNotFound,
+    currentView,
+    activeSegment,
+    goToSegment,
+    goToNotebooks,
+    currentUser,
+    userType,
+    handleLoginSuccess,
+    handleLogout,
+    handleResetDemoData,
+    studentProfile,
+    handleUpdateProfile,
+    isProfileModalOpen,
+    openProfile,
+    closeProfile,
+    isSupportOpen,
+    openSupport,
+    closeSupport,
+    isSearchAgentOpen,
+    setIsSearchAgentOpen,
+    searchAgentInitialQuery,
+    chatInitialPrompt,
+    setChatInitialPrompt,
+    sourceNotification,
+    pendingArtifactType,
+    setPendingArtifactType,
+    isFocusModeActive,
+    focusWarningToast,
+    handleActivateFocusMode,
+    handleExitFocusMode,
+    folders,
+    notebooks,
+    activeNotebook,
+    handleOpenNotebook,
+    handleCreateFolder,
+    handleDeleteFolder,
+    handleCreateNotebook,
+    handleDeleteNotebook,
+    handleMoveNotebook,
+    handleAddSource,
+    handleDeleteSource,
+    handleToggleSourceForChat,
+    handleSelectAllSourcesForChat,
+    handleSetAnalysis,
+    handleAddArtifact,
+    handleDeleteArtifact,
+    handleUpdateArtifact,
+    stats,
+    handleUpdateStats,
+    currentThreads,
+    currentActiveThreadId,
+    currentActiveThread,
+    handleStartNewChat,
+    handleSelectChatThread,
+    handleDeleteChatThread,
+    handleRenameChatThread,
+    handleUpdateThreadMessages,
+    handleOpenGoogleSearch,
+    handleSaveSearchSource
+  } = useAppState();
 
   // Theme comes from ThemeProvider; legacy "Blanco/Negro" toggle maps to light/dark.
   const {resolvedTheme, setMode: setThemeMode} = useTheme();
   const isDarkMode = resolvedTheme === 'dark';
   const handleToggleTheme = (dark: boolean) => setThemeMode(dark ? 'dark' : 'light');
 
-  // Support Agent AI Modal/Drawer State
-  const [isSupportOpen, setIsSupportOpen] = useState(false);
-
-  // Google Search Agent Live Grounding Modal State
-  const [isSearchAgentOpen, setIsSearchAgentOpen] = useState(false);
-  const [searchAgentInitialQuery, setSearchAgentInitialQuery] = useState<string | undefined>(undefined);
-
-  // Chat initial prompt and source processing toast state
-  const [chatInitialPrompt, setChatInitialPrompt] = useState<string | undefined>(undefined);
-  const [sourceNotification, setSourceNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
-
-  // Current Screen View:
-  // - 'explorer': Shown once logged in! Lists folders and loose notebooks.
-  // - 'workspace': Inside a specific notebook, displaying the 4 segments (CHAT, FUENTES, ARTEFACTOS, ESTUDIO)
-  const [currentView, setCurrentView] = useState<'explorer' | 'workspace'>('explorer');
-
-  // Focus mode active state (locks down outside navigation, triggers fullscreen and keyboard lock)
-  const [isFocusModeActive, setIsFocusModeActive] = useState<boolean>(false);
-  const [focusWarningToast, setFocusWarningToast] = useState<string | null>(null);
-
-  // Keyboard and tab switch tamper protection when Focus mode is active
-  useEffect(() => {
-    if (!isFocusModeActive) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Intercept Alt + Tab
-      if (e.altKey && e.key === 'Tab') {
-        e.preventDefault();
-        e.stopPropagation();
-        soundManager.playTamperWarning();
-        setFocusWarningToast('⚠️ Focus mode activo: atajo Alt + Tab bloqueado');
-        setTimeout(() => setFocusWarningToast(null), 3500);
-        return false;
-      }
-
-      // Intercept Windows/Meta key or Win + D
-      if (e.metaKey || e.key === 'Meta') {
-        if (e.key.toLowerCase() === 'd') {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        soundManager.playTamperWarning();
-        setFocusWarningToast('⚠️ Focus mode activo: tecla del sistema bloqueada');
-        setTimeout(() => setFocusWarningToast(null), 3500);
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        soundManager.playTamperWarning();
-        setStats(prev => ({
-          ...prev,
-          tamperAttemptsBlocked: prev.tamperAttemptsBlocked + 1
-        }));
-        setFocusWarningToast('⚠️ Focus mode: se detectó un cambio de ventana o pestaña');
-        setTimeout(() => setFocusWarningToast(null), 3500);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown, true);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isFocusModeActive]);
-
-  const handleActivateFocusMode = () => {
-    setActiveSegment('ESTUDIO');
-    setIsFocusModeActive(true);
-    try {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-      (navigator as any).keyboard?.lock?.(['Tab', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight', 'Escape', 'KeyD']).catch(() => {});
-    } catch {
-      // ignore
-    }
-  };
-
-  const handleExitFocusMode = () => {
-    setIsFocusModeActive(false);
-    try {
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-      (navigator as any).keyboard?.unlock?.();
-    } catch {
-      // ignore
-    }
-  };
-
-  // Ensure login screen is ALWAYS shown first on refresh/load, and clear legacy cache
-  useEffect(() => {
-    sessionStorage.removeItem('focused_auth_user');
-    try {
-      localStorage.removeItem('focused_folders_frecuente');
-      localStorage.removeItem('focused_notebooks_frecuente');
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // The 4 Main Segments inside a notebook (opens initially in CHAT)
-  const [activeSegment, setActiveSegment] = useState<MainSegment>('CHAT');
-
-  // Folders & Notebooks state (persisted per userType)
-  const [folders, setFolders] = useState<Folder[]>(() => {
-    try {
-      const savedType = sessionStorage.getItem('focused_auth_usertype');
-      if (savedType === 'nuevo') return [];
-      const saved = localStorage.getItem('focused_folders_frecuente_v2');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return INITIAL_FOLDERS;
-  });
-
-  const [notebooks, setNotebooks] = useState<Notebook[]>(() => {
-    try {
-      const savedType = sessionStorage.getItem('focused_auth_usertype');
-      if (savedType === 'nuevo') return [];
-      const saved = localStorage.getItem('focused_notebooks_frecuente_v2');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return INITIAL_NOTEBOOKS;
-  });
-
-  const [activeNotebookId, setActiveNotebookId] = useState<string | null>(() => {
-    const savedType = sessionStorage.getItem('focused_auth_usertype');
-    if (savedType === 'nuevo') return null;
-    return INITIAL_NOTEBOOKS[0]?.id || null;
-  });
-
-  // Pending artifact type when navigating from Sources to Artifacts
-  const [pendingArtifactType, setPendingArtifactType] = useState<ArtifactType | null>(null);
-
-  // User study statistics
-  const [stats, setStats] = useState<UserStudyStats>(() => {
-    try {
-      const savedType = sessionStorage.getItem('focused_auth_usertype');
-      if (savedType === 'nuevo') {
-        return {
-          focusMinutesToday: 0,
-          totalFocusHours: 0,
-          currentStreakDays: 1,
-          xpPoints: 0,
-          sessionsCompleted: 0,
-          flashcardsMastered: 0,
-          tamperAttemptsBlocked: 0,
-          weeklyLogs: [
-            { day: 'Lun', fullDay: 'Lunes', date: 'Lun', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Mar', fullDay: 'Martes', date: 'Mar', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Mié', fullDay: 'Miércoles', date: 'Mié', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Jue', fullDay: 'Jueves', date: 'Jue', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Vie', fullDay: 'Viernes', date: 'Vie', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Sáb', fullDay: 'Sábado', date: 'Sáb', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Dom', fullDay: 'Domingo (Hoy)', date: 'Hoy', minutes: 0, targetMinutes: 45, sessions: 0 }
-          ]
-        };
-      }
-      const saved = localStorage.getItem('focused_user_stats_frecuente');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return INITIAL_USER_STATS;
-  });
-
-  // Save changes when user is frecuente
-  useEffect(() => {
-    if (userType === 'frecuente') {
-      try {
-        localStorage.setItem('focused_notebooks_frecuente_v2', JSON.stringify(notebooks));
-      } catch {
-        // ignore
-      }
-    }
-  }, [notebooks, userType]);
-
-  useEffect(() => {
-    if (userType === 'frecuente') {
-      try {
-        localStorage.setItem('focused_folders_frecuente_v2', JSON.stringify(folders));
-      } catch {
-        // ignore
-      }
-    }
-  }, [folders, userType]);
-
-  useEffect(() => {
-    if (userType === 'frecuente') {
-      try {
-        localStorage.setItem('focused_user_stats_frecuente', JSON.stringify(stats));
-      } catch {
-        // ignore
-      }
-    }
-  }, [stats, userType]);
-
-  // Handle Login with "Usuario nuevo" vs "Usuario frecuente"
-  const handleLoginSuccess = (username: string, type: UserType) => {
-    sessionStorage.setItem('focused_auth_user', username);
-    sessionStorage.setItem('focused_auth_usertype', type);
-    setCurrentUser(username);
-    setUserType(type);
-
-    if (type === 'nuevo') {
-      // Clean slate for new user who has never entered
-      setFolders([]);
-      setNotebooks([]);
-      setActiveNotebookId(null);
-      setStats({
-        focusMinutesToday: 0,
-        totalFocusHours: 0,
-        currentStreakDays: 1,
-        xpPoints: 0,
-        sessionsCompleted: 0,
-        flashcardsMastered: 0,
-        tamperAttemptsBlocked: 0
-      });
-    } else {
-      // Modeled example data for frequent user
-      setFolders(INITIAL_FOLDERS);
-      setNotebooks(INITIAL_NOTEBOOKS);
-      setActiveNotebookId(INITIAL_NOTEBOOKS[0]?.id || null);
-      setStats(INITIAL_USER_STATS);
-    }
-
-    // Critical Requirement: Once logged in, show the list of folders and loose notebooks!
-    setCurrentView('explorer');
-    setActiveSegment('CHAT');
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('focused_auth_user');
-    sessionStorage.removeItem('focused_auth_usertype');
-    setCurrentUser(null);
-    setCurrentView('explorer');
-  };
-
-  const handleResetDemoData = () => {
-    setFolders(INITIAL_FOLDERS);
-    setNotebooks(INITIAL_NOTEBOOKS);
-    setActiveNotebookId(INITIAL_NOTEBOOKS[0]?.id || null);
-    setStats(INITIAL_USER_STATS);
-    setStudentProfile(INITIAL_STUDENT_PROFILE);
-    try {
-      localStorage.removeItem('mia_student_profile');
-    } catch {
-      // ignore
-    }
-  };
-
-  // Open a notebook: transitions to the 4 sections, initially opening CHAT!
-  const handleOpenNotebook = (id: string) => {
-    setActiveNotebookId(id);
-    setActiveSegment('CHAT'); // Initially opens CHAT!
-    setCurrentView('workspace');
-  };
-
-  const activeNotebook = notebooks.find((n) => n.id === activeNotebookId) || notebooks[0] || null;
-
-  // Folder & Notebook Management Handlers
-  const handleCreateFolder = (name: string, color: string, icon: string, coverImage?: string) => {
-    const newFolder: Folder = {
-      id: `folder-${Date.now()}`,
-      name,
-      color,
-      icon,
-      coverImage: coverImage || undefined,
-      createdAt: new Date().toLocaleDateString('es-ES')
-    };
-    setFolders((prev) => [...prev, newFolder]);
-  };
-
-  const handleDeleteFolder = (folderId: string) => {
-    setFolders((prev) => prev.filter((f) => f.id !== folderId));
-    // Eject notebooks in deleted folder so they remain as loose notebooks
-    setNotebooks((prev) =>
-      prev.map((nb) => (nb.folderId === folderId ? { ...nb, folderId: null } : nb))
-    );
-  };
-
-  const handleCreateNotebook = (newNb: Partial<Notebook>) => {
-    const initialThread: ChatThread = {
-      id: `thread-${Date.now()}`,
-      title: 'Chat 1',
-      createdAt: 'Hoy',
-      messages: []
-    };
-
-    const fullNotebook: Notebook = {
-      id: `nb-${Date.now()}`,
-      title: newNb.title || 'Nuevo Cuaderno',
-      icon: newNb.icon || '📘',
-      subject: newNb.subject || 'General',
-      description: newNb.description || '',
-      category: 'emprendimiento',
-      color: 'indigo',
-      folderId: newNb.folderId || null,
-      createdAt: new Date().toLocaleDateString('es-ES'),
-      updatedAt: new Date().toLocaleDateString('es-ES'),
-      sources: [],
-      analysis: null,
-      artifacts: [],
-      chatMessages: [],
-      chatThreads: [initialThread],
-      activeChatThreadId: initialThread.id
-    };
-
-    setNotebooks((prev) => [fullNotebook, ...prev]);
-    setActiveNotebookId(fullNotebook.id);
-    setActiveSegment('CHAT');
-    setCurrentView('workspace');
-  };
-
-  const handleDeleteNotebook = (notebookId: string) => {
-    setNotebooks((prev) => prev.filter((n) => n.id !== notebookId));
-    if (activeNotebookId === notebookId) {
-      setActiveNotebookId(null);
-      setCurrentView('explorer');
-    }
-  };
-
-  // Right-click action: Move into folder or eject (leave loose)
-  const handleMoveNotebook = (notebookId: string, folderId: string | null) => {
-    setNotebooks((prev) =>
-      prev.map((nb) => (nb.id === notebookId ? { ...nb, folderId } : nb))
-    );
-  };
-
-  // Content mutation inside active notebook
-  const handleUpdateActiveNotebook = (updated: Notebook) => {
-    setNotebooks((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
-  };
-
-  const handleAddSource = async (source: SourceItem) => {
-    if (!activeNotebook) return;
-    const initialSource: SourceItem = {
-      ...source,
-      selectedForChat: source.selectedForChat !== undefined ? source.selectedForChat : true,
-      isAnalyzing: true
-    };
-
-    const targetNotebookId = activeNotebook.id;
-
-    // Add source with analyzing status immediately
-    const updatedWithPending: Notebook = {
-      ...activeNotebook,
-      sources: [initialSource, ...activeNotebook.sources],
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updatedWithPending);
-
-    setSourceNotification({
-      message: `🧠 La IA está procesando y analizando "${source.title}"...`,
-      type: 'info'
-    });
-
-    try {
-      const res = await fetch('/api/process-and-analyze-source', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source: initialSource,
-          notebookTitle: activeNotebook.title,
-          existingSources: activeNotebook.sources
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.processedSource) {
-          setNotebooks((prev) =>
-            prev.map((nb) => {
-              if (nb.id !== targetNotebookId) return nb;
-              return {
-                ...nb,
-                sources: nb.sources.map((s) => (s.id === source.id ? { ...data.processedSource, selectedForChat: true } : s)),
-                analysis: data.notebookAnalysis || nb.analysis,
-                updatedAt: new Date().toLocaleDateString('es-ES')
-              };
-            })
-          );
-          setSourceNotification({
-            message: `✅ Fuente "${source.title}" procesada y analizada por IA. ¡Lista para consultas específicas en el Chat!`,
-            type: 'success'
-          });
-          setTimeout(() => {
-            setSourceNotification(null);
-          }, 4500);
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn('Auto-analysis error upon source addition', err);
-    }
-
-    // Fallback mark as processed
-    setNotebooks((prev) =>
-      prev.map((nb) => {
-        if (nb.id !== targetNotebookId) return nb;
-        return {
-          ...nb,
-          sources: nb.sources.map((s) => (s.id === source.id ? { ...s, isAnalyzing: false, isProcessed: true } : s))
-        };
-      })
-    );
-    setSourceNotification({
-      message: `✅ Fuente "${source.title}" agregada al cuaderno.`,
-      type: 'success'
-    });
-    setTimeout(() => {
-      setSourceNotification(null);
-    }, 3500);
-  };
-
-  const handleDeleteSource = (sourceId: string) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      sources: activeNotebook.sources.filter((s) => s.id !== sourceId),
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-  };
-
-  const handleToggleSourceForChat = (sourceId: string) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      sources: activeNotebook.sources.map((s) =>
-        s.id === sourceId
-          ? { ...s, selectedForChat: s.selectedForChat === false ? true : false }
-          : s
-      ),
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-  };
-
-  const handleSelectAllSourcesForChat = (selected: boolean) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      sources: activeNotebook.sources.map((s) => ({
-        ...s,
-        selectedForChat: selected
-      })),
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-  };
-
-  const handleSetAnalysis = (analysis: SourceAnalysis) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      analysis,
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-  };
-
-  const handleAddArtifact = (artifact: StudyArtifact) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      artifacts: [artifact, ...activeNotebook.artifacts],
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-    setStats((prev) => ({ ...prev, xpPoints: prev.xpPoints + 50 }));
-  };
-
-  const handleDeleteArtifact = (artifactId: string) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      artifacts: activeNotebook.artifacts.filter((a) => a.id !== artifactId),
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-  };
-
-  const handleUpdateArtifact = (artifact: StudyArtifact) => {
-    if (!activeNotebook) return;
-    const updated: Notebook = {
-      ...activeNotebook,
-      artifacts: activeNotebook.artifacts.map((a) => (a.id === artifact.id ? artifact : a)),
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updated);
-  };
-
-  const handleUpdateStats = (newStats: Partial<UserStudyStats>) => {
-    setStats((prev) => ({ ...prev, ...newStats }));
-  };
-
-  // -------------------------------------------------------------
-  // MULTI-CHAT THREAD MANAGEMENT WITHIN THE NOTEBOOK
-  // -------------------------------------------------------------
-  const getNotebookThreads = (nb: Notebook): ChatThread[] => {
-    if (nb.chatThreads && nb.chatThreads.length > 0) {
-      return nb.chatThreads;
-    }
-    // Fallback if notebook only had flat chatMessages
-    return [
-      {
-        id: 'thread-default',
-        title: 'Chat Principal',
-        createdAt: 'Hoy',
-        messages: nb.chatMessages || []
-      }
-    ];
-  };
-
-  const currentThreads = activeNotebook ? getNotebookThreads(activeNotebook) : [];
-  const currentActiveThreadId = activeNotebook?.activeChatThreadId || currentThreads[0]?.id || 'thread-default';
-  const currentActiveThread = currentThreads.find(t => t.id === currentActiveThreadId) || currentThreads[0];
-
-  // Action: "+ Iniciar chat"
-  const handleStartNewChat = () => {
-    if (!activeNotebook) return;
-    const threads = getNotebookThreads(activeNotebook);
-    const newIndex = threads.length + 1;
-    const newThreadId = `thread-${Date.now()}`;
-
-    const greetingMessage: ChatMessage = {
-      id: `msg-welcome-${Date.now()}`,
-      sender: 'assistant',
-      text: `Nuevo chat iniciado en el cuaderno "${activeNotebook.title}".\n\nEste hilo comparte el 100% de las ${activeNotebook.sources.length} fuentes y ${activeNotebook.artifacts.length} artefactos de este cuaderno. ¿En qué tema o pregunta te gustaría trabajar?`,
-      timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      sourcesCited: activeNotebook.sources.map(s => s.title)
-    };
-
-    const newThread: ChatThread = {
-      id: newThreadId,
-      title: `Chat ${newIndex}`,
-      createdAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      messages: activeNotebook.sources.length > 0 ? [greetingMessage] : []
-    };
-
-    const updatedThreads = [...threads, newThread];
-    const updatedNotebook: Notebook = {
-      ...activeNotebook,
-      chatThreads: updatedThreads,
-      activeChatThreadId: newThreadId
-    };
-
-    handleUpdateActiveNotebook(updatedNotebook);
-    setActiveSegment('CHAT'); // Always switch to CHAT to see the new conversation
-  };
-
-  const handleSelectChatThread = (threadId: string) => {
-    if (!activeNotebook) return;
-    const updatedNotebook: Notebook = {
-      ...activeNotebook,
-      activeChatThreadId: threadId
-    };
-    handleUpdateActiveNotebook(updatedNotebook);
-    setActiveSegment('CHAT');
-  };
-
-  const handleDeleteChatThread = (threadId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!activeNotebook) return;
-    const threads = getNotebookThreads(activeNotebook);
-    if (threads.length <= 1) {
-      alert('Cada cuaderno debe tener al menos un chat activo.');
-      return;
-    }
-
-    if (confirm('¿Deseas eliminar este hilo de chat? (Las fuentes y artefactos permanecerán intactos).')) {
-      const remainingThreads = threads.filter(t => t.id !== threadId);
-      const nextActiveId = remainingThreads[0]?.id;
-      const updatedNotebook: Notebook = {
-        ...activeNotebook,
-        chatThreads: remainingThreads,
-        activeChatThreadId: nextActiveId
-      };
-      handleUpdateActiveNotebook(updatedNotebook);
-    }
-  };
-
-  const handleRenameChatThread = (threadId: string, newTitle: string) => {
-    if (!activeNotebook) return;
-    const threads = getNotebookThreads(activeNotebook);
-    const updatedThreads = threads.map(t => (t.id === threadId ? { ...t, title: newTitle } : t));
-    const updatedNotebook: Notebook = {
-      ...activeNotebook,
-      chatThreads: updatedThreads
-    };
-    handleUpdateActiveNotebook(updatedNotebook);
-  };
-
-  const handleUpdateThreadMessages = (threadId: string, newMessages: ChatMessage[]) => {
-    if (!activeNotebook) return;
-    const threads = getNotebookThreads(activeNotebook);
-    const updatedThreads = threads.map(t => (t.id === threadId ? { ...t, messages: newMessages } : t));
-    const updatedNotebook: Notebook = {
-      ...activeNotebook,
-      chatThreads: updatedThreads,
-      chatMessages: newMessages // Also keep in sync
-    };
-    handleUpdateActiveNotebook(updatedNotebook);
-  };
-
-  const handleOpenGoogleSearch = (query?: string) => {
-    setSearchAgentInitialQuery(query);
-    setIsSearchAgentOpen(true);
-  };
-
-  const handleSaveSearchSource = (sourceData: Partial<SourceItem>) => {
-    if (!activeNotebook) return;
-    const newSource: SourceItem = {
-      id: `src-google-${Date.now()}`,
-      type: (sourceData.type as SourceType) || 'link',
-      title: sourceData.title || 'Noticia verificada con Google Search',
-      content: sourceData.content || '',
-      sourceUrl: sourceData.sourceUrl || '',
-      uploadDate: new Date().toLocaleDateString('es-ES'),
-      wordCount: sourceData.wordCount || 100,
-      selectedForChat: true
-    };
-    handleAddSource(newSource);
-  };
-
-  // If not logged in, render LoginScreen with "Usuario nuevo" vs "Usuario frecuente"
+  // Session gate (T4.2 / A3): no session → Login at ANY URL. The URL is kept,
+  // so after "Empezar" the requested screen renders. Reload → Login again.
   if (!currentUser) {
     return (
       <LoginScreen
@@ -709,6 +99,16 @@ export default function App() {
     );
   }
 
+  // `/` with a session → Mis cuadernos.
+  if (route.kind === 'login') {
+    return <Navigate to={paths.notebooks()} replace />;
+  }
+
+  // `/cuadernos/<id>` without section → its chat.
+  if (route.kind === 'notebookIndex' && !isNotFound) {
+    return <Navigate to={paths.notebookSegment(route.notebookId, 'CHAT')} replace />;
+  }
+
   return (
     <div className={`min-h-screen font-sans selection:bg-indigo-600 selection:text-white flex flex-col transition-colors duration-200 ${
       isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
@@ -717,15 +117,15 @@ export default function App() {
       {!isFocusModeActive && (
         <Navbar
           currentView={currentView}
-          onBackToExplorer={() => setCurrentView('explorer')}
+          onBackToExplorer={goToNotebooks}
           activeSegment={activeSegment}
-          onSelectSegment={setActiveSegment}
+          onSelectSegment={goToSegment}
           activeNotebook={activeNotebook}
           onLogout={handleLogout}
           username={currentUser}
           userType={userType}
           stats={stats}
-          onOpenSupport={() => setIsSupportOpen(true)}
+          onOpenSupport={openSupport}
           onOpenSearch={() => handleOpenGoogleSearch()}
           isDarkMode={isDarkMode}
           onToggleTheme={handleToggleTheme}
@@ -765,7 +165,9 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6 pb-28">
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
-        {currentView === 'explorer' && (
+        {isNotFound && <NotFound />}
+
+        {currentView === 'explorer' && !isNotFound && (
           <NotebooksExplorer
             folders={folders}
             notebooks={notebooks}
@@ -781,7 +183,7 @@ export default function App() {
         )}
 
         {/* VIEW 2: INTERIOR DEL CUADERNO CON SUS 4 SEGMENTOS (CHAT, FUENTES, ARTEFACTOS, ESTUDIO) */}
-        {currentView === 'workspace' && activeNotebook && (
+        {currentView === 'workspace' && activeNotebook && !isNotFound && (
           <div className="space-y-5">
             {/* Active Notebook Banner - Inverted dark background with light text (hidden in Focus mode) */}
             {!isFocusModeActive && (
@@ -809,7 +211,7 @@ export default function App() {
                   <div className="flex flex-wrap items-center gap-3">
                     {/* BOTÓN BIEN GRANDE Y VISTOSO: AÑADIR FUENTES */}
                     <button
-                      onClick={() => setActiveSegment('FUENTES')}
+                      onClick={() => goToSegment('FUENTES')}
                       className="group flex items-center gap-3 px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-500/25 border-2 border-emerald-300/40 hover:scale-105 active:scale-95 transition-all cursor-pointer ring-4 ring-emerald-500/20"
                       title="Añadir nuevas fuentes (PDF, Videos, Textos, Enlaces)"
                     >
@@ -829,7 +231,7 @@ export default function App() {
                     {/* Contador / Estado de fuentes */}
                     {activeNotebook.sources.length > 0 ? (
                       <button
-                        onClick={() => setActiveSegment('FUENTES')}
+                        onClick={() => goToSegment('FUENTES')}
                         className="flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/30 px-3.5 py-3 rounded-2xl backdrop-blur-xs shadow-xs transition cursor-pointer"
                         title="Ver fuentes cargadas"
                       >
@@ -838,7 +240,7 @@ export default function App() {
                       </button>
                     ) : (
                       <button
-                        onClick={() => setActiveSegment('FUENTES')}
+                        onClick={() => goToSegment('FUENTES')}
                         className="flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-950/60 hover:bg-amber-900/60 border border-amber-500/30 px-3.5 py-3 rounded-2xl transition cursor-pointer backdrop-blur-xs shadow-xs"
                       >
                         <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
@@ -909,7 +311,7 @@ export default function App() {
 
                     {/* Salir del chat y volver al explorador de carpetas */}
                     <button
-                      onClick={() => setCurrentView('explorer')}
+                      onClick={goToNotebooks}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-rose-500/20 text-slate-200 hover:text-white border border-white/15 hover:border-rose-400/40 text-xs font-bold transition cursor-pointer"
                       title="Salir del chat y volver a las carpetas"
                     >
@@ -929,13 +331,13 @@ export default function App() {
                 onUpdateThreadMessages={handleUpdateThreadMessages}
                 onRenameThread={handleRenameChatThread}
                 onStartNewChat={handleStartNewChat}
-                onGoToArtifactsTab={() => setActiveSegment('ARTEFACTOS')}
-                onGoToSourcesTab={() => setActiveSegment('FUENTES')}
+                onGoToArtifactsTab={() => goToSegment('ARTEFACTOS')}
+                onGoToSourcesTab={() => goToSegment('FUENTES')}
                 onOpenGoogleSearch={handleOpenGoogleSearch}
                 onSelectAllSourcesForChat={handleSelectAllSourcesForChat}
                 initialPrompt={chatInitialPrompt}
                 onClearInitialPrompt={() => setChatInitialPrompt(undefined)}
-                onCloseChat={() => setCurrentView('explorer')}
+                onCloseChat={goToNotebooks}
                 isDarkMode={isDarkMode}
               />
             )}
@@ -951,15 +353,15 @@ export default function App() {
                 onSetAnalysis={handleSetAnalysis}
                 onAskAboutSource={(sourceTitle) => {
                   setChatInitialPrompt(`¿Qué aspectos centrales, definiciones, autores y conclusiones específicas se detallan en la fuente "${sourceTitle}"?`);
-                  setActiveSegment('CHAT');
+                  goToSegment('CHAT');
                 }}
                 onGoToCreateSummary={() => {
                   setPendingArtifactType('resumen');
-                  setActiveSegment('ARTEFACTOS');
+                  goToSegment('ARTEFACTOS');
                 }}
                 onGoToCreateOtherArtifact={() => {
                   setPendingArtifactType('cuestionario');
-                  setActiveSegment('ARTEFACTOS');
+                  goToSegment('ARTEFACTOS');
                 }}
               />
             )}
@@ -984,7 +386,7 @@ export default function App() {
                 onUpdateStats={handleUpdateStats}
                 onGoToArtifacts={() => {
                   if (isFocusModeActive) return;
-                  setActiveSegment('ARTEFACTOS');
+                  goToSegment('ARTEFACTOS');
                 }}
                 isFocusModeActive={isFocusModeActive}
                 onActivateFocusMode={handleActivateFocusMode}
@@ -1029,8 +431,8 @@ export default function App() {
       {!isFocusModeActive && (
         <SupportAgentChatbot
           isOpen={isSupportOpen}
-          onOpen={() => setIsSupportOpen(true)}
-          onClose={() => setIsSupportOpen(false)}
+          onOpen={openSupport}
+          onClose={closeSupport}
           username={currentUser || 'Estudiante'}
           userType={userType}
           currentView={currentView}
@@ -1052,7 +454,7 @@ export default function App() {
           {/* Botón rectangular con foto de perfil y 'PERFIL' en grande y en mayúsculas */}
           <button
             type="button"
-            onClick={() => setIsProfileModalOpen(true)}
+            onClick={openProfile}
             className="flex items-center gap-3.5 px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300/80 dark:border-slate-700 transition-all cursor-pointer shadow-xs active:scale-98 group"
             title="Abrir perfil: consulta tu plan actual y el estado de tu cuenta"
           >
@@ -1096,7 +498,7 @@ export default function App() {
       {/* Modal de Perfil de Estudiante, Plan Actual y Estado de Cuenta */}
       <StudentProfileModal
         isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
+        onClose={closeProfile}
         profile={studentProfile}
         onUpdateProfile={handleUpdateProfile}
         onResetAllData={handleResetDemoData}
