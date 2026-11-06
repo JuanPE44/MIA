@@ -4,7 +4,7 @@ import { useTheme } from './app/providers/ThemeProvider';
 import { LoginScreen } from './components/LoginScreen';
 import { Navbar } from './components/Navbar';
 import { NotebooksExplorer } from './components/NotebooksExplorer';
-import { NotebookChat } from './components/NotebookChat';
+import { ChatScreen } from './features/chat';
 import { NotebookSources } from './components/NotebookSources';
 import { NotebookArtifacts } from './components/NotebookArtifacts';
 import { NotebookMethods } from './components/NotebookMethods';
@@ -325,21 +325,7 @@ export default function App() {
 
             {/* 1. SEGMENTO: CHAT (Opened initially upon opening the notebook!) */}
             {!isFocusModeActive && activeSegment === 'CHAT' && currentActiveThread && (
-              <NotebookChat
-                notebook={activeNotebook}
-                activeThread={currentActiveThread}
-                onUpdateThreadMessages={handleUpdateThreadMessages}
-                onRenameThread={handleRenameChatThread}
-                onStartNewChat={handleStartNewChat}
-                onGoToArtifactsTab={() => goToSegment('ARTEFACTOS')}
-                onGoToSourcesTab={() => goToSegment('FUENTES')}
-                onOpenGoogleSearch={handleOpenGoogleSearch}
-                onSelectAllSourcesForChat={handleSelectAllSourcesForChat}
-                initialPrompt={chatInitialPrompt}
-                onClearInitialPrompt={() => setChatInitialPrompt(undefined)}
-                onCloseChat={goToNotebooks}
-                isDarkMode={isDarkMode}
-              />
+              <ChatScreen />
             )}
 
             {/* 2. SEGMENTO: FUENTES */}
