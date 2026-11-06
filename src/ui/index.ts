@@ -16,3 +16,7 @@ export * from './Chip';
 export * from './StatusBadge';
 export * from './SimulatedBadge';
 export * from './EmptyState';
+export * from './Avatar';
+export * from './Breadcrumb';
+export * from './Tabs';
+export * from './BottomTabBar';

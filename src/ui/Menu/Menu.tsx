@@ -24,6 +24,8 @@ export interface MenuItem {
   /** Destructive item; rendered last, after a divider. */
   danger?: boolean;
   disabled?: boolean;
+  /** Renders a divider above this item (to group items; danger items get one automatically). */
+  dividerBefore?: boolean;
 }
 
 /** Props to spread on a custom trigger element. */
@@ -48,11 +50,13 @@ export interface MenuProps {
    */
   contextTargetRef?: RefObject<HTMLElement | null>;
   className?: string;
+  /** Optional non-interactive header at the top of the panel (e.g. account name). */
+  header?: ReactNode;
 }
 
 type Anchor = {kind: 'trigger'} | {kind: 'point'; x: number; y: number};
 
-export function Menu({items, label = 'Más opciones', renderTrigger, contextTargetRef, className}: MenuProps) {
+export function Menu({items, label = 'Más opciones', renderTrigger, contextTargetRef, className, header}: MenuProps) {
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [focusLast, setFocusLast] = useState(false);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -117,6 +121,7 @@ export function Menu({items, label = 'Más opciones', renderTrigger, contextTarg
           id={menuId}
           label={label}
           items={items}
+          header={header}
           anchor={anchor}
           triggerRef={triggerRef}
           focusLast={focusLast}
@@ -131,13 +136,14 @@ interface PanelProps {
   id: string;
   label: string;
   items: MenuItem[];
+  header?: ReactNode;
   anchor: Anchor;
   triggerRef: RefObject<HTMLElement | null>;
   focusLast: boolean;
   onClose: (restoreFocus: boolean) => void;
 }
 
-function MenuPanel({id, label, items, anchor, triggerRef, focusLast, onClose}: PanelProps) {
+function MenuPanel({id, label, items, header, anchor, triggerRef, focusLast, onClose}: PanelProps) {
   const phone = useIsPhone();
   const panelRef = useRef<HTMLDivElement>(null);
   const typeahead = useRef({text: '', timer: 0});
@@ -253,9 +259,14 @@ function MenuPanel({id, label, items, anchor, triggerRef, focusLast, onClose}: P
       )}
     >
       {phone ? <div aria-hidden className="mx-auto mb-2 mt-1 h-1 w-8 shrink-0 rounded-pill bg-hairline" /> : null}
+      {header ? (
+        <div role="none" className="border-b border-hairline px-3 pb-2 pt-1">
+          {header}
+        </div>
+      ) : null}
       {ordered.map((item, idx) => (
         <div key={item.id} role="none">
-          {idx === firstDanger && idx > 0 ? <div role="separator" className="my-1 h-px bg-hairline" /> : null}
+          {(idx === firstDanger && idx > 0) || (item.dividerBefore && idx > 0) ? <div role="separator" className="my-1 h-px bg-hairline" /> : null}
           <button
             type="button"
             role="menuitem"
