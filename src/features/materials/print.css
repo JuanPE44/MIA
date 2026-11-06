@@ -1,0 +1,22 @@
+/* Off-screen reading copy used by window.print. No colors here — tokens only. */
+.mia-material-print {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  width: 800px;
+  background: var(--mia-bg-page);
+  color: var(--mia-text-strong);
+}
+
+@media print {
+  body.mia-printing #root {
+    display: none !important;
+  }
+
+  body.mia-printing .mia-material-print {
+    position: static;
+    left: auto;
+    width: auto;
+    display: block;
+  }
+}

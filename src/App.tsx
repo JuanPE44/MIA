@@ -5,7 +5,6 @@ import { LoginScreen } from './components/LoginScreen';
 import { LibraryScreen } from './features/library';
 import { ChatScreen } from './features/chat';
 import { NotebookSources } from './components/NotebookSources';
-import { NotebookArtifacts } from './components/NotebookArtifacts';
 import { NotebookMethods } from './components/NotebookMethods';
 import { SupportAgentChatbot } from './components/SupportAgentChatbot';
 import { GoogleSearchAgent } from './components/GoogleSearchAgent';
@@ -13,6 +12,7 @@ import { StudentProfileModal } from './components/StudentProfileModal';
 import { useAppState } from './app/AppStateContext';
 import { NotFound, paths } from './app/routes';
 import { TopBar, NotebookLayout } from './app/shell';
+import { MaterialsJobsProvider, MaterialsScreen, MaterialViewer } from './features/materials';
 import { Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -64,9 +64,6 @@ export default function App() {
     handleToggleSourceForChat,
     handleSelectAllSourcesForChat,
     handleSetAnalysis,
-    handleAddArtifact,
-    handleDeleteArtifact,
-    handleUpdateArtifact,
     stats,
     handleUpdateStats,
     currentThreads,
@@ -108,7 +105,14 @@ export default function App() {
     return <Navigate to={paths.notebookSegment(route.notebookId, 'CHAT')} replace />;
   }
 
+  const viewingMaterial =
+    route.kind === 'workspace' && Boolean(route.artifactId) && !isNotFound && !isFocusModeActive;
+
   return (
+    <MaterialsJobsProvider>
+      {viewingMaterial && activeNotebook ? (
+        <MaterialViewer />
+      ) : (
     <div className="min-h-screen font-sans selection:bg-primary selection:text-on-primary flex flex-col bg-page text-strong transition-colors duration-200">
       {/* Global top bar (hides itself in Focus mode) */}
       <TopBar />
@@ -188,14 +192,7 @@ export default function App() {
 
             {/* 3. SEGMENTO: ARTEFACTOS */}
             {!isFocusModeActive && activeSegment === 'ARTEFACTOS' && (
-              <NotebookArtifacts
-                notebook={activeNotebook}
-                onAddArtifact={handleAddArtifact}
-                onUpdateArtifact={handleUpdateArtifact}
-                onDeleteArtifact={handleDeleteArtifact}
-                initialArtifactType={pendingArtifactType}
-                onClearInitialType={() => setPendingArtifactType(null)}
-              />
+              <MaterialsScreen />
             )}
 
             {/* 4. SEGMENTO: ESTUDIO (MÉTODOS DE ESTUDIO ACTIVO & FOCUS MODE) */}
@@ -255,5 +252,7 @@ export default function App() {
         />
       )}
     </div>
+      )}
+    </MaterialsJobsProvider>
   );
 }
