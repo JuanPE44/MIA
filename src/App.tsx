@@ -7,7 +7,7 @@ import { AccountScreen } from './features/account';
 import { LibraryScreen } from './features/library';
 import { ChatScreen } from './features/chat';
 import { NotebookSources } from './components/NotebookSources';
-import { NotebookMethods } from './components/NotebookMethods';
+import { StudyScreen, StudySessionProvider } from './features/study';
 import { GoogleSearchAgent } from './components/GoogleSearchAgent';
 import { useAppState } from './app/AppStateContext';
 import { NotFound, paths } from './app/routes';
@@ -140,6 +140,7 @@ export default function App() {
 
         {/* VIEW 2: INTERIOR DEL CUADERNO CON SUS 4 SEGMENTOS (CHAT, FUENTES, ARTEFACTOS, ESTUDIO) */}
         {route.kind === 'workspace' && activeNotebook && !isNotFound && (
+          <StudySessionProvider key={activeNotebook.id}>
           <NotebookLayout>
             {/* Notebook header + section tabs / bottom bar live in NotebookLayout */}
 
@@ -178,21 +179,9 @@ export default function App() {
             )}
 
             {/* 4. SEGMENTO: ESTUDIO (MÉTODOS DE ESTUDIO ACTIVO & FOCUS MODE) */}
-            {(isFocusModeActive || activeSegment === 'ESTUDIO') && (
-              <NotebookMethods
-                notebook={activeNotebook}
-                stats={stats}
-                onUpdateStats={handleUpdateStats}
-                onGoToArtifacts={() => {
-                  if (isFocusModeActive) return;
-                  goToSegment('ARTEFACTOS');
-                }}
-                isFocusModeActive={isFocusModeActive}
-                onActivateFocusMode={handleActivateFocusMode}
-                onExitFocusMode={handleExitFocusMode}
-              />
-            )}
+            {(isFocusModeActive || activeSegment === 'ESTUDIO') && <StudyScreen />}
           </NotebookLayout>
+          </StudySessionProvider>
         )}
       </main>
 

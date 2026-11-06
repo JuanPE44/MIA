@@ -74,71 +74,28 @@ function useAppStateValue() {
   const [chatInitialPrompt, setChatInitialPrompt] = useState<string | undefined>(undefined);
   const [sourceNotification, setSourceNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 
-  // Focus mode active state (locks down outside navigation, triggers fullscreen and keyboard lock)
+  // Focus mode active state (locks down outside navigation and requests fullscreen; no keyboard lock)
   const [isFocusModeActive, setIsFocusModeActive] = useState<boolean>(false);
   const [focusWarningToast, setFocusWarningToast] = useState<string | null>(null);
   // URL prefix Focus mode is locked to (`/cuadernos/<id>/estudiar`)
   const focusPathRef = useRef<string | null>(null);
 
-  // Keyboard and tab switch tamper protection when Focus mode is active
-  useEffect(() => {
-    if (!isFocusModeActive) return;
+  // Tab-leave detection lives in features/study (alertdialog + counter).
+  // Keys are never intercepted or locked here: Tab/Escape must always work
+  // (WCAG 2.2 AA, UX-23).
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Intercept Alt + Tab
-      if (e.altKey && e.key === 'Tab') {
-        e.preventDefault();
-        e.stopPropagation();
-        soundManager.playTamperWarning();
-        setFocusWarningToast('⚠️ Focus mode activo: atajo Alt + Tab bloqueado');
-        setTimeout(() => setFocusWarningToast(null), 3500);
-        return false;
-      }
-
-      // Intercept Windows/Meta key or Win + D
-      if (e.metaKey || e.key === 'Meta') {
-        if (e.key.toLowerCase() === 'd') {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        soundManager.playTamperWarning();
-        setFocusWarningToast('⚠️ Focus mode activo: tecla del sistema bloqueada');
-        setTimeout(() => setFocusWarningToast(null), 3500);
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        soundManager.playTamperWarning();
-        setStats(prev => ({
-          ...prev,
-          tamperAttemptsBlocked: prev.tamperAttemptsBlocked + 1
-        }));
-        setFocusWarningToast('⚠️ Focus mode: se detectó un cambio de ventana o pestaña');
-        setTimeout(() => setFocusWarningToast(null), 3500);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown, true);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isFocusModeActive]);
-
-  const handleActivateFocusMode = () => {
+  /** Resolves to whether the browser actually entered fullscreen. */
+  const handleActivateFocusMode = async (): Promise<boolean> => {
     goToSegment('ESTUDIO');
     focusPathRef.current = activeNotebook ? paths.notebookSegment(activeNotebook.id, 'ESTUDIO') : null;
     setIsFocusModeActive(true);
     try {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-      (navigator as any).keyboard?.lock?.(['Tab', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight', 'Escape', 'KeyD']).catch(() => {});
+      if (document.fullscreenElement) return true;
+      if (!document.fullscreenEnabled) return false;
+      await document.documentElement.requestFullscreen();
+      return true;
     } catch {
-      // ignore
+      return false;
     }
   };
 
@@ -149,7 +106,6 @@ function useAppStateValue() {
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(() => {});
       }
-      (navigator as any).keyboard?.unlock?.();
     } catch {
       // ignore
     }
@@ -792,7 +748,7 @@ function useAppStateValue() {
     if (location.pathname === lockedPath || location.pathname.startsWith(`${lockedPath}/`)) return;
     navigate(lockedPath, { replace: true });
     soundManager.playTamperWarning();
-    setFocusWarningToast('⚠️ Focus mode activo: navegación bloqueada');
+    setFocusWarningToast('Modo blindado activo: no puedes salir de esta sección.');
     setTimeout(() => setFocusWarningToast(null), 3500);
   }, [isFocusModeActive, location.pathname]);
 
