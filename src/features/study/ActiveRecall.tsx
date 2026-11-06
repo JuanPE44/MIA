@@ -1,0 +1,155 @@
+import {useRef, useState} from 'react';
+import {Link} from 'react-router';
+import {Brain} from 'lucide-react';
+import {useAppState} from '../../app/AppStateContext';
+import {paths} from '../../app/routes';
+import {Button, Card, EmptyState, InlineAlert, SimulatedBadge, Textarea} from '../../ui';
+import {requestChallenge, type RecallChallenge} from './recallApi';
+
+type Phase = 'idle' | 'loading' | 'question' | 'compared' | 'error';
+
+/** S7c: generate a question, answer from memory, compare with the reference. */
+export function ActiveRecall() {
+  const {activeNotebook} = useAppState();
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [challenge, setChallenge] = useState<RecallChallenge | null>(null);
+  const [answer, setAnswer] = useState('');
+  const questionRef = useRef<HTMLHeadingElement>(null);
+
+  if (!activeNotebook) return null;
+
+  if (activeNotebook.sources.length === 0) {
+    return (
+      <Card className="mx-auto w-full max-w-[720px] p-6">
+        <EmptyState
+          icon={<Brain aria-hidden />}
+          title="Necesitas al menos una fuente"
+          description="El repaso activo hace preguntas sobre tus fuentes. Agrega una para empezar."
+          action={
+            <Link
+              to={paths.notebookSegment(activeNotebook.id, 'FUENTES')}
+              className="inline-flex h-control-md items-center rounded-control bg-primary px-4 text-label text-on-primary hover:bg-primary-hover"
+            >
+              Ir a Fuentes
+            </Link>
+          }
+        />
+      </Card>
+    );
+  }
+
+  const generate = async () => {
+    setPhase('loading');
+    setAnswer('');
+    try {
+      const next = await requestChallenge(activeNotebook);
+      setChallenge(next);
+      setPhase('question');
+      // The heading is mounted after this state update.
+      requestAnimationFrame(() => questionRef.current?.focus());
+    } catch {
+      setPhase('error');
+    }
+  };
+
+  return (
+    <Card className="mx-auto w-full max-w-[720px] space-y-6 p-6">
+      <div className="space-y-1">
+        <h2 className="text-h2 text-strong">Repaso activo</h2>
+        <p className="text-small text-muted">
+          Intenta recordar sin mirar tus apuntes y luego compara con las fuentes.
+        </p>
+      </div>
+
+      {phase === 'idle' ? (
+        <Button variant="primary" onClick={generate}>
+          Generar pregunta
+        </Button>
+      ) : null}
+
+      {phase === 'loading' ? (
+        <Button variant="primary" loading disabled>
+          Generando pregunta…
+        </Button>
+      ) : null}
+
+      {phase === 'error' ? (
+        <InlineAlert
+          variant="danger"
+          live
+          title="No pudimos generar la pregunta"
+          actions={
+            <Button size="sm" variant="secondary" onClick={generate}>
+              Reintentar
+            </Button>
+          }
+        >
+          Revisa tu conexión e inténtalo de nuevo.
+        </InlineAlert>
+      ) : null}
+
+      {challenge && (phase === 'question' || phase === 'compared') ? (
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <SimulatedBadge />
+            <h3 ref={questionRef} tabIndex={-1} className="text-h2 text-strong outline-none">
+              {challenge.challengeQuestion}
+            </h3>
+          </div>
+
+          <Textarea
+            label="Tu respuesta"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            minRows={4}
+            readOnly={phase === 'compared'}
+          />
+
+          {phase === 'question' ? (
+            <Button
+              variant="primary"
+              disabled={!answer.trim()}
+              disabledReason="Escribe tu respuesta primero"
+              onClick={() => setPhase('compared')}
+            >
+              Comparar con la respuesta
+            </Button>
+          ) : (
+            <div className="space-y-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <section aria-labelledby="recall-yours" className="space-y-2 rounded-card bg-subtle p-4">
+                  <h4 id="recall-yours" className="text-label text-strong">
+                    Tu respuesta
+                  </h4>
+                  <p className="whitespace-pre-wrap text-small text-default">{answer}</p>
+                </section>
+                <section aria-labelledby="recall-ref" className="space-y-2 rounded-card bg-success-tint p-4">
+                  <h4 id="recall-ref" className="text-label text-strong">
+                    Respuesta de referencia
+                  </h4>
+                  <p className="text-small text-default">{challenge.canonicalAnswer}</p>
+                  {challenge.expectedKeyPoints.length > 0 ? (
+                    <>
+                      <p className="pt-1 text-caption text-muted">Puntos que deberías mencionar</p>
+                      <ul className="list-disc space-y-1 pl-5 text-small text-default">
+                        {challenge.expectedKeyPoints.map((p) => (
+                          <li key={p}>{p}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                </section>
+              </div>
+              {challenge.sourceReference ? (
+                <p className="text-caption text-muted">Fuente: {challenge.sourceReference}</p>
+              ) : null}
+              <Button variant="secondary" onClick={generate}>
+                Otra pregunta
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : null}
+    </Card>
+  );
+}

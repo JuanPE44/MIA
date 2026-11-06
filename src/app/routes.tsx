@@ -104,10 +104,8 @@ const ROUTE_TABLE: Array<{ pattern: string; toRoute: (p: Params) => AppRoute }> 
     pattern: '/cuadernos/:notebookId/estudiar',
     toRoute: (p) => ({ kind: 'workspace', notebookId: p.notebookId!, segment: 'ESTUDIO' })
   },
-  // TODO(L8): map study sub-tabs to the legacy NotebookMethods tabs
-  // (sesion → pomodoro, repaso → active_recall, tarjetas → flashcards). The
-  // legacy component keeps its tab in internal state, so these URLs only
-  // select the ESTUDIO segment for now.
+  // Study sub-tabs (L8): `studyTab` is read by features/study/StudyScreen;
+  // `/estudiar` without a tab renders `sesion`.
   ...(['sesion', 'repaso', 'tarjetas'] as StudyTab[]).map((tab) => ({
     pattern: `/cuadernos/:notebookId/estudiar/${tab}`,
     toRoute: (p: Params): AppRoute => ({ kind: 'workspace', notebookId: p.notebookId!, segment: 'ESTUDIO', studyTab: tab })
