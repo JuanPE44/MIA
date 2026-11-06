@@ -1,15 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/jpeg" href="/assets/aistudio/WhatsApp_Image_2026-11-05_at_8.03.54_AM_cb87d5b4.jpeg" />
-    <title>Mi Inteligencia Artificial</title>
+    <link rel="icon" type="image/jpeg" href="/favicon.jpeg" />
+    <title>MIA — Mi Inteligencia Artificial</title>
     <meta name="description" content="Mi Inteligencia Artificial: transforma textos escolares en artefactos de aprendizaje activo dentro de un entorno blindado contra distracciones." />
-    <meta property="og:title" content="Mi Inteligencia Artificial" />
+    <meta property="og:title" content="MIA — Mi Inteligencia Artificial" />
     <meta property="og:description" content="Mi Inteligencia Artificial: transforma textos escolares en artefactos de aprendizaje activo dentro de un entorno blindado contra distracciones." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Apply the persisted theme before first paint (mirrors ThemeProvider).
+      (function () {
+        var mode = 'system';
+        try { mode = localStorage.getItem('mia_theme_mode') || 'system'; } catch (e) {}
+        var dark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var root = document.documentElement;
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        if (dark) root.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

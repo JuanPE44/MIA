@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router';
+import { useTheme } from './app/providers/ThemeProvider';
 import { LoginScreen } from './components/LoginScreen';
 import { Navbar } from './components/Navbar';
 import { NotebooksExplorer } from './components/NotebooksExplorer';
@@ -81,37 +82,10 @@ export default function App() {
     handleSaveSearchSource
   } = useAppState();
 
-  // Theme mode state: Blanco (false) or Negro (true)
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('mia_theme_mode') === 'dark';
-    } catch {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.body.classList.remove('dark');
-      }
-    } catch {
-      // ignore
-    }
-  }, [isDarkMode]);
-
-  const handleToggleTheme = (dark: boolean) => {
-    setIsDarkMode(dark);
-    try {
-      localStorage.setItem('mia_theme_mode', dark ? 'dark' : 'light');
-    } catch {
-      // ignore
-    }
-  };
+  // Theme comes from ThemeProvider; legacy "Blanco/Negro" toggle maps to light/dark.
+  const {resolvedTheme, setMode: setThemeMode} = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
+  const handleToggleTheme = (dark: boolean) => setThemeMode(dark ? 'dark' : 'light');
 
   // Session gate (T4.2 / A3): no session → Login at ANY URL. The URL is kept,
   // so after "Empezar" the requested screen renders. Reload → Login again.
