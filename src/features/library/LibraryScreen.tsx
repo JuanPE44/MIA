@@ -132,7 +132,7 @@ export function LibraryScreen() {
         title="Crea tu primer cuaderno"
         description="Un cuaderno reúne tus fuentes, un chat con IA y material de estudio sobre una materia."
         action={
-          <Button leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
             Crear tu primer cuaderno
           </Button>
         }
@@ -158,7 +158,7 @@ export function LibraryScreen() {
         title="Esta carpeta está vacía"
         description="Crea un cuaderno aquí o muévelo desde otra carpeta."
         action={
-          <Button leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
             Crear cuaderno aquí
           </Button>
         }
@@ -171,7 +171,7 @@ export function LibraryScreen() {
         title={selected === LOOSE_FILTER ? 'No hay cuadernos sin carpeta' : 'Todavía no hay cuadernos'}
         description="Crea un cuaderno para empezar a estudiar."
         action={
-          <Button leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
             Nuevo cuaderno
           </Button>
         }
@@ -225,12 +225,12 @@ export function LibraryScreen() {
           <Button variant="secondary" leadingIcon={<FolderPlus aria-hidden />} onClick={() => setNewFolderOpen(true)}>
             Nueva carpeta
           </Button>
-          <Button leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
             Nuevo cuaderno
           </Button>
         </div>
         <div className="flex items-center gap-2 sm:hidden">
-          <Button fullWidth leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" fullWidth leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
             Nuevo cuaderno
           </Button>
           <Menu

@@ -70,10 +70,14 @@ export function ChatScreen() {
     inputRef.current?.focus();
   }, [chatInitialPrompt, setChatInitialPrompt]);
 
-  // Switching thread resets the draft and puts the cursor in the composer.
+  // Switching thread resets the draft. The cursor goes to the composer only on
+  // wider screens: on phones focusing it opens the keyboard and hides the
+  // bottom tab bar, so the user would lose section navigation on arrival.
   useEffect(() => {
     setInput('');
-    inputRef.current?.focus({preventScroll: true});
+    if (window.matchMedia('(min-width: 640px)').matches) {
+      inputRef.current?.focus({preventScroll: true});
+    }
   }, [threadId]);
 
   const firstRender = useRef(true);

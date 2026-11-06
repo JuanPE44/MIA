@@ -47,7 +47,7 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
             >
               {notebook.icon || '📘'}
             </span>
-            <span className="line-clamp-2">{notebook.title}</span>
+            <span className="min-w-0 line-clamp-2 break-words">{notebook.title}</span>
           </span>
         }
         actions={
@@ -57,8 +57,8 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
         <p className="text-small text-muted">{notebook.subject}</p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {folder ? (
-            <Chip size="sm" variant="outline" icon={<span>{folder.icon || '📁'}</span>}>
-              {folder.name}
+            <Chip size="sm" variant="outline" className="max-w-full" icon={<span>{folder.icon || '📁'}</span>}>
+              <span className="truncate">{folder.name}</span>
             </Chip>
           ) : null}
           <span className="text-small text-muted">
