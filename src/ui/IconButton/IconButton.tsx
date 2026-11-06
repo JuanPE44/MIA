@@ -63,10 +63,12 @@ export function IconButton({
         <span
           aria-hidden
           className={cx(
-            'pointer-events-none absolute inset-x-0 mx-auto w-max top-full z-30 mt-1 whitespace-nowrap',
-            'rounded-small bg-strong px-2 py-1 text-caption text-page opacity-0',
-            'transition-opacity duration-[120ms] pointer-coarse:hidden',
-            'group-hover:opacity-100 group-has-[:focus-visible]:opacity-100',
+            // Hidden (display:none) until hover/focus so it never widens the page;
+            // anchored to the right edge so it grows leftwards (no right overflow).
+            'pointer-events-none absolute right-0 w-max top-full z-30 mt-1 whitespace-nowrap hidden',
+            'rounded-small bg-strong px-2 py-1 text-caption text-page',
+            'pointer-coarse:!hidden',
+            'group-hover:block group-has-[:focus-visible]:block',
           )}
         >
           {ariaLabel}
