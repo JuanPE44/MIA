@@ -5,6 +5,7 @@ import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths, SEGMENT_SLUGS} from '../routes';
 import type {MainSegment} from '../../types';
+import {AddSourceDialog} from '../../features/sources';
 import {NotebookHeader} from './NotebookHeader';
 
 const SECTIONS: Array<{segment: MainSegment; label: string; icon: ReactNode}> = [
@@ -20,7 +21,8 @@ const SECTIONS: Array<{segment: MainSegment; label: string; icon: ReactNode}> = 
  */
 export function NotebookLayout({children}: {children: ReactNode}) {
   const phone = useIsPhone();
-  const {activeNotebook, activeSegment, currentThreads, isFocusModeActive} = useAppState();
+  const {activeNotebook, activeSegment, currentThreads, isFocusModeActive, isAddSourceOpen, closeAddSource} =
+    useAppState();
 
   if (!activeNotebook || isFocusModeActive) return <>{children}</>;
 
@@ -45,6 +47,7 @@ export function NotebookLayout({children}: {children: ReactNode}) {
         {!phone ? <Tabs aria-label="Secciones del cuaderno" items={tabs} activeId={activeId} /> : null}
       </div>
       {children}
+      <AddSourceDialog open={isAddSourceOpen} onClose={closeAddSource} />
       {phone ? (
         <BottomTabBar
           aria-label="Secciones del cuaderno"

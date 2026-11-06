@@ -13,7 +13,7 @@ import {paths} from '../routes';
 export function NotebookHeader() {
   const navigate = useNavigate();
   const phone = useIsPhone();
-  const {activeNotebook, folders, handleDeleteNotebook} = useAppState();
+  const {activeNotebook, folders, handleDeleteNotebook, openAddSource} = useAppState();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   if (!activeNotebook) return null;
@@ -22,8 +22,7 @@ export function NotebookHeader() {
   const sourcesCount = nb.sources.length;
   const sourcesLabel = `${sourcesCount} ${sourcesCount === 1 ? 'fuente' : 'fuentes'}`;
   const toSources = paths.notebookSegment(nb.id, 'FUENTES');
-  // TODO(L6): open the "Añadir fuente" dialog instead of just going to Fuentes.
-  const addSource = () => navigate(toSources);
+  const addSource = openAddSource;
 
   const items: MenuItem[] = [
     ...(phone ? [{id: 'add-source', label: 'Añadir fuente', icon: <Plus />, onSelect: addSource}] : []),

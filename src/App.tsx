@@ -4,16 +4,15 @@ import { useTheme } from './app/providers/ThemeProvider';
 import { LoginScreen } from './components/LoginScreen';
 import { LibraryScreen } from './features/library';
 import { ChatScreen } from './features/chat';
-import { NotebookSources } from './components/NotebookSources';
+import { SourcesScreen } from './features/sources';
 import { NotebookArtifacts } from './components/NotebookArtifacts';
 import { NotebookMethods } from './components/NotebookMethods';
 import { SupportAgentChatbot } from './components/SupportAgentChatbot';
-import { GoogleSearchAgent } from './components/GoogleSearchAgent';
+import { WebSearchDialog } from './features/web-search';
 import { StudentProfileModal } from './components/StudentProfileModal';
 import { useAppState } from './app/AppStateContext';
 import { NotFound, paths } from './app/routes';
 import { TopBar, NotebookLayout } from './app/shell';
-import { Sparkles } from 'lucide-react';
 
 export default function App() {
   // App state and handlers live in AppStateContext; view / notebook / segment /
@@ -43,7 +42,6 @@ export default function App() {
     searchAgentInitialQuery,
     chatInitialPrompt,
     setChatInitialPrompt,
-    sourceNotification,
     pendingArtifactType,
     setPendingArtifactType,
     isFocusModeActive,
@@ -59,11 +57,6 @@ export default function App() {
     handleCreateNotebook,
     handleDeleteNotebook,
     handleMoveNotebook,
-    handleAddSource,
-    handleDeleteSource,
-    handleToggleSourceForChat,
-    handleSelectAllSourcesForChat,
-    handleSetAnalysis,
     handleAddArtifact,
     handleDeleteArtifact,
     handleUpdateArtifact,
@@ -77,8 +70,6 @@ export default function App() {
     handleDeleteChatThread,
     handleRenameChatThread,
     handleUpdateThreadMessages,
-    handleOpenGoogleSearch,
-    handleSaveSearchSource
   } = useAppState();
 
   // Theme comes from ThemeProvider; legacy "Blanco/Negro" toggle maps to light/dark.
@@ -123,26 +114,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Floating Toast Notification for AI Processing */}
-      {sourceNotification && (
-        <div className="fixed top-20 right-6 z-50 max-w-md animate-in slide-in-from-top-4 duration-300">
-          <div className={`p-4 rounded-2xl shadow-xl border flex items-center gap-3 bg-white text-slate-900 ${
-            sourceNotification.type === 'success'
-              ? 'border-emerald-300 shadow-emerald-500/10'
-              : 'border-indigo-300 shadow-indigo-500/10'
-          }`}>
-            <span className={`p-2 rounded-xl shrink-0 ${
-              sourceNotification.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-indigo-50 text-indigo-600 border border-indigo-200'
-            }`}>
-              <Sparkles className="w-4 h-4" />
-            </span>
-            <p className="text-xs font-semibold leading-relaxed text-slate-800">
-              {sourceNotification.message}
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Main Container */}
       <main className="flex-1 max-w-content w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
@@ -163,28 +134,7 @@ export default function App() {
             )}
 
             {/* 2. SEGMENTO: FUENTES */}
-            {!isFocusModeActive && activeSegment === 'FUENTES' && (
-              <NotebookSources
-                notebook={activeNotebook}
-                onAddSource={handleAddSource}
-                onDeleteSource={handleDeleteSource}
-                onToggleSourceForChat={handleToggleSourceForChat}
-                onSelectAllSourcesForChat={handleSelectAllSourcesForChat}
-                onSetAnalysis={handleSetAnalysis}
-                onAskAboutSource={(sourceTitle) => {
-                  setChatInitialPrompt(`¿Qué aspectos centrales, definiciones, autores y conclusiones específicas se detallan en la fuente "${sourceTitle}"?`);
-                  goToSegment('CHAT');
-                }}
-                onGoToCreateSummary={() => {
-                  setPendingArtifactType('resumen');
-                  goToSegment('ARTEFACTOS');
-                }}
-                onGoToCreateOtherArtifact={() => {
-                  setPendingArtifactType('cuestionario');
-                  goToSegment('ARTEFACTOS');
-                }}
-              />
-            )}
+            {!isFocusModeActive && activeSegment === 'FUENTES' && <SourcesScreen />}
 
             {/* 3. SEGMENTO: ARTEFACTOS */}
             {!isFocusModeActive && activeSegment === 'ARTEFACTOS' && (
@@ -246,11 +196,9 @@ export default function App() {
 
       {/* Agente de Búsqueda Google en Vivo (Grounding en Tiempo Real con Gemini 3.8 Flash invocado desde el Chat) (hidden in Focus mode) */}
       {!isFocusModeActive && (
-        <GoogleSearchAgent
-          isOpen={isSearchAgentOpen}
+        <WebSearchDialog
+          open={isSearchAgentOpen}
           onClose={() => setIsSearchAgentOpen(false)}
-          activeNotebook={activeNotebook}
-          onSaveSourceToNotebook={handleSaveSearchSource}
           initialQuery={searchAgentInitialQuery}
         />
       )}

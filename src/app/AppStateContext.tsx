@@ -23,6 +23,7 @@ import {
 } from '../data/initialData';
 import { soundManager } from '../services/audioSynthesizer';
 import { AppRoute, parseRoute, paths } from './routes';
+import { useToast } from '../ui/Toast';
 
 /**
  * Thin app-state context (roadmap Revision 2, "thin AppStateContext").
@@ -75,9 +76,23 @@ function useAppStateValue() {
   const [isSearchAgentOpen, setIsSearchAgentOpen] = useState(false);
   const [searchAgentInitialQuery, setSearchAgentInitialQuery] = useState<string | undefined>(undefined);
 
-  // Chat initial prompt and source processing toast state
+  // "Añadir fuente" dialog (opened from the notebook header or the Fuentes screen)
+  const [isAddSourceOpen, setIsAddSourceOpen] = useState(false);
+  const openAddSource = () => setIsAddSourceOpen(true);
+  const closeAddSource = () => setIsAddSourceOpen(false);
+
+  // Source analysis tracking: ids currently being analyzed in this session and
+  // ids whose last analysis failed (transient, not persisted).
+  const [analyzingSourceIds, setAnalyzingSourceIds] = useState<string[]>([]);
+  const [failedSourceIds, setFailedSourceIds] = useState<string[]>([]);
+
+  // True while the last notebooks write to localStorage failed (quota, private mode).
+  const [persistenceError, setPersistenceError] = useState(false);
+  const toast = useToast();
+  const persistenceToastShown = useRef(false);
+
+  // Chat initial prompt
   const [chatInitialPrompt, setChatInitialPrompt] = useState<string | undefined>(undefined);
-  const [sourceNotification, setSourceNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 
   // Focus mode active state (locks down outside navigation, triggers fullscreen and keyboard lock)
   const [isFocusModeActive, setIsFocusModeActive] = useState<boolean>(false);
@@ -242,8 +257,18 @@ function useAppStateValue() {
     if (userType === 'frecuente') {
       try {
         localStorage.setItem('focused_notebooks_frecuente_v2', JSON.stringify(notebooks));
+        setPersistenceError(false);
+        persistenceToastShown.current = false;
       } catch {
-        // ignore
+        setPersistenceError(true);
+        if (!persistenceToastShown.current) {
+          persistenceToastShown.current = true;
+          toast.show({
+            variant: 'danger',
+            message: 'No se pudo guardar en este navegador. Libera espacio eliminando fuentes grandes.',
+            duration: 10000
+          });
+        }
       }
     }
   }, [notebooks, userType]);
@@ -446,37 +471,21 @@ function useAppStateValue() {
     setNotebooks((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
   };
 
-  const handleAddSource = async (source: SourceItem) => {
-    if (!activeNotebook) return;
-    const initialSource: SourceItem = {
-      ...source,
-      selectedForChat: source.selectedForChat !== undefined ? source.selectedForChat : true,
-      isAnalyzing: true
-    };
+  // Runs the server-side processing + analysis of one source and merges the result.
+  const analyzeSource = async (source: SourceItem, notebook: Notebook) => {
+    const targetNotebookId = notebook.id;
+    setAnalyzingSourceIds((prev) => (prev.includes(source.id) ? prev : [...prev, source.id]));
+    setFailedSourceIds((prev) => prev.filter((id) => id !== source.id));
 
-    const targetNotebookId = activeNotebook.id;
-
-    // Add source with analyzing status immediately
-    const updatedWithPending: Notebook = {
-      ...activeNotebook,
-      sources: [initialSource, ...activeNotebook.sources],
-      updatedAt: new Date().toLocaleDateString('es-ES')
-    };
-    handleUpdateActiveNotebook(updatedWithPending);
-
-    setSourceNotification({
-      message: `🧠 La IA está procesando y analizando "${source.title}"...`,
-      type: 'info'
-    });
-
+    let succeeded = false;
     try {
       const res = await fetch('/api/process-and-analyze-source', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          source: initialSource,
-          notebookTitle: activeNotebook.title,
-          existingSources: activeNotebook.sources
+          source,
+          notebookTitle: notebook.title,
+          existingSources: notebook.sources.filter((s) => s.id !== source.id)
         })
       });
 
@@ -488,43 +497,68 @@ function useAppStateValue() {
               if (nb.id !== targetNotebookId) return nb;
               return {
                 ...nb,
-                sources: nb.sources.map((s) => (s.id === source.id ? { ...data.processedSource, selectedForChat: true } : s)),
+                sources: nb.sources.map((s) =>
+                  s.id === source.id
+                    ? { ...data.processedSource, selectedForChat: s.selectedForChat !== false }
+                    : s
+                ),
                 analysis: data.notebookAnalysis || nb.analysis,
                 updatedAt: new Date().toLocaleDateString('es-ES')
               };
             })
           );
-          setSourceNotification({
-            message: `✅ Fuente "${source.title}" procesada y analizada por IA. ¡Lista para consultas específicas en el Chat!`,
-            type: 'success'
-          });
-          setTimeout(() => {
-            setSourceNotification(null);
-          }, 4500);
-          return;
+          succeeded = true;
         }
       }
     } catch (err) {
       console.warn('Auto-analysis error upon source addition', err);
     }
 
-    // Fallback mark as processed
-    setNotebooks((prev) =>
-      prev.map((nb) => {
-        if (nb.id !== targetNotebookId) return nb;
-        return {
-          ...nb,
-          sources: nb.sources.map((s) => (s.id === source.id ? { ...s, isAnalyzing: false, isProcessed: true } : s))
-        };
-      })
-    );
-    setSourceNotification({
-      message: `✅ Fuente "${source.title}" agregada al cuaderno.`,
-      type: 'success'
+    if (!succeeded) {
+      // Keep the source usable (its text is stored) but surface the failure per row.
+      setNotebooks((prev) =>
+        prev.map((nb) => {
+          if (nb.id !== targetNotebookId) return nb;
+          return {
+            ...nb,
+            sources: nb.sources.map((s) => (s.id === source.id ? { ...s, isAnalyzing: false, isProcessed: false } : s))
+          };
+        })
+      );
+      setFailedSourceIds((prev) => (prev.includes(source.id) ? prev : [...prev, source.id]));
+    }
+    setAnalyzingSourceIds((prev) => prev.filter((id) => id !== source.id));
+  };
+
+  const handleAddSource = async (source: SourceItem) => {
+    if (!activeNotebook) return;
+    const initialSource: SourceItem = {
+      ...source,
+      selectedForChat: source.selectedForChat !== undefined ? source.selectedForChat : true,
+      isAnalyzing: true
+    };
+
+    // Add source with analyzing status immediately
+    const updatedWithPending: Notebook = {
+      ...activeNotebook,
+      sources: [initialSource, ...activeNotebook.sources],
+      updatedAt: new Date().toLocaleDateString('es-ES')
+    };
+    handleUpdateActiveNotebook(updatedWithPending);
+
+    await analyzeSource(initialSource, activeNotebook);
+  };
+
+  const handleRetrySourceAnalysis = async (sourceId: string) => {
+    if (!activeNotebook) return;
+    const source = activeNotebook.sources.find((s) => s.id === sourceId);
+    if (!source) return;
+    const pending: SourceItem = { ...source, isAnalyzing: true };
+    handleUpdateActiveNotebook({
+      ...activeNotebook,
+      sources: activeNotebook.sources.map((s) => (s.id === sourceId ? pending : s))
     });
-    setTimeout(() => {
-      setSourceNotification(null);
-    }, 3500);
+    await analyzeSource(pending, activeNotebook);
   };
 
   const handleDeleteSource = (sourceId: string) => {
@@ -844,7 +878,6 @@ function useAppStateValue() {
     searchAgentInitialQuery,
     chatInitialPrompt,
     setChatInitialPrompt,
-    sourceNotification,
     pendingArtifactType,
     setPendingArtifactType,
     // Focus mode
@@ -867,6 +900,13 @@ function useAppStateValue() {
     // Notebook content
     handleUpdateActiveNotebook,
     handleAddSource,
+    handleRetrySourceAnalysis,
+    analyzingSourceIds,
+    failedSourceIds,
+    isAddSourceOpen,
+    openAddSource,
+    closeAddSource,
+    persistenceError,
     handleDeleteSource,
     handleToggleSourceForChat,
     handleSelectAllSourcesForChat,
