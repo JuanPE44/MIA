@@ -4,6 +4,7 @@ export * from './IconButton';
 export * from './Spinner';
 export * from './TextField';
 export * from './Textarea';
+export * from './FileDrop';
 export * from './Switch';
 export * from './SegmentedControl';
 export * from './Dialog';
