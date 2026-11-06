@@ -1,64 +1,22 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+
+/* Legacy `dark:` variants keep working: the ThemeProvider toggles `.dark` on
+   <html> alongside `data-theme`. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  color-scheme: light;
+/*
+ * LEGACY (remove in L10): native form controls are forced to readable token
+ * colors in both themes, as the previous hard-coded overrides did. Kept
+ * unlayered on purpose so it still wins over legacy utility classes.
+ * New primitives opt out with the `data-mia-ui` attribute.
+ */
+:where(input, select, textarea, option):not([data-mia-ui]) {
+  color: var(--mia-text-strong);
 }
 
-html.dark {
-  color-scheme: dark;
-}
-
-html,
-body {
-  min-height: 100%;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-/* Modo claro: todas las letras son oscuras/negras (#0f172a / #000000) sobre fondo claro */
-html:not(.dark),
-body:not(.dark) {
-  background-color: #ffffff;
-  color: #0f172a;
-}
-
-/* Modo oscuro: todas las letras son blancas (#ffffff / #f8fafc) sobre fondo oscuro */
-html.dark,
-body.dark {
-  background-color: #020617;
-  color: #f8fafc;
-}
-
-/* Reglas estrictas para controles nativos (select, option, input, textarea) */
-input,
-select,
-textarea,
-option {
-  font-family: inherit;
-}
-
-/* En modo claro: texto negro estricto para selects, inputs, opciones y textareas */
-html:not(.dark) input,
-html:not(.dark) select,
-html:not(.dark) textarea,
-html:not(.dark) option {
-  color: #0f172a;
-}
-
-html:not(.dark) select option {
-  background-color: #ffffff;
-  color: #0f172a;
-}
-
-/* En modo oscuro: texto blanco para selects, inputs, opciones y textareas */
-html.dark input,
-html.dark select,
-html.dark textarea,
-html.dark option {
-  color: #f8fafc;
-}
-
-html.dark select option {
-  background-color: #0f172a;
-  color: #f8fafc;
+select:not([data-mia-ui]) option {
+  background-color: var(--mia-bg-surface);
+  color: var(--mia-text-strong);
 }

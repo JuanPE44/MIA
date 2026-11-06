@@ -1,5 +1,11 @@
 import {createRoot} from 'react-dom/client';
+import '@fontsource-variable/plus-jakarta-sans';
 import App from './App.tsx';
+import {ThemeProvider} from './app/providers/ThemeProvider';
 import './index.css';
 
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById('root')!).render(
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>,
+);

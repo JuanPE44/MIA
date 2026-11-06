@@ -1,0 +1,308 @@
+/*
+ * MIA design tokens — single source of truth for every color value.
+ * Spec: redesign/design/ui-specifications.md §2 (color), §3 (type), §4 (radius,
+ * elevation, sizing), §7 (motion), §8.3 (focus), §9 (theming).
+ *
+ * Layer 1: raw semantic custom properties (`--mia-*`), switched by
+ *          `data-theme="light|dark"` on <html>.
+ * Layer 2: Tailwind v4 `@theme inline` mapping, so utilities such as
+ *          `bg-surface`, `text-strong`, `border-hairline`, `rounded-card`,
+ *          `shadow-elevation-2`, `text-h1` resolve to the live variables.
+ *
+ * Hex values are only allowed in this file.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Light theme (default)
+ * ------------------------------------------------------------------------ */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds (§2.1 bg.*) */
+  --mia-bg-page: #FAFAFA;
+  --mia-bg-surface: #FFFFFF;
+  --mia-bg-surface-raised: #FFFFFF;
+  --mia-bg-subtle: #F4F5F7;
+
+  /* Text (§2.1 text.*) */
+  --mia-text-strong: #1E242C;
+  --mia-text-default: #323C4B;
+  --mia-text-muted: #5B6677;
+  --mia-text-on-primary: #FFFFFF;
+
+  /* Borders (§2.1 border.*) */
+  --mia-border-hairline: #EDEEF0;
+  --mia-border-control: #8A93A1;
+
+  /* Primary (§2.1 primary.*) */
+  --mia-primary: #0066FF;
+  --mia-primary-hover: #0050CC;
+  --mia-primary-text: #0066FF;
+  --mia-primary-tint: #E6F0FF;
+  --mia-primary-on-tint: #0050CC;
+  --mia-primary-tint-border: #3385FF;
+
+  /* Focus (§2.1 focus, §8.3) */
+  --mia-focus: #0066FF;
+
+  /* Status (§2.1) */
+  --mia-danger: #B42318;
+  --mia-danger-tint: #FEF3F2;
+  --mia-success: #067647;
+  --mia-success-tint: #ECFDF3;
+  --mia-warning: #93370D;
+  --mia-warning-tint: #FFFAEB;
+  --mia-simulated: #5B21B6;
+  --mia-simulated-tint: #F5F3FF;
+  --mia-accent-star: #FFC805;
+
+  /* Notebook / folder icon tiles (§2.2) — never behind text */
+  --mia-tile-azul: #E1E9FE;
+  --mia-tile-durazno: #FFEED2;
+  --mia-tile-lima: #ECF5D6;
+  --mia-tile-rosa: #FFE4F1;
+  --mia-tile-violeta: #EDE9FE;
+  --mia-tile-gris: #F4F5F7;
+
+  /* Elevation (§4) — light uses shadows */
+  --mia-shadow-color: 30 36 44;
+  --mia-elevation-1: 0 2px 8px rgb(var(--mia-shadow-color) / 6%);
+  --mia-elevation-2: 0 8px 24px rgb(var(--mia-shadow-color) / 10%);
+  --mia-elevation-3: 0 16px 48px rgb(var(--mia-shadow-color) / 16%);
+}
+
+/* ---------------------------------------------------------------------------
+ * Dark theme — no pure black/white; elevation = surface-raised + 1px border
+ * ------------------------------------------------------------------------ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --mia-bg-page: #12161C;
+  --mia-bg-surface: #1E242C;
+  --mia-bg-surface-raised: #262D37;
+  --mia-bg-subtle: #262D37;
+
+  --mia-text-strong: #E8ECF2;
+  --mia-text-default: #E8ECF2;
+  --mia-text-muted: #A9B3C2;
+  --mia-text-on-primary: #FFFFFF;
+
+  --mia-border-hairline: #2B3441;
+  --mia-border-control: #6B7788;
+
+  --mia-primary: #0066FF;
+  --mia-primary-hover: #3385FF;
+  --mia-primary-text: #5C9BFF;
+  --mia-primary-tint: #14284D;
+  --mia-primary-on-tint: #E8ECF2;
+  --mia-primary-tint-border: #5C9BFF;
+
+  --mia-focus: #5C9BFF;
+
+  --mia-danger: #F97066;
+  --mia-danger-tint: #3A1F1F;
+  --mia-success: #47CD89;
+  --mia-success-tint: #16301F;
+  --mia-warning: #FDB022;
+  --mia-warning-tint: #33280F;
+  --mia-simulated: #C4B5FD;
+  --mia-simulated-tint: #2A2340;
+  --mia-accent-star: #FFC805;
+
+  --mia-tile-azul: #1C2A4A;
+  --mia-tile-durazno: #3A2C18;
+  --mia-tile-lima: #24311A;
+  --mia-tile-rosa: #3A1E2E;
+  --mia-tile-violeta: #2A2340;
+  --mia-tile-gris: #262D37;
+
+  /* Dark elevation: shadows replaced by a 1px hairline ring. Pair with
+     `bg-surface-raised` (which equals bg-surface in light). */
+  --mia-elevation-1: 0 0 0 1px var(--mia-border-hairline);
+  --mia-elevation-2: 0 0 0 1px var(--mia-border-hairline);
+  --mia-elevation-3: 0 0 0 1px var(--mia-border-hairline);
+}
+
+/* ---------------------------------------------------------------------------
+ * Theme-independent tokens
+ * ------------------------------------------------------------------------ */
+:root {
+  /* Typography (§3) — phone sizes first, desktop from 640px */
+  --mia-font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mia-display-size: 2rem;      /* 32 */
+  --mia-display-leading: 2.5rem; /* 40 */
+  --mia-timer-size: 3.5rem;      /* 56 */
+  --mia-timer-leading: 4rem;     /* 64 */
+  --mia-h1-size: 1.5rem;         /* 24 */
+  --mia-h1-leading: 2rem;        /* 32 */
+
+  /* Radius (§4) */
+  --mia-radius-sm: 8px;
+  --mia-radius-md: 12px;
+  --mia-radius-lg: 20px;
+  --mia-radius-pill: 9999px;
+
+  /* Motion (§7) */
+  --mia-duration-hover: 120ms;
+  --mia-duration-menu: 150ms;
+  --mia-duration-dialog: 200ms;
+  --mia-duration-toast-in: 200ms;
+  --mia-duration-toast-out: 150ms;
+  --mia-duration-flip: 300ms;
+  --mia-duration-shimmer: 1.2s;
+  --mia-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Focus ring (§8.3) */
+  --mia-focus-width: 2px;
+  --mia-focus-offset: 2px;
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --mia-display-size: 2.5rem;    /* 40 */
+    --mia-display-leading: 3rem;   /* 48 */
+    --mia-timer-size: 4.5rem;      /* 72 */
+    --mia-timer-leading: 5rem;     /* 80 */
+    --mia-h1-size: 1.75rem;        /* 28 */
+    --mia-h1-leading: 2.25rem;     /* 36 */
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Tailwind v4 mapping
+ * ------------------------------------------------------------------------ */
+@theme inline {
+  /* Font: overrides Tailwind's default sans, so legacy screens adopt it too */
+  --font-sans: var(--mia-font-sans);
+
+  /* Backgrounds: bg-page, bg-surface, bg-surface-raised, bg-subtle */
+  --color-page: var(--mia-bg-page);
+  --color-surface: var(--mia-bg-surface);
+  --color-surface-raised: var(--mia-bg-surface-raised);
+  --color-subtle: var(--mia-bg-subtle);
+
+  /* Text: text-strong, text-default, text-muted, text-on-primary */
+  --color-strong: var(--mia-text-strong);
+  --color-default: var(--mia-text-default);
+  --color-muted: var(--mia-text-muted);
+  --color-on-primary: var(--mia-text-on-primary);
+
+  /* Borders: border-hairline, border-control */
+  --color-hairline: var(--mia-border-hairline);
+  --color-control: var(--mia-border-control);
+
+  /* Primary */
+  --color-primary: var(--mia-primary);
+  --color-primary-hover: var(--mia-primary-hover);
+  --color-primary-text: var(--mia-primary-text);
+  --color-primary-tint: var(--mia-primary-tint);
+  --color-primary-on-tint: var(--mia-primary-on-tint);
+  --color-primary-tint-border: var(--mia-primary-tint-border);
+  --color-focus: var(--mia-focus);
+
+  /* Status */
+  --color-danger: var(--mia-danger);
+  --color-danger-tint: var(--mia-danger-tint);
+  --color-success: var(--mia-success);
+  --color-success-tint: var(--mia-success-tint);
+  --color-warning: var(--mia-warning);
+  --color-warning-tint: var(--mia-warning-tint);
+  --color-simulated: var(--mia-simulated);
+  --color-simulated-tint: var(--mia-simulated-tint);
+  --color-accent-star: var(--mia-accent-star);
+
+  /* Notebook tiles: bg-tile-azul, … */
+  --color-tile-azul: var(--mia-tile-azul);
+  --color-tile-durazno: var(--mia-tile-durazno);
+  --color-tile-lima: var(--mia-tile-lima);
+  --color-tile-rosa: var(--mia-tile-rosa);
+  --color-tile-violeta: var(--mia-tile-violeta);
+  --color-tile-gris: var(--mia-tile-gris);
+
+  /* Radius: semantic names so Tailwind's rounded-sm/md/lg used by legacy
+     screens keep their current values. rounded-small (8), rounded-control
+     (12), rounded-card (20), rounded-pill (9999). */
+  --radius-small: var(--mia-radius-sm);
+  --radius-control: var(--mia-radius-md);
+  --radius-card: var(--mia-radius-lg);
+  --radius-pill: var(--mia-radius-pill);
+
+  /* Elevation: shadow-elevation-1..3 (ring-only in dark) */
+  --shadow-elevation-1: var(--mia-elevation-1);
+  --shadow-elevation-2: var(--mia-elevation-2);
+  --shadow-elevation-3: var(--mia-elevation-3);
+
+  /* Sizing (§4): h-control-sm/md/lg, min-h-touch; spacing scale is Tailwind's
+     default 4px base, which already matches §4. */
+  --spacing-control-sm: 2rem;
+  --spacing-control-md: 2.5rem;
+  --spacing-control-lg: 3rem;
+  --spacing-touch: 2.75rem;
+
+  /* Content widths (§5.3): max-w-reading, max-w-content, dialog widths */
+  --container-reading: 45rem;
+  --container-content: 77.5rem;
+  --container-dialog-sm: 25rem;
+  --container-dialog-md: 35rem;
+  --container-dialog-lg: 50rem;
+
+  /* Type scale (§3): text-display, text-timer, text-h1 … text-caption */
+  --text-display: var(--mia-display-size);
+  --text-display--line-height: var(--mia-display-leading);
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 600;
+  --text-timer: var(--mia-timer-size);
+  --text-timer--line-height: var(--mia-timer-leading);
+  --text-timer--letter-spacing: -0.02em;
+  --text-timer--font-weight: 600;
+  --text-h1: var(--mia-h1-size);
+  --text-h1--line-height: var(--mia-h1-leading);
+  --text-h1--letter-spacing: -0.01em;
+  --text-h1--font-weight: 600;
+  --text-h2: 1.25rem;
+  --text-h2--line-height: 1.75rem;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.0625rem;
+  --text-h3--line-height: 1.5rem;
+  --text-h3--font-weight: 600;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-body--font-weight: 400;
+  --text-body-strong: 1rem;
+  --text-body-strong--line-height: 1.5rem;
+  --text-body-strong--font-weight: 600;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.25rem;
+  --text-label--font-weight: 500;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  --text-small--font-weight: 400;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-caption--letter-spacing: 0.01em;
+  --text-caption--font-weight: 500;
+
+  /* Motion: ease-standard, duration via arbitrary values or the raw vars */
+  --ease-standard: var(--mia-ease-standard);
+}
+
+/*
+ * TEMPORARY (remove in L10): re-point Tailwind's `indigo-*` palette — the
+ * legacy primary (~544 uses) — to a blue scale derived from #0066FF so
+ * existing screens adopt the new primary without editing components.
+ * New code must use the semantic tokens above, never `indigo-*`.
+ */
+@theme {
+  --color-indigo-50: #EBF3FF;
+  --color-indigo-100: #D6E6FF;
+  --color-indigo-200: #B3D1FF;
+  --color-indigo-300: #85B3FF;
+  --color-indigo-400: #5C9BFF;
+  --color-indigo-500: #1A75FF;
+  --color-indigo-600: #0066FF;
+  --color-indigo-700: #0050CC;
+  --color-indigo-800: #003D99;
+  --color-indigo-900: #002966;
+  --color-indigo-950: #001A40;
+}

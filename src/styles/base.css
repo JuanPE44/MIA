@@ -1,0 +1,47 @@
+/*
+ * Base layer (ui-specifications §3, §7, §8.3). Token-based only.
+ */
+
+@layer base {
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    background-color: var(--mia-bg-page);
+    color: var(--mia-text-strong);
+    font-family: var(--mia-font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition:
+      background-color var(--mia-duration-dialog) ease-out,
+      color var(--mia-duration-dialog) ease-out;
+  }
+
+  input,
+  select,
+  textarea,
+  button,
+  option {
+    font-family: inherit;
+  }
+
+  /* Focus ring: 2px focus color + 2px outer offset on every focusable element */
+  :focus-visible {
+    outline: var(--mia-focus-width) solid var(--mia-focus);
+    outline-offset: var(--mia-focus-offset);
+  }
+}
+
+/* Reduced motion: transitions and animations become (near) instant */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
