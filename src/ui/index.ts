@@ -20,3 +20,4 @@ export * from './Avatar';
 export * from './Breadcrumb';
 export * from './Tabs';
 export * from './BottomTabBar';
+export * from './IconPicker';

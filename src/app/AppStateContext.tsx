@@ -424,6 +424,16 @@ function useAppStateValue() {
     }
   };
 
+  // Undo for delete: puts a removed notebook back (at its previous index).
+  const handleRestoreNotebook = (notebook: Notebook, index = 0) => {
+    setNotebooks((prev) => {
+      if (prev.some((n) => n.id === notebook.id)) return prev;
+      const next = [...prev];
+      next.splice(Math.min(index, next.length), 0, notebook);
+      return next;
+    });
+  };
+
   // Right-click action: Move into folder or eject (leave loose)
   const handleMoveNotebook = (notebookId: string, folderId: string | null) => {
     setNotebooks((prev) =>
@@ -823,6 +833,7 @@ function useAppStateValue() {
     handleDeleteFolder,
     handleCreateNotebook,
     handleDeleteNotebook,
+    handleRestoreNotebook,
     handleMoveNotebook,
     // Notebook content
     handleUpdateActiveNotebook,

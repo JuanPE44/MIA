@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router';
 import { useTheme } from './app/providers/ThemeProvider';
 import { LoginScreen } from './components/LoginScreen';
-import { NotebooksExplorer } from './components/NotebooksExplorer';
+import { LibraryScreen } from './features/library';
 import { NotebookChat } from './components/NotebookChat';
 import { NotebookSources } from './components/NotebookSources';
 import { NotebookArtifacts } from './components/NotebookArtifacts';
@@ -149,18 +149,7 @@ export default function App() {
         {isNotFound && <NotFound />}
 
         {currentView === 'explorer' && !isNotFound && (
-          <NotebooksExplorer
-            folders={folders}
-            notebooks={notebooks}
-            onOpenNotebook={handleOpenNotebook}
-            onCreateNotebook={handleCreateNotebook}
-            onDeleteNotebook={handleDeleteNotebook}
-            onCreateFolder={handleCreateFolder}
-            onDeleteFolder={handleDeleteFolder}
-            onMoveNotebook={handleMoveNotebook}
-            userType={userType}
-            isDarkMode={isDarkMode}
-          />
+          <LibraryScreen />
         )}
 
         {/* VIEW 2: INTERIOR DEL CUADERNO CON SUS 4 SEGMENTOS (CHAT, FUENTES, ARTEFACTOS, ESTUDIO) */}
