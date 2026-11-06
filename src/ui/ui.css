@@ -1,0 +1,25 @@
+/* Short, token-based entrance animations for ui primitives (spec §7).
+   Reduced motion is handled globally in styles/base.css. */
+@keyframes mia-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes mia-pop-in {
+  from { opacity: 0; transform: scale(0.97) translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mia-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes mia-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.mia-anim-fade { animation: mia-fade-in var(--mia-duration-menu) var(--mia-ease-standard); }
+.mia-anim-pop { animation: mia-pop-in var(--mia-duration-menu) var(--mia-ease-standard); }
+.mia-anim-dialog { animation: mia-pop-in var(--mia-duration-dialog) var(--mia-ease-standard); }
+.mia-anim-sheet { animation: mia-sheet-in var(--mia-duration-dialog) var(--mia-ease-standard); }
+.mia-anim-toast { animation: mia-toast-in var(--mia-duration-toast-in) var(--mia-ease-standard); }
+dialog.mia-dialog::backdrop { animation: mia-fade-in var(--mia-duration-dialog) var(--mia-ease-standard); }
