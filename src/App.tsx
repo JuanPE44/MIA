@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router';
-import { useTheme } from './app/providers/ThemeProvider';
-import { LoginScreen } from './components/LoginScreen';
+import { WelcomeScreen } from './features/welcome';
+import { ProgressScreen } from './features/progress';
+import { HelpScreen } from './features/help';
+import { AccountScreen } from './features/account';
 import { LibraryScreen } from './features/library';
 import { ChatScreen } from './features/chat';
 import { NotebookSources } from './components/NotebookSources';
 import { NotebookArtifacts } from './components/NotebookArtifacts';
 import { NotebookMethods } from './components/NotebookMethods';
-import { SupportAgentChatbot } from './components/SupportAgentChatbot';
 import { GoogleSearchAgent } from './components/GoogleSearchAgent';
-import { StudentProfileModal } from './components/StudentProfileModal';
 import { useAppState } from './app/AppStateContext';
 import { NotFound, paths } from './app/routes';
 import { TopBar, NotebookLayout } from './app/shell';
@@ -21,23 +21,10 @@ export default function App() {
   const {
     route,
     isNotFound,
-    currentView,
     activeSegment,
     goToSegment,
     goToNotebooks,
     currentUser,
-    userType,
-    handleLoginSuccess,
-    handleLogout,
-    handleResetDemoData,
-    studentProfile,
-    handleUpdateProfile,
-    isProfileModalOpen,
-    openProfile,
-    closeProfile,
-    isSupportOpen,
-    openSupport,
-    closeSupport,
     isSearchAgentOpen,
     setIsSearchAgentOpen,
     searchAgentInitialQuery,
@@ -81,21 +68,10 @@ export default function App() {
     handleSaveSearchSource
   } = useAppState();
 
-  // Theme comes from ThemeProvider; legacy "Blanco/Negro" toggle maps to light/dark.
-  const {resolvedTheme, setMode: setThemeMode} = useTheme();
-  const isDarkMode = resolvedTheme === 'dark';
-  const handleToggleTheme = (dark: boolean) => setThemeMode(dark ? 'dark' : 'light');
-
-  // Session gate (T4.2 / A3): no session → Login at ANY URL. The URL is kept,
-  // so after "Empezar" the requested screen renders. Reload → Login again.
+  // Session gate (T4.2 / A3): no session → Bienvenida at ANY URL. The URL is kept,
+  // so after "Empezar" the requested screen renders. Reload → Bienvenida again.
   if (!currentUser) {
-    return (
-      <LoginScreen
-        onLoginSuccess={handleLoginSuccess}
-        isDarkMode={isDarkMode}
-        onToggleTheme={handleToggleTheme}
-      />
-    );
+    return <WelcomeScreen />;
   }
 
   // `/` with a session → Mis cuadernos.
@@ -148,12 +124,18 @@ export default function App() {
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
         {isNotFound && <NotFound />}
 
-        {currentView === 'explorer' && !isNotFound && (
+        {route.kind === 'explorer' && !isNotFound && (
           <LibraryScreen />
         )}
 
+        {/* Account-level pages (inside the shell, no NotebookLayout) */}
+        {route.kind === 'progreso' && <ProgressScreen />}
+        {route.kind === 'ayuda' && <HelpScreen />}
+        {route.kind === 'perfil' && <AccountScreen tab="perfil" />}
+        {route.kind === 'preferencias' && <AccountScreen tab="preferencias" />}
+
         {/* VIEW 2: INTERIOR DEL CUADERNO CON SUS 4 SEGMENTOS (CHAT, FUENTES, ARTEFACTOS, ESTUDIO) */}
-        {currentView === 'workspace' && activeNotebook && !isNotFound && (
+        {route.kind === 'workspace' && activeNotebook && !isNotFound && (
           <NotebookLayout>
             {/* Notebook header + section tabs / bottom bar live in NotebookLayout */}
 
@@ -216,33 +198,6 @@ export default function App() {
           </NotebookLayout>
         )}
       </main>
-
-      {/* Agente de Soporte IA y Reservas Multiturno (hidden in Focus mode) */}
-      {!isFocusModeActive && isSupportOpen && (
-        <SupportAgentChatbot
-          isOpen={isSupportOpen}
-          onOpen={openSupport}
-          onClose={closeSupport}
-          username={currentUser || 'Estudiante'}
-          userType={userType}
-          currentView={currentView}
-          activeNotebook={activeNotebook}
-          activeSegment={activeSegment}
-          stats={stats}
-        />
-      )}
-
-      {/* Modal de Perfil de Estudiante, Plan Actual y Estado de Cuenta */}
-      <StudentProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={closeProfile}
-        profile={studentProfile}
-        onUpdateProfile={handleUpdateProfile}
-        onResetAllData={handleResetDemoData}
-        stats={stats}
-        username={currentUser || 'Juan'}
-        notebooksCount={notebooks.length}
-      />
 
       {/* Agente de Búsqueda Google en Vivo (Grounding en Tiempo Real con Gemini 3.8 Flash invocado desde el Chat) (hidden in Focus mode) */}
       {!isFocusModeActive && (

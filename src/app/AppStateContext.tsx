@@ -48,7 +48,6 @@ function useAppStateValue() {
   const [userType, setUserType] = useState<UserType>('frecuente');
 
   // Student Profile state
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(() => {
     try {
       const saved = localStorage.getItem('mia_student_profile');
@@ -66,10 +65,6 @@ function useAppStateValue() {
       // ignore
     }
   };
-
-
-  // Support Agent AI Modal/Drawer State
-  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   // Google Search Agent Live Grounding Modal State
   const [isSearchAgentOpen, setIsSearchAgentOpen] = useState(false);
@@ -239,34 +234,34 @@ function useAppStateValue() {
 
   // Save changes when user is frecuente
   useEffect(() => {
-    if (userType === 'frecuente') {
+    if (userType === 'frecuente' && currentUser) {
       try {
         localStorage.setItem('focused_notebooks_frecuente_v2', JSON.stringify(notebooks));
       } catch {
         // ignore
       }
     }
-  }, [notebooks, userType]);
+  }, [notebooks, userType, currentUser]);
 
   useEffect(() => {
-    if (userType === 'frecuente') {
+    if (userType === 'frecuente' && currentUser) {
       try {
         localStorage.setItem('focused_folders_frecuente_v2', JSON.stringify(folders));
       } catch {
         // ignore
       }
     }
-  }, [folders, userType]);
+  }, [folders, userType, currentUser]);
 
   useEffect(() => {
-    if (userType === 'frecuente') {
+    if (userType === 'frecuente' && currentUser) {
       try {
         localStorage.setItem('focused_user_stats_frecuente', JSON.stringify(stats));
       } catch {
         // ignore
       }
     }
-  }, [stats, userType]);
+  }, [stats, userType, currentUser]);
 
   // Handle Login with "Usuario nuevo" vs "Usuario frecuente"
   const handleLoginSuccess = (username: string, type: UserType) => {
@@ -789,20 +784,6 @@ function useAppStateValue() {
       (!!route.artifactId && !routeNotebook.artifacts.some((a) => a.id === route.artifactId))
     ));
 
-  // `/ayuda` opens the legacy support panel; `/cuenta/*` opens the legacy profile
-  // modal (both over Explorer). Closing them while on that URL goes to Mis cuadernos.
-  const isAccountRoute = route.kind === 'perfil' || route.kind === 'preferencias';
-  const openSupport = () => setIsSupportOpen(true);
-  const closeSupport = () => {
-    setIsSupportOpen(false);
-    if (route.kind === 'ayuda') goToNotebooks();
-  };
-  const openProfile = () => setIsProfileModalOpen(true);
-  const closeProfile = () => {
-    setIsProfileModalOpen(false);
-    if (isAccountRoute) goToNotebooks();
-  };
-
   // Focus mode hides all navigation, but the browser Back/Forward buttons now
   // change the URL. Keep the user inside the locked notebook's ESTUDIO section.
   useEffect(() => {
@@ -832,13 +813,7 @@ function useAppStateValue() {
     // Profile
     studentProfile,
     handleUpdateProfile,
-    isProfileModalOpen: isProfileModalOpen || isAccountRoute,
-    openProfile,
-    closeProfile,
     // Overlays / transient UI
-    isSupportOpen: isSupportOpen || route.kind === 'ayuda',
-    openSupport,
-    closeSupport,
     isSearchAgentOpen,
     setIsSearchAgentOpen,
     searchAgentInitialQuery,
