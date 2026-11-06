@@ -644,19 +644,12 @@ function useAppStateValue() {
     const newIndex = threads.length + 1;
     const newThreadId = `thread-${Date.now()}`;
 
-    const greetingMessage: ChatMessage = {
-      id: `msg-welcome-${Date.now()}`,
-      sender: 'assistant',
-      text: `Nuevo chat iniciado en el cuaderno "${activeNotebook.title}".\n\nEste hilo comparte el 100% de las ${activeNotebook.sources.length} fuentes y ${activeNotebook.artifacts.length} artefactos de este cuaderno. ¿En qué tema o pregunta te gustaría trabajar?`,
-      timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      sourcesCited: activeNotebook.sources.map(s => s.title)
-    };
-
     const newThread: ChatThread = {
       id: newThreadId,
       title: `Chat ${newIndex}`,
       createdAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      messages: activeNotebook.sources.length > 0 ? [greetingMessage] : []
+      // Empty on purpose: the Chat screen shows suggested questions for empty threads.
+      messages: []
     };
 
     const updatedThreads = [...threads, newThread];
@@ -704,6 +697,42 @@ function useAppStateValue() {
         navigate(paths.chatThread(activeNotebook.id, nextActiveId), { replace: true });
       }
     }
+  };
+
+  /**
+   * Chat screen deletion (the confirmation lives in the UI, no native dialogs).
+   * Deleting the last thread replaces it with a new empty "Chat 1" (UX-30).
+   */
+  const handleRemoveChatThread = (threadId: string): 'deleted' | 'replaced' => {
+    if (!activeNotebook) return 'deleted';
+    const threads = getNotebookThreads(activeNotebook);
+    const remaining = threads.filter(t => t.id !== threadId);
+    let replaced = false;
+    let nextThreads = remaining;
+    if (remaining.length === 0) {
+      replaced = true;
+      nextThreads = [
+        {
+          id: `thread-${Date.now()}`,
+          title: 'Chat 1',
+          createdAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+          messages: []
+        }
+      ];
+    }
+    const deletedWasActive = threadId === currentActiveThreadId;
+    const nextActiveId = deletedWasActive ? nextThreads[0].id : currentActiveThreadId;
+    handleUpdateActiveNotebook({
+      ...activeNotebook,
+      chatThreads: nextThreads,
+      activeChatThreadId: nextActiveId,
+      chatMessages: replaced ? [] : activeNotebook.chatMessages
+    });
+    // Leave `/chat/<deletedId>` so it does not turn into Not found.
+    if (routeThreadId === threadId || (replaced && routeThreadId)) {
+      navigate(paths.chatThread(activeNotebook.id, nextActiveId), { replace: true });
+    }
+    return replaced ? 'replaced' : 'deleted';
   };
 
   const handleRenameChatThread = (threadId: string, newTitle: string) => {
@@ -855,6 +884,7 @@ function useAppStateValue() {
     handleStartNewChat,
     handleSelectChatThread,
     handleDeleteChatThread,
+    handleRemoveChatThread,
     handleRenameChatThread,
     handleUpdateThreadMessages,
     // Web search
