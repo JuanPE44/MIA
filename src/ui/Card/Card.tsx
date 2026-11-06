@@ -1,4 +1,4 @@
-import type {ComponentProps, ElementType, ReactNode} from 'react';
+import type {ComponentProps, ElementType, MouseEvent, ReactNode} from 'react';
 import {cx} from '../internal/cx';
 
 export interface CardProps extends ComponentProps<'div'> {
@@ -28,7 +28,8 @@ export interface InteractiveCardProps {
   headingLevel?: 2 | 3 | 4;
   /** Renders the title as an <a>; otherwise a <button> using `onClick`. */
   href?: string;
-  onClick?: () => void;
+  /** Receives the click event so SPA links can `preventDefault()` and navigate client-side. */
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
   selected?: boolean;
   /** Visual content under the title (not part of the link's accessible name). */
   children?: ReactNode;

@@ -16,3 +16,4 @@ export * from './Chip';
 export * from './StatusBadge';
 export * from './SimulatedBadge';
 export * from './EmptyState';
+export * from './IconPicker';
