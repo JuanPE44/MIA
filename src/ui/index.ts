@@ -21,3 +21,4 @@ export * from './Breadcrumb';
 export * from './Tabs';
 export * from './BottomTabBar';
 export * from './IconPicker';
+export * from './Checkbox';

@@ -1,0 +1,114 @@
+import {useRef, type MouseEvent} from 'react';
+import {AlertCircle, ExternalLink, Printer, SlidersHorizontal, Trash2} from 'lucide-react';
+import type {StudyArtifact} from '../../types';
+import {Button, Card, InteractiveCard, Menu, SimulatedBadge, Spinner, type MenuItem} from '../../ui';
+import {paths} from '../../app/routes';
+import {materialTypeOf, plural} from './materialModel';
+import type {MaterialJob} from './MaterialsJobs';
+
+interface MaterialCardProps {
+  notebookId: string;
+  artifact: StudyArtifact;
+  onOpen: (artifact: StudyArtifact) => void;
+  onAdjust: (artifact: StudyArtifact) => void;
+  onPrint: (artifact: StudyArtifact) => void;
+  onDelete: (artifact: StudyArtifact) => void;
+}
+
+export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, onDelete}: MaterialCardProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const info = materialTypeOf(artifact.type);
+  const Icon = info.icon;
+  const sources = artifact.citations?.length || 1;
+
+  // A real link (middle/ctrl-click keep native behavior); plain clicks navigate client-side.
+  const handleClick = (e: MouseEvent<HTMLElement>) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    onOpen(artifact);
+  };
+
+  const items: MenuItem[] = [
+    {id: 'open', label: 'Abrir', icon: <ExternalLink />, onSelect: () => onOpen(artifact)},
+    {id: 'adjust', label: 'Ajustar material', icon: <SlidersHorizontal />, onSelect: () => onAdjust(artifact)},
+    {id: 'print', label: 'Imprimir / PDF', icon: <Printer />, onSelect: () => onPrint(artifact)},
+    {id: 'delete', label: 'Eliminar', icon: <Trash2 />, danger: true, onSelect: () => onDelete(artifact)},
+  ];
+
+  return (
+    <div ref={wrapperRef} className="h-full">
+      <InteractiveCard
+        className="h-full"
+        href={paths.artifact(notebookId, artifact.id)}
+        onClick={handleClick}
+        title={
+          <span className="flex items-center gap-3 pr-10">
+            <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
+              <Icon className="size-5" />
+            </span>
+            <span className="flex min-w-0 flex-col">
+              <span className="text-caption font-medium text-muted">{info.label}</span>
+              <span className="line-clamp-2 break-words">{artifact.title}</span>
+            </span>
+          </span>
+        }
+        actions={<Menu label={`Más opciones de ${artifact.title}`} items={items} contextTargetRef={wrapperRef} />}
+      >
+        <p className="text-small text-muted">
+          {artifact.createdAt} · {plural(sources, 'fuente', 'fuentes')}
+        </p>
+        <SimulatedBadge className="mt-2" />
+      </InteractiveCard>
+    </div>
+  );
+}
+
+/** Skeleton card shown while a material is generating in the background. */
+export function GeneratingCard({job}: {job: MaterialJob}) {
+  const info = materialTypeOf(job.type);
+  return (
+    <Card aria-busy="true" className="h-full">
+      <div className="flex items-center gap-3">
+        <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
+          <info.icon className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-caption font-medium text-muted">{info.label}</p>
+          <p role="status" className="flex items-center gap-2 text-h3 text-strong">
+            <Spinner size={16} />
+            Generando…
+          </p>
+        </div>
+      </div>
+      <div aria-hidden className="mt-4 space-y-2">
+        <div className="h-3 w-4/5 animate-pulse rounded-pill bg-subtle" />
+        <div className="h-3 w-3/5 animate-pulse rounded-pill bg-subtle" />
+      </div>
+      <p className="mt-3 text-small text-muted">Puedes seguir usando la app; te avisamos cuando esté listo.</p>
+    </Card>
+  );
+}
+
+/** Card error state with Reintentar. */
+export function FailedCard({job, onRetry, onDismiss}: {job: MaterialJob; onRetry: () => void; onDismiss: () => void}) {
+  const info = materialTypeOf(job.type);
+  return (
+    <Card className="h-full border-danger/30 bg-danger-tint">
+      <div role="alert" className="flex items-start gap-3">
+        <AlertCircle aria-hidden className="mt-0.5 size-5 shrink-0 text-danger" />
+        <div className="min-w-0">
+          <p className="text-body-strong text-strong">No se pudo crear: {info.label.toLowerCase()}</p>
+          <p className="text-small text-default">Revisa tu conexión e inténtalo de nuevo.</p>
+        </div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button variant="secondary" size="sm" onClick={onRetry}>
+          Reintentar
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onDismiss}>
+          Descartar
+        </Button>
+      </div>
+    </Card>
+  );
+}

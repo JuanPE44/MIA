@@ -90,9 +90,8 @@ const ROUTE_TABLE: Array<{ pattern: string; toRoute: (p: Params) => AppRoute }> 
     toRoute: (p) => ({ kind: 'workspace', notebookId: p.notebookId!, segment: 'ARTEFACTOS' })
   },
   {
-    // TODO(L7): open this artifact in the viewer. The legacy NotebookArtifacts
-    // keeps the selected artifact / viewer in internal state, so for now the id
-    // is only validated (unknown id → Not found) and the segment is shown.
+    // Viewer (L7): App renders MaterialViewer when artifactId is set.
+    // Unknown ids are Not found in AppStateContext.
     pattern: '/cuadernos/:notebookId/materiales/:artifactId',
     toRoute: (p) => ({ kind: 'workspace', notebookId: p.notebookId!, segment: 'ARTEFACTOS', artifactId: p.artifactId })
   },
