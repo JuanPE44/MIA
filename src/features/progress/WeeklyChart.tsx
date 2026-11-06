@@ -75,7 +75,8 @@ export function WeeklyChart({week, goal}: WeeklyChartProps) {
         </li>
       </ul>
 
-      <table className="sr-only">
+      <div className="sr-only">
+        <table>
         <caption>Minutos de estudio de los últimos 7 días. Meta diaria: {goal} minutos.</caption>
         <thead>
           <tr>
@@ -96,6 +97,7 @@ export function WeeklyChart({week, goal}: WeeklyChartProps) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
