@@ -20,13 +20,9 @@ export type StudyTab = 'sesion' | 'repaso' | 'tarjetas';
 export type AppRoute =
   | { kind: 'login' }
   | { kind: 'explorer' }
-  // TODO(L9): dedicated Progreso page; renders the legacy Explorer for now
-  // (the legacy weekly chart lives inside the notebook-scoped ESTUDIO segment).
+  // Account-level pages rendered inside the shell by App.tsx (features/progress|help|account).
   | { kind: 'progreso' }
-  // Renders Explorer + opens the legacy support panel.
   | { kind: 'ayuda' }
-  // Render Explorer + open the legacy profile modal (it has no separate
-  // Perfil/Preferencias views yet). TODO(L9): dedicated account pages.
   | { kind: 'perfil' }
   | { kind: 'preferencias' }
   // `/cuadernos/:notebookId` without section: redirected to its chat.
