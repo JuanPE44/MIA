@@ -39,7 +39,7 @@ export function QuizView({questions}: {questions: QuizQuestion[]}) {
 
   return (
     <div className="w-full max-w-reading space-y-5">
-      <div className="flex flex-col gap-3 rounded-card border-[1.5px] border-ink bg-surface p-4 shadow-offset sm:flex-row sm:items-center sm:justify-between sm:p-5">
+      <div className="flex flex-col gap-3 rounded-card border border-rule bg-surface p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
         <div>
           <h2 className="font-display text-h2 text-strong">Cuestionario con autoevaluación</h2>
           <p className="font-mono text-caption text-muted">
@@ -86,7 +86,7 @@ export function QuizView({questions}: {questions: QuizQuestion[]}) {
                     else if (isChosen) tone = 'border-danger bg-danger-tint text-strong';
                     else tone = 'border-rule bg-surface text-muted';
                   } else if (isChosen) {
-                    tone = 'border-ink bg-primary-tint text-primary-on-tint shadow-offset';
+                    tone = 'border-ink bg-primary-tint text-primary-on-tint';
                   }
                   return (
                     <button

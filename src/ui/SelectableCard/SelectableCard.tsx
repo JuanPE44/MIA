@@ -28,7 +28,7 @@ export const SelectableCard = forwardRef<HTMLInputElement, SelectableCardProps>(
       data-mia-ui
       className={cx(
         'relative flex flex-col items-start gap-3 rounded-card border p-5 text-left transition-[box-shadow,border-color,translate] duration-[120ms]',
-        selected ? 'border-ink bg-primary-tint shadow-offset' : 'border-rule bg-surface',
+        selected ? 'border-ink bg-primary-tint' : 'border-rule bg-surface',
         disabled
           ? 'cursor-not-allowed opacity-50'
           : 'cursor-pointer hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset',

@@ -1,6 +1,6 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Dialog, EmptyState, IconButton, Reveal, RevealItem, useToast} from '../../ui';
+import {Button, Dialog, EmptyState, InteractiveCard, Reveal, RevealItem, useToast} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {AssistantMessage, ErrorMessage, PendingMessage, UserMessage} from './ChatMessage';
 import {CitationInspector} from './CitationInspector';
@@ -14,6 +14,21 @@ const GENERIC_SUGGESTIONS = [
   'Resume las fuentes en cinco ideas',
   '¿Qué conceptos centrales se explican?',
 ];
+
+const LG_QUERY = '(min-width: 1024px)';
+
+/** True from the `lg` breakpoint: the history opens as a side panel instead of a dialog. */
+function useIsDesktop(): boolean {
+  return useSyncExternalStore(
+    (cb) => {
+      const mql = window.matchMedia(LG_QUERY);
+      mql.addEventListener('change', cb);
+      return () => mql.removeEventListener('change', cb);
+    },
+    () => window.matchMedia(LG_QUERY).matches,
+    () => false,
+  );
+}
 
 const now = () => new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
 
@@ -40,6 +55,7 @@ export function ChatScreen() {
     setChatInitialPrompt,
   } = useAppState();
   const toast = useToast();
+  const desktop = useIsDesktop();
 
   const [input, setInput] = useState('');
   const [waiting, setWaiting] = useState(false);
@@ -224,6 +240,42 @@ export function ChatScreen() {
     />
   );
 
+  const hasAskedSomething = messages.some((m) => m.sender === 'user');
+  const starterCards = (
+    <Reveal as="ul" aria-label="Qué puedes hacer" className="grid gap-3 sm:grid-cols-3">
+      <RevealItem as="li">
+        <InteractiveCard
+          headingLevel={3}
+          title="Pregunta sobre tus fuentes"
+          onClick={() => inputRef.current?.focus()}
+          className="h-full"
+        >
+          <p className="text-small text-muted">Respuestas con citas de lo que subiste.</p>
+        </InteractiveCard>
+      </RevealItem>
+      <RevealItem as="li">
+        <InteractiveCard
+          headingLevel={3}
+          title="Genera un resumen o quiz"
+          onClick={() => goToSegment('ARTEFACTOS')}
+          className="h-full"
+        >
+          <p className="text-small text-muted">Crea materiales para repasar.</p>
+        </InteractiveCard>
+      </RevealItem>
+      <RevealItem as="li">
+        <InteractiveCard
+          headingLevel={3}
+          title="Estudia 25 min"
+          onClick={() => goToSegment('ESTUDIO')}
+          className="h-full"
+        >
+          <p className="text-small text-muted">Una sesión de enfoque, sin distracciones.</p>
+        </InteractiveCard>
+      </RevealItem>
+    </Reveal>
+  );
+
   const lastQuestion = [...messages].reverse().find((m) => m.sender === 'user')?.text;
 
   let body;
@@ -280,10 +332,12 @@ export function ChatScreen() {
             </RevealItem>
           ))}
         </Reveal>
+        <div className="mt-6">{starterCards}</div>
       </div>
     );
   } else {
     body = (
+      <>
       <div role="log" aria-live="polite" aria-label="Conversación" className="space-y-6 py-6">
         {messages.map((m) =>
           m.sender === 'user' ? (
@@ -305,35 +359,45 @@ export function ChatScreen() {
         {waiting ? <PendingMessage /> : null}
         {failed ? <ErrorMessage onRetry={retry} /> : null}
       </div>
+      {!hasAskedSomething && !waiting ? <div className="pb-6">{starterCards}</div> : null}
+      </>
     );
   }
 
   return (
-    <section aria-label="Chat" className="flex flex-col lg:flex-row lg:gap-6">
-      {/* Desktop: threads panel */}
-      <aside aria-label="Chats" className="hidden w-72 shrink-0 lg:block">
-        <div className="sticky top-4">{threadsList()}</div>
-      </aside>
-
-      {/* Tablet / phone: 48 px sub-header */}
-      <div className="flex h-12 items-center justify-between gap-2 border-b border-hairline lg:hidden">
+    <section aria-label="Chat" className="flex flex-col gap-3">
+      {/* Toolbar: history toggle + new chat (both quiet) */}
+      <div className="flex items-center gap-1 border-b border-rule pb-2">
         <Button
           variant="ghost"
           leadingIcon={<Icon name="chats" className="size-5" />}
-          onClick={() => setThreadsOpen(true)}
-          className="min-w-0"
+          aria-expanded={threadsOpen}
+          aria-controls={desktop ? 'chat-history-panel' : undefined}
+          onClick={() => setThreadsOpen((v) => !v)}
         >
-          <span className="truncate">Chats · {currentActiveThread.title}</span>
+          Historial
         </Button>
-        <IconButton
-          aria-label="Nuevo chat"
-          icon={<Icon name="add" className="size-5" />}
+        <Button
+          variant="ghost"
+          leadingIcon={<Icon name="add" className="size-5" />}
           onClick={handleStartNewChat}
-        />
+        >
+          Nuevo chat
+        </Button>
+        <p className="ml-2 min-w-0 flex-1 truncate text-small text-muted">{currentActiveThread.title}</p>
       </div>
-      <Dialog open={threadsOpen} onClose={() => setThreadsOpen(false)} title="Chats" size="sm">
-        {threadsList(() => setThreadsOpen(false))}
-      </Dialog>
+      {!desktop ? (
+        <Dialog open={threadsOpen} onClose={() => setThreadsOpen(false)} title="Historial" size="sm">
+          {threadsList(() => setThreadsOpen(false))}
+        </Dialog>
+      ) : null}
+
+      <div className="flex flex-col lg:flex-row lg:gap-6">
+      {desktop && threadsOpen ? (
+        <aside id="chat-history-panel" aria-label="Chats" className="w-72 shrink-0">
+          <div className="sticky top-4">{threadsList()}</div>
+        </aside>
+      ) : null}
 
       {/* Conversation */}
       <div className="flex w-full min-w-0 flex-1 flex-col">
@@ -359,6 +423,8 @@ export function ChatScreen() {
             />
           </div>
         </div>
+      </div>
+
       </div>
 
       <CitationInspector chunk={chunk} onClose={() => setChunk(null)} onOpenSources={() => goToSegment('FUENTES')} />

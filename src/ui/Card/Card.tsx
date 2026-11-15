@@ -14,7 +14,7 @@ export function Card({as: Tag = 'div', selected, flush, className, ...rest}: Car
       {...rest}
       className={cx(
         'rounded-card border',
-        selected ? 'border-ink bg-primary-tint shadow-offset' : 'border-rule bg-surface',
+        selected ? 'border-ink bg-primary-tint' : 'border-rule bg-surface',
         !flush && 'p-4 sm:p-5',
         className,
       )}

@@ -135,8 +135,8 @@ export function Flashcards() {
         type="button"
         onClick={() => setFlipped((f) => !f)}
         className={[
-          'flex aspect-[3/2] w-full flex-col justify-between rounded-card border-[1.5px] border-ink p-6 text-center shadow-offset focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus',
-          flipped ? 'bg-highlight text-highlight-ink' : 'bg-surface',
+          'flex aspect-[3/2] w-full flex-col justify-between rounded-card border border-rule p-6 text-center transition-[box-shadow,border-color] hover:border-ink hover:shadow-offset focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus',
+          flipped ? 'bg-subtle text-strong' : 'bg-surface',
         ].join(' ')}
       >
         <span className={`font-mono text-caption uppercase tracking-widest ${flipped ? '' : 'text-muted'}`}>{flipped ? 'Respuesta' : 'Pregunta'}</span>

@@ -10,7 +10,7 @@ export function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <ol className="border-t border-ink">
+    <ol className="border-t border-rule">
       {FAQ.map((item, i) => {
         const isOpen = open === i;
         const panelId = `${baseId}-panel-${i}`;

@@ -42,7 +42,7 @@ export function NotebookLayout({children}: {children: ReactNode}) {
   const activeId = SEGMENT_SLUGS[activeSegment];
 
   return (
-    <Page className="flex flex-col gap-5">
+    <Page className="flex flex-col gap-4">
       <div>
         <NotebookHeader />
         {!phone ? <Tabs aria-label="Secciones del cuaderno" items={tabs} activeId={activeId} /> : null}

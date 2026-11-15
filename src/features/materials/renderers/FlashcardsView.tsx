@@ -50,7 +50,7 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
             animate={{rotateY: flipped && !reduced ? 180 : 0}}
             transition={reduced ? {duration: 0} : {type: 'spring', stiffness: 170, damping: 18, mass: 0.9}}
           >
-            <span className={`${face} border-ink bg-surface shadow-offset ${reduced && flipped ? 'hidden' : ''}`}>
+            <span className={`${face} border-rule bg-surface ${reduced && flipped ? 'hidden' : ''}`}>
               <span className="flex items-center justify-between font-mono text-caption uppercase tracking-widest text-muted">
                 <span>Pregunta</span>
                 <span className="rounded-pill bg-subtle px-2 py-0.5 normal-case tracking-normal text-default">{card.category || 'Concepto'}</span>
@@ -59,7 +59,7 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
               <span className="text-caption text-muted">Pulsa para ver la respuesta</span>
             </span>
             <span
-              className={`${face} border-ink bg-highlight text-highlight-ink shadow-offset ${reduced ? (flipped ? '' : 'hidden') : '[transform:rotateY(180deg)]'}`}
+              className={`${face} border-rule bg-subtle text-strong ${reduced ? (flipped ? '' : 'hidden') : '[transform:rotateY(180deg)]'}`}
             >
               <span className="font-mono text-caption uppercase tracking-widest">Respuesta</span>
               <span className="my-4 font-display text-h1">{card.answer}</span>

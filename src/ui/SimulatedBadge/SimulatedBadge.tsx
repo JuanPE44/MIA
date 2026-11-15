@@ -35,9 +35,9 @@ export function SimulatedBadge({className}: SimulatedBadgeProps) {
         aria-expanded={pinned}
         onClick={() => setPinned((p) => !p)}
         onBlur={() => setPinned(false)}
-        className="relative inline-flex h-6 items-center gap-1 rounded-pill bg-simulated-tint px-2 text-caption text-simulated pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2.5 pointer-coarse:after:content-['']"
+        className="relative inline-flex h-5 items-center gap-1 rounded-pill px-1.5 text-caption text-muted hover:bg-subtle pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2.5 pointer-coarse:after:content-['']"
       >
-        <Icon name="experiment" className="size-3.5" />
+        <Icon name="experiment" className="size-3" />
         Simulado
       </button>
       <span

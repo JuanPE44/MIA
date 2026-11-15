@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router';
-import {Breadcrumb, Button, ConfirmDialog, IconButton, Menu, type MenuItem} from '../../ui';
+import {Breadcrumb, ConfirmDialog, IconButton, Menu, type MenuItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
@@ -8,8 +8,8 @@ import {MoveNotebookDialog} from '../../features/library/MoveNotebookDialog';
 import {Icon, resolveItemIcon} from '../../ui/Icon';
 
 /**
- * Notebook context header. Desktop/tablet: breadcrumb, icon tile, h1, sources
- * chip, "Añadir fuente", menu. Phone (56 px): back button, truncated title, menu.
+ * Notebook context header. Desktop/tablet: breadcrumb, one title row (small
+ * icon, h1, mono metadata, menu); "Añadir fuente" lives in the menu and Fuentes. Phone (56 px): back button, truncated title, menu.
  */
 export function NotebookHeader() {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export function NotebookHeader() {
   const addSource = openAddSource;
 
   const items: MenuItem[] = [
-    ...(phone ? [{id: 'add-source', label: 'Añadir fuente', icon: <Icon name="add" />, onSelect: addSource}] : []),
+    {id: 'add-source', label: 'Añadir fuente', icon: <Icon name="add" />, onSelect: addSource},
     // TODO: rename needs a notebook-rename action and dialog; neither exists yet.
     {id: 'rename', label: 'Renombrar (próximamente)', onSelect: () => {}, disabled: true},
     {id: 'move', label: 'Mover a…', onSelect: () => setMoving(true)},
@@ -76,7 +76,7 @@ export function NotebookHeader() {
 
   return (
     <>
-      <div className="flex flex-col gap-3 pb-1">
+      <div className="flex flex-col gap-2 pb-2">
         <Breadcrumb
           items={[
             {label: 'Biblioteca', to: paths.notebooks()},
@@ -84,27 +84,24 @@ export function NotebookHeader() {
             {label: nb.title},
           ]}
         />
-        {/* Editorial masthead: display title, mono metadata, ink rule */}
-        <div className="flex items-end gap-4 border-b-2 border-ink pb-4">
-          <span
+        {/* Compact masthead: one band, title + inline mono metadata, tabs follow with a single rule */}
+        <div className="flex items-center gap-3">
+          <Icon
+            name={resolveItemIcon(nb.icon, 'notebook')}
+            weight="duotone"
             aria-hidden
-            className="inline-flex size-14 shrink-0 items-center justify-center rounded-card border border-rule bg-tile-azul text-strong shadow-offset"
-          >
-            <Icon name={resolveItemIcon(nb.icon, 'notebook')} weight="duotone" className="size-8" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-mono text-caption uppercase tracking-widest text-muted">
+            className="size-6 shrink-0 text-muted"
+          />
+          <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3">
+            <h1 className="min-w-0 max-w-full truncate font-display text-h1 text-strong">{nb.title}</h1>
+            <p className="shrink-0 font-mono text-caption text-muted">
               {nb.subject || 'General'}
               <span aria-hidden> · </span>
               <Link to={toSources} className="rounded-small underline-offset-4 hover:underline">
                 {sourcesLabel}
               </Link>
             </p>
-            <h1 className="truncate text-display font-medium text-strong">{nb.title}</h1>
           </div>
-          <Button variant="secondary" leadingIcon={<Icon name="add" className="size-5" />} onClick={addSource}>
-            Añadir fuente
-          </Button>
           <Menu label={`Opciones de ${nb.title}`} items={items} />
         </div>
       </div>

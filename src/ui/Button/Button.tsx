@@ -26,10 +26,10 @@ export interface ButtonProps extends Omit<ComponentProps<'button'>, 'children'> 
 
 export const buttonVariants: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-on-primary hover:bg-primary-hover',
-  secondary: 'border-[1.5px] border-ink bg-surface text-strong hover:bg-subtle hover:shadow-offset hover:-translate-x-px hover:-translate-y-px',
+  secondary: 'border border-control bg-surface text-strong hover:border-ink hover:bg-subtle',
   // Highlighter underline sweeps in on hover (decorative stripe below the label)
   ghost: cx(
-    'bg-transparent text-primary-text bg-no-repeat [background-image:linear-gradient(var(--mia-highlight),var(--mia-highlight))]',
+    'bg-transparent text-default bg-no-repeat [background-image:linear-gradient(var(--mia-highlight),var(--mia-highlight))]',
     '[background-position:center_calc(100%-5px)] [background-size:0%_4px] hover:[background-size:calc(100%-1.5rem)_4px]',
     'transition-[background-size] duration-[var(--mia-duration-sweep)] ease-[var(--mia-ease-out)]',
   ),

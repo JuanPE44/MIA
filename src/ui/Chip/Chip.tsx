@@ -39,7 +39,7 @@ export function Chip(props: ChipProps) {
           'relative border pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-[""]',
           'transition-colors duration-[120ms]',
           selected
-            ? 'border-ink bg-highlight text-highlight-ink'
+            ? 'border-ink bg-subtle font-semibold text-strong'
             : 'border-rule bg-surface text-default hover:border-ink',
           className,
         )}

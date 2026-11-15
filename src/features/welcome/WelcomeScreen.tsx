@@ -61,7 +61,7 @@ export function WelcomeScreen() {
             <img
               src="/assets/aistudio/WhatsApp_Image_2026-11-05_at_8.03.54_AM_cb87d5b4.jpeg"
               alt="MIA"
-              className="size-14 rounded-card border border-ink object-cover shadow-offset"
+              className="size-14 rounded-card border border-rule object-cover"
             />
           </RevealItem>
           <RevealItem>

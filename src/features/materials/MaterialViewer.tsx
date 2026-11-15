@@ -162,7 +162,7 @@ export function MaterialViewer() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-page text-strong">
-      <header className="flex min-h-14 flex-wrap items-center gap-2 border-b-[1.5px] border-ink bg-surface px-2 sm:px-4">
+      <header className="flex min-h-14 flex-wrap items-center gap-2 border-b border-rule bg-surface px-2 sm:px-4">
         <IconButton aria-label="Volver a materiales" icon={<Icon name="chevron-left" className="size-5" />} onClick={closeViewer} />
         <h1 className="min-w-0 flex-1 truncate font-display text-h2 text-strong">{artifact.title}</h1>
         <SimulatedBadge />

@@ -11,7 +11,7 @@ export function InfographicView({data}: {data: InfographicData}) {
   return (
     <div className="w-full max-w-reading space-y-5">
       {data.highlightStat ? (
-        <div className="rounded-card border-[1.5px] border-ink bg-surface p-6 text-center shadow-offset">
+        <div className="rounded-card border border-rule bg-surface p-6 text-center">
           <p className="font-display text-display text-strong">
             <Highlight trigger="mount">{data.highlightStat.number}</Highlight>
           </p>

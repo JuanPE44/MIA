@@ -47,10 +47,10 @@ export function Composer({
         e.preventDefault();
         if (canSend) onSend();
       }}
-      className="rounded-card border-[1.5px] border-ink bg-surface p-2 shadow-offset focus-within:bg-surface"
+      className="rounded-card border border-rule bg-surface p-2 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
     >
       <div className="flex items-end gap-2">
-        <div className="min-w-0 flex-1 [&_label]:sr-only [&_textarea]:border-0 [&_textarea]:bg-transparent">
+        <div className="min-w-0 flex-1 [&_label]:sr-only [&_textarea]:border-0 [&_textarea]:bg-transparent [&_textarea]:outline-none">
           <Textarea
             ref={ref}
             label="Tu pregunta"
@@ -77,7 +77,7 @@ export function Composer({
           {blocked ? disabledReason : 'Enter envía · Mayús+Enter agrega una línea'}
         </p>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={onOpenSources} className="font-mono">
+          <Button variant="ghost" size="sm" onClick={onOpenSources} className="font-mono text-muted!">
             Fuentes activas: {activeSources} de {totalSources}
           </Button>
           <Button
@@ -85,6 +85,7 @@ export function Composer({
             size="sm"
             leadingIcon={<Icon name="web" className="size-4" />}
             onClick={onSearchWeb}
+            className="text-muted!"
           >
             Buscar en la web
           </Button>

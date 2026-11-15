@@ -62,7 +62,7 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
 
   return (
     <div className="w-full max-w-reading space-y-4">
-      <div className="flex items-center justify-between gap-3 rounded-card border-[1.5px] border-ink bg-primary-tint p-4 text-primary-on-tint shadow-offset sm:p-5">
+      <div className="flex items-center justify-between gap-3 rounded-card border border-rule bg-primary-tint p-4 text-primary-on-tint sm:p-5">
         <div className="flex min-w-0 items-center gap-3">
           <IconButton
             variant="primary"
@@ -102,7 +102,7 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
                 aria-current={current || undefined}
                 className={`block min-h-11 w-full rounded-control border p-4 text-left transition-colors duration-[120ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                   current
-                    ? 'border-ink bg-highlight text-highlight-ink shadow-offset'
+                    ? 'border-ink bg-subtle text-strong'
                     : host
                       ? 'border-rule bg-surface hover:border-ink'
                       : 'border-rule bg-subtle hover:border-ink'

@@ -13,9 +13,23 @@ interface ThreadsListProps {
   onDelete: (threadId: string) => void;
 }
 
-/** Stored dates are free text ("Hoy" or an HH:MM time); show them as given. */
-function formatThreadDate(createdAt: string): string {
-  return /^\d{1,2}:\d{2}/.test(createdAt) ? `Hoy · ${createdAt}` : createdAt;
+const dateFormat = new Intl.DateTimeFormat('es-AR', {day: 'numeric', month: 'short'});
+const dateYearFormat = new Intl.DateTimeFormat('es-AR', {day: 'numeric', month: 'short', year: 'numeric'});
+
+/**
+ * Stored dates are free text ("Hoy", "HH:MM", "YYYY-MM-DD" or "YYYY-MM-DD HH:MM").
+ * Shows "Hoy 11:22", "Ayer", "3 oct"; unknown formats are shown as given.
+ */
+export function formatThreadDate(createdAt: string, today: Date = new Date()): string {
+  if (/^\d{1,2}:\d{2}/.test(createdAt)) return `Hoy ${createdAt}`;
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}:\d{2}))?/.exec(createdAt);
+  if (!m) return createdAt;
+  const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const days = Math.round((startOfToday.getTime() - date.getTime()) / 86_400_000);
+  if (days === 0) return m[4] ? `Hoy ${m[4]}` : 'Hoy';
+  if (days === 1) return 'Ayer';
+  return (date.getFullYear() === today.getFullYear() ? dateFormat : dateYearFormat).format(date).replace('.', '');
 }
 
 /** Thread list + the only "Nuevo chat" control (UX-10). Used in the aside and in the Chats dialog. */
@@ -42,8 +56,8 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
   return (
     <div className="flex flex-col gap-3">
       <Button
-        variant="primary"
-        fullWidth
+        variant="ghost"
+        className="self-start"
         leadingIcon={<Icon name="add" className="size-5" />}
         onClick={onNewChat}
       >
@@ -56,7 +70,7 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
           return (
             <li
               key={thread.id}
-              className={`flex min-h-11 items-center gap-1 rounded-control pr-1 ${active ? 'border-l-2 border-ink bg-primary-tint' : 'border-l-2 border-transparent hover:bg-subtle'}`}
+              className={`flex min-h-11 items-center gap-1 rounded-control pr-1 ${active ? 'border-l-2 border-ink bg-subtle' : 'border-l-2 border-transparent hover:bg-subtle'}`}
             >
               {renamingId === thread.id ? (
                 <div className="min-w-0 flex-1 p-1 [&_label]:sr-only">
@@ -89,7 +103,7 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
                     onClick={() => onSelect(thread.id)}
                     className="flex min-h-11 min-w-0 flex-1 flex-col justify-center rounded-control px-3 py-1 text-left"
                   >
-                    <span className={`truncate text-label ${active ? 'text-primary-on-tint' : 'text-strong'}`}>
+                    <span className={`truncate text-label ${active ? 'font-semibold text-strong' : 'text-default'}`}>
                       {thread.title}
                     </span>
                     <span className="truncate text-caption text-muted">{formatThreadDate(thread.createdAt)}</span>

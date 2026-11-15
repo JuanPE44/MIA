@@ -32,7 +32,7 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
   return (
     <article className="w-full max-w-reading rounded-card border border-rule bg-surface p-5 shadow-elevation-1 sm:p-12 print:max-w-none print:border-0 print:p-0 print:shadow-none">
       <header>
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink pb-3 font-mono text-caption text-muted">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-rule pb-3 font-mono text-caption text-muted">
           <span>Cuaderno: {notebookTitle}</span>
           <span>Basado en tus fuentes · {artifact.createdAt}</span>
         </div>

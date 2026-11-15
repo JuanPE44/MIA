@@ -99,8 +99,8 @@ function DialogInner({
         if (dismissible && e.target === ref.current) onClose();
       }}
       className={cx(
-        'mia-dialog flex w-full max-w-none flex-col overflow-hidden border border-ink bg-surface-raised p-0',
-        'text-strong shadow-offset backdrop:bg-[rgb(20_19_15/55%)]',
+        'mia-dialog flex w-full max-w-none flex-col overflow-hidden border border-rule bg-surface-raised p-0',
+        'text-strong shadow-elevation-3 backdrop:bg-[rgb(20_19_15/55%)]',
         phone
           ? 'mia-anim-sheet mx-0 mb-0 mt-auto max-h-[92vh] rounded-t-card'
           : cx(

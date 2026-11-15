@@ -27,7 +27,7 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
           'relative inline-flex h-8 shrink-0 items-center gap-2 whitespace-nowrap rounded-control border px-3 text-label transition-colors duration-[120ms]',
           'pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-[""]',
           isSelected
-            ? 'border-ink bg-highlight font-semibold text-highlight-ink'
+            ? 'border-ink bg-subtle font-semibold text-strong'
             : 'border-rule bg-surface text-default hover:border-ink',
         )}
       >

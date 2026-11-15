@@ -23,7 +23,7 @@ export function RequestCard({request}: {request: HelpRequest}) {
   ];
 
   return (
-    <Card flush className="overflow-hidden border-dashed border-ink/40">
+    <Card flush className="overflow-hidden border-dashed border-rule">
       <p className="bg-warning-tint px-4 py-2 font-mono text-caption uppercase tracking-wide text-strong">Solicitud enviada · pendiente de confirmación</p>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 px-4 pt-3 text-small">
         {rows.map(([k, v]) => (

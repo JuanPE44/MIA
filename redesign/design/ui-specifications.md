@@ -229,3 +229,17 @@ Removed from today's chrome: fixed bottom stats bar (79–90 px), notebook banne
 - **Library toolbar**: one row under the header: search (`flex-1 max-w-narrow`, label `sr-only`), "Nueva carpeta" (ghost) and "Nuevo cuaderno" (primary) at the right. Phone: full-width primary + "Más acciones" menu in the header.
 - **Folder hierarchy**: folders never look like notebooks. `FolderFilter` has a mono overline "CARPETAS"; chips always use `folder` (`folder-open` + fill when selected), a tile-color dot, and a mono count; "Todas" shows an explicit count ("1 cuaderno"); selected = ink border + highlighter bg. Group headers (and `FolderHeader`) are folder dividers: mono overline "Carpeta", `folder-open` icon, Fraunces name, `border-rule` line. `NotebookCard` takes `showFolder` and hides its folder chip inside a folder group.
 - **TodayChip**: mono overline "HOY", `min / goal min` in mono, thin ink progress bar (highlighter fill when the goal is met), "Racha · N días" with ink `streak` icon. No success/star colors. `compact` = single line for TopBar. Links to Progreso with an aria-label.
+
+## 14. QA round 2: noise reduction rules (2026-11-15)
+
+Entering a notebook was judged tiring: too many loud elements and a flat text hierarchy. System rules (apply to every screen):
+
+- **Offset shadow**: `shadow-offset` appears only on hover/focus of clickable cards (`InteractiveCard`, `SourceRow`, `CitationChip`, flashcard) and on transient overlays (Toast). Never at rest and never as a "selected" marker. Resting containers use `border-rule` 1 px; selected = `border-ink` + tint.
+- **Buttons**: secondary = 1 px `border-control` (ink on hover), no offset. One solid primary per screen; everything else secondary or ghost. Ghost text is `text-default` (not blue) with the highlighter sweep on hover.
+- **Blue** (`primary`) only on primary buttons and inline text links. Selected threads / nav / chips use ink border + `bg-subtle`, never blue text.
+- **Highlighter** only for: active tab indicator, `CitationChip`, one keyword per page title (+ Toast). Selected chips and flipped flashcards use `bg-subtle`.
+- **Text hierarchy**: body `text-default`, metadata `text-muted`, `text-strong` only for headings/titles and emphasis.
+- **Dialog**: `border-rule` + elevation 3, no offset.
+- **SimulatedBadge**: neutral, muted, 20 px, no violet fill (`InlineAlert` simulated keeps its tint).
+- **Notebook header**: one compact band (breadcrumb, small icon + h1 28 px + inline mono meta, ⋮ menu) and tabs with a single 1 px rule. "Añadir fuente" lives in the ⋮ menu and in Fuentes, not in the header.
+- **Chat**: history behind a "Historial" ghost toggle (side panel on lg, dialog below); "Nuevo chat" is ghost; thread dates via `Intl` es-AR ("Hoy 11:22", "Ayer", "3 oct"); assistant turns start with a mono "MIA" label (AppMark 16); user turns use `bg-subtle` without border; sources per message = muted count + numbered `CitationChip`s (full titles in tooltip, inspector and margin notes); raw "[Fuente: …]" lines are stripped at render time; feedback and Simulado show on hover/focus-within (always on touch); composer = 1 px border + focus ring; empty/starter threads show three `InteractiveCard` actions (preguntar, generar material, estudiar 25 min).
