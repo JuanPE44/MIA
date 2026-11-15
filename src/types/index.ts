@@ -1,9 +1,5 @@
 export type MainSegment = 'CHAT' | 'FUENTES' | 'ARTEFACTOS' | 'ESTUDIO';
 
-export type NavigationCategory = 'notebooks' | 'study_workspace' | 'focus_mode' | 'profile';
-
-export type InnerNotebookTab = 'chat' | 'sources' | 'artifacts' | 'methods';
-
 export type SourceType = 'text' | 'pdf' | 'link' | 'image' | 'video' | 'audio';
 
 export interface SourceItem {

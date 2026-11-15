@@ -5,6 +5,7 @@ import {Breadcrumb, Button, ConfirmDialog, IconButton, Menu, type MenuItem} from
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
+import {MoveNotebookDialog} from '../../features/library/MoveNotebookDialog';
 
 /**
  * Notebook context header. Desktop/tablet: breadcrumb, icon tile, h1, sources
@@ -13,8 +14,9 @@ import {paths} from '../routes';
 export function NotebookHeader() {
   const navigate = useNavigate();
   const phone = useIsPhone();
-  const {activeNotebook, folders, handleDeleteNotebook, openAddSource} = useAppState();
+  const {activeNotebook, folders, handleDeleteNotebook, handleMoveNotebook, openAddSource} = useAppState();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [moving, setMoving] = useState(false);
 
   if (!activeNotebook) return null;
   const nb = activeNotebook;
@@ -26,13 +28,22 @@ export function NotebookHeader() {
 
   const items: MenuItem[] = [
     ...(phone ? [{id: 'add-source', label: 'Añadir fuente', icon: <Plus />, onSelect: addSource}] : []),
-    // TODO(L4): wire rename and move once the library dialogs exist.
+    // TODO: rename needs a notebook-rename action and dialog; neither exists yet.
     {id: 'rename', label: 'Renombrar (próximamente)', onSelect: () => {}, disabled: true},
-    {id: 'move', label: 'Mover a… (próximamente)', onSelect: () => {}, disabled: true},
+    {id: 'move', label: 'Mover a…', onSelect: () => setMoving(true)},
     {id: 'delete', label: 'Eliminar', onSelect: () => setConfirmingDelete(true), danger: true},
   ];
 
   const dialog = (
+    <>
+    {moving ? (
+      <MoveNotebookDialog
+        notebook={nb}
+        folders={folders}
+        onClose={() => setMoving(false)}
+        onMove={(folderId) => handleMoveNotebook(nb.id, folderId)}
+      />
+    ) : null}
     <ConfirmDialog
       open={confirmingDelete}
       onCancel={() => setConfirmingDelete(false)}
@@ -43,6 +54,7 @@ export function NotebookHeader() {
       title={`¿Eliminar el cuaderno «${nb.title}»?`}
       description="Se borrarán sus fuentes, chats y materiales. No se puede deshacer."
     />
+    </>
   );
 
   if (phone) {
