@@ -79,7 +79,7 @@ export function NewFolderDialog({onClose, onCreate}: NewFolderDialogProps) {
                 <label
                   key={c.id || 'none'}
                   className={`relative flex min-h-11 w-32 cursor-pointer flex-col overflow-hidden rounded-control border text-small has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
-                    selected ? 'border-primary bg-primary-tint' : 'border-hairline bg-surface hover:border-control'
+                    selected ? 'border-ink bg-primary-tint shadow-offset' : 'border-rule bg-surface hover:border-ink'
                   }`}
                 >
                   <input

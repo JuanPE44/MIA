@@ -1,6 +1,6 @@
 import {useRef, type MouseEvent} from 'react';
 import type {Folder, Notebook} from '../../types';
-import {InteractiveCard, Menu, Chip, type MenuItem} from '../../ui';
+import {InteractiveCard, Menu, Chip, RevealItem, type MenuItem} from '../../ui';
 import {paths} from '../../app/routes';
 import {countLabels, tileClassFor} from './libraryModel';
 import {Icon, resolveItemIcon} from '../../ui/Icon';
@@ -33,39 +33,47 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
     {id: 'delete', label: 'Eliminar', icon: <Icon name="delete" />, danger: true, onSelect: () => onDelete(notebook)},
   ];
 
+  const updated = new Date(notebook.updatedAt);
+  const updatedLabel = Number.isNaN(updated.getTime())
+    ? null
+    : updated.toLocaleDateString('es', {day: 'numeric', month: 'short'});
+
   return (
-    <div ref={wrapperRef} className="h-full">
-      <InteractiveCard
-        className="h-full"
-        href={paths.notebookSegment(notebook.id, 'CHAT')}
-        onClick={handleClick}
-        title={
-          <span className="flex items-center gap-3 pr-10">
-            <span
-              aria-hidden
-              className={`flex size-10 shrink-0 items-center justify-center rounded-control text-xl ${tileClassFor(notebook.id)}`}
-            >
-              <Icon name={resolveItemIcon(notebook.icon, 'notebook')} weight="duotone" className="size-6" />
+    <RevealItem as="li" className="h-full">
+      <div ref={wrapperRef} className="h-full">
+        <InteractiveCard
+          className="h-full"
+          href={paths.notebookSegment(notebook.id, 'CHAT')}
+          onClick={handleClick}
+          title={
+            <span className="flex flex-col gap-3 pr-10">
+              <span
+                aria-hidden
+                className={`flex h-20 items-end rounded-control border border-rule p-3 ${tileClassFor(notebook.id)}`}
+              >
+                <Icon name={resolveItemIcon(notebook.icon, 'notebook')} weight="duotone" className="size-10 text-ink" />
+              </span>
+              <span className="min-w-0 line-clamp-2 break-words font-display">{notebook.title}</span>
             </span>
-            <span className="min-w-0 line-clamp-2 break-words">{notebook.title}</span>
-          </span>
-        }
-        actions={
-          <Menu label={`Más opciones de ${notebook.title}`} items={items} contextTargetRef={wrapperRef} />
-        }
-      >
-        <p className="text-small text-muted">{notebook.subject}</p>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {folder ? (
-            <Chip size="sm" variant="outline" className="max-w-full" icon={<Icon name={resolveItemIcon(folder.icon, 'folder')} />}>
-              <span className="truncate">{folder.name}</span>
-            </Chip>
-          ) : null}
-          <span className="text-small text-muted">
-            {sources === 0 ? 'Sin fuentes' : countLabels.sources(sources)}
-          </span>
-        </div>
-      </InteractiveCard>
-    </div>
+          }
+          actions={
+            <Menu label={`Más opciones de ${notebook.title}`} items={items} contextTargetRef={wrapperRef} />
+          }
+        >
+          <p className="text-small text-muted">{notebook.subject}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+            {folder ? (
+              <Chip size="sm" variant="outline" className="max-w-full" icon={<Icon name={resolveItemIcon(folder.icon, 'folder')} />}>
+                <span className="truncate">{folder.name}</span>
+              </Chip>
+            ) : null}
+            <span className="font-mono text-small text-muted">
+              {sources === 0 ? 'Sin fuentes' : countLabels.sources(sources)}
+              {updatedLabel ? ` · ${updatedLabel}` : ''}
+            </span>
+          </div>
+        </InteractiveCard>
+      </div>
+    </RevealItem>
   );
 }
