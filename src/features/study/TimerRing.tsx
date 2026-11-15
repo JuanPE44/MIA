@@ -16,9 +16,9 @@ const CIRC = 2 * Math.PI * RADIUS;
 export function TimerRing({remainingSeconds, totalSeconds, tone}: TimerRingProps) {
   const progress = totalSeconds > 0 ? Math.min(1, Math.max(0, 1 - remainingSeconds / totalSeconds)) : 0;
   return (
-    <div className="relative mx-auto size-[220px] sm:size-[280px]">
+    <div className="relative mx-auto size-56 sm:size-72">
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="size-full -rotate-90" aria-hidden>
-        <circle cx={SIZE / 2} cy={SIZE / 2} r={RADIUS} fill="none" strokeWidth={STROKE} className="stroke-hairline" />
+        <circle cx={SIZE / 2} cy={SIZE / 2} r={RADIUS} fill="none" strokeWidth={STROKE} className="stroke-rule" />
         <circle
           cx={SIZE / 2}
           cy={SIZE / 2}
@@ -34,7 +34,7 @@ export function TimerRing({remainingSeconds, totalSeconds, tone}: TimerRingProps
       <div
         role="timer"
         aria-label="Tiempo restante"
-        className="absolute inset-0 flex items-center justify-center text-timer tabular-nums text-strong"
+        className="absolute inset-0 flex items-center justify-center font-mono text-timer font-medium tabular-nums text-strong"
       >
         {formatClock(remainingSeconds)}
       </div>

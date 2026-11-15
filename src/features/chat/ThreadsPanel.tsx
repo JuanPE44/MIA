@@ -56,7 +56,7 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
           return (
             <li
               key={thread.id}
-              className={`flex min-h-11 items-center gap-1 rounded-control pr-1 ${active ? 'bg-primary-tint' : 'hover:bg-subtle'}`}
+              className={`flex min-h-11 items-center gap-1 rounded-control pr-1 ${active ? 'border-l-2 border-ink bg-primary-tint' : 'border-l-2 border-transparent hover:bg-subtle'}`}
             >
               {renamingId === thread.id ? (
                 <div className="min-w-0 flex-1 p-1 [&_label]:sr-only">

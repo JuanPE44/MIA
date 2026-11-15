@@ -3,7 +3,7 @@ import {Link, useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import type {ArtifactType, StudyArtifact} from '../../types';
-import {ConfirmDialog, EmptyState, InlineAlert, useToast} from '../../ui';
+import {ConfirmDialog, EmptyState, InlineAlert, Reveal, RevealItem, useToast} from '../../ui';
 import {FailedCard, GeneratingCard, MaterialCard} from './MaterialCard';
 import {CreateMaterialSheet} from './CreateMaterialSheet';
 import {useMaterialJobs} from './MaterialsJobs';
@@ -75,17 +75,18 @@ export function MaterialsScreen() {
             </InlineAlert>
           </div>
         ) : null}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Reveal className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {MATERIAL_TYPES.map((info) => (
-            <TypeTile
-              key={info.id}
-              info={info}
-              disabled={noSources}
-              describedBy={NO_SOURCES_ID}
-              onSelect={setCreateType}
-            />
+            <RevealItem key={info.id}>
+              <TypeTile
+                info={info}
+                disabled={noSources}
+                describedBy={NO_SOURCES_ID}
+                onSelect={setCreateType}
+              />
+            </RevealItem>
           ))}
-        </div>
+        </Reveal>
       </section>
 
       <section aria-labelledby="tus-materiales" className="flex flex-col gap-4">
@@ -100,18 +101,18 @@ export function MaterialsScreen() {
             description="Elige un tipo arriba para generar el primero a partir de tus fuentes."
           />
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <Reveal as="ul" className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {mine.map((job) => (
-              <li key={job.id}>
+              <RevealItem as="li" key={job.id}>
                 {job.status === 'error' ? (
                   <FailedCard job={job} onRetry={() => retry(job.id)} onDismiss={() => dismiss(job.id)} />
                 ) : (
                   <GeneratingCard job={job} />
                 )}
-              </li>
+              </RevealItem>
             ))}
             {artifacts.map((artifact) => (
-              <li key={artifact.id}>
+              <RevealItem as="li" key={artifact.id}>
                 <MaterialCard
                   notebookId={notebook.id}
                   artifact={artifact}
@@ -120,9 +121,9 @@ export function MaterialsScreen() {
                   onPrint={(item) => requestMaterialPrint(item, notebook.title)}
                   onDelete={setDeleting}
                 />
-              </li>
+              </RevealItem>
             ))}
-          </ul>
+          </Reveal>
         )}
       </section>
 

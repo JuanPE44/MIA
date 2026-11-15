@@ -1,5 +1,5 @@
 import {useRef, useState} from 'react';
-import {Link} from 'react-router';
+import {useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import {Button, Card, EmptyState, InlineAlert, SimulatedBadge, Textarea} from '../../ui';
@@ -11,6 +11,7 @@ type Phase = 'idle' | 'loading' | 'question' | 'compared' | 'error';
 /** S7c: generate a question, answer from memory, compare with the reference. */
 export function ActiveRecall() {
   const {activeNotebook} = useAppState();
+  const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>('idle');
   const [challenge, setChallenge] = useState<RecallChallenge | null>(null);
   const [answer, setAnswer] = useState('');
@@ -20,18 +21,15 @@ export function ActiveRecall() {
 
   if (activeNotebook.sources.length === 0) {
     return (
-      <Card className="mx-auto w-full max-w-[720px] p-6">
+      <Card className="mx-auto w-full max-w-reading p-6">
         <EmptyState
           icon={<Icon name="brain" />}
           title="Necesitas al menos una fuente"
           description="El repaso activo hace preguntas sobre tus fuentes. Agrega una para empezar."
           action={
-            <Link
-              to={paths.notebookSegment(activeNotebook.id, 'FUENTES')}
-              className="inline-flex h-control-md items-center rounded-control bg-primary px-4 text-label text-on-primary hover:bg-primary-hover"
-            >
+            <Button variant="primary" onClick={() => navigate(paths.notebookSegment(activeNotebook.id, 'FUENTES'))}>
               Ir a Fuentes
-            </Link>
+            </Button>
           }
         />
       </Card>
@@ -53,9 +51,9 @@ export function ActiveRecall() {
   };
 
   return (
-    <Card className="mx-auto w-full max-w-[720px] space-y-6 p-6">
+    <Card className="mx-auto w-full max-w-reading space-y-6 p-6">
       <div className="space-y-1">
-        <h2 className="text-h2 text-strong">Repaso activo</h2>
+        <h2 className="text-h1 text-strong">Repaso activo</h2>
         <p className="text-small text-muted">
           Intenta recordar sin mirar tus apuntes y luego compara con las fuentes.
         </p>
@@ -92,7 +90,7 @@ export function ActiveRecall() {
         <div className="space-y-5">
           <div className="space-y-2">
             <SimulatedBadge />
-            <h3 ref={questionRef} tabIndex={-1} className="text-h2 text-strong outline-none">
+            <h3 ref={questionRef} tabIndex={-1} className="font-display text-h1 text-strong outline-none">
               {challenge.challengeQuestion}
             </h3>
           </div>
@@ -117,14 +115,14 @@ export function ActiveRecall() {
           ) : (
             <div className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
-                <section aria-labelledby="recall-yours" className="space-y-2 rounded-card bg-subtle p-4">
-                  <h4 id="recall-yours" className="text-label text-strong">
+                <section aria-labelledby="recall-yours" className="space-y-2 rounded-card border border-rule bg-subtle p-4">
+                  <h4 id="recall-yours" className="font-mono text-caption uppercase tracking-widest text-muted">
                     Tu respuesta
                   </h4>
                   <p className="whitespace-pre-wrap text-small text-default">{answer}</p>
                 </section>
-                <section aria-labelledby="recall-ref" className="space-y-2 rounded-card bg-success-tint p-4">
-                  <h4 id="recall-ref" className="text-label text-strong">
+                <section aria-labelledby="recall-ref" className="space-y-2 rounded-card border border-success bg-success-tint p-4">
+                  <h4 id="recall-ref" className="font-mono text-caption uppercase tracking-widest text-muted">
                     Respuesta de referencia
                   </h4>
                   <p className="text-small text-default">{challenge.canonicalAnswer}</p>

@@ -30,22 +30,22 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
   const data = Array.isArray(artifact.structuredData) ? artifact.structuredData : null;
 
   return (
-    <article className="mx-auto w-full max-w-[800px] rounded-card border border-hairline bg-surface p-5 shadow-elevation-1 sm:p-12 print:max-w-none print:border-0 print:p-0 print:shadow-none">
+    <article className="mx-auto w-full max-w-reading rounded-card border border-rule bg-surface p-5 shadow-elevation-1 sm:p-12 print:max-w-none print:border-0 print:p-0 print:shadow-none">
       <header>
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-strong pb-3 text-caption text-muted">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink pb-3 font-mono text-caption text-muted">
           <span>Cuaderno: {notebookTitle}</span>
           <span>Basado en tus fuentes · {artifact.createdAt}</span>
         </div>
 
         <div className="mt-6">
-          <span className="inline-flex h-6 items-center rounded-pill bg-subtle px-2 text-caption text-default">
+          <span className="inline-flex h-6 items-center rounded-small bg-highlight px-2 font-mono text-caption uppercase tracking-widest text-highlight-ink">
             {info.label}
           </span>
           {/* The toolbar already carries the title as h1; this copy is the full, non-truncated one. */}
-          <p aria-hidden className="mt-2 text-h1 text-strong">
+          <p aria-hidden className="mt-2 font-display text-h1 text-strong">
             {artifact.title}
           </p>
-          <dl className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-hairline pt-2 text-small text-muted">
+          <dl className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-rule pt-2 text-small text-muted">
             <div className="flex gap-1">
               <dt className="font-semibold">Calidad:</dt>
               <dd>{labelOf(QUALITY_OPTIONS, p?.quality) ?? 'Alto'}</dd>
@@ -82,11 +82,11 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
       </div>
 
       {artifact.type === 'cuestionario' && data ? (
-        <section className="mt-8 border-t-2 border-hairline pt-6">
+        <section className="mt-8 border-t-2 border-rule pt-6">
           <h2 className="text-h3 text-strong">Anexo: preguntas y soluciones</h2>
           <ol className="mt-4 space-y-4">
             {data.map((q: any, i: number) => (
-              <li key={i} className="rounded-control border border-hairline bg-subtle p-4 text-small">
+              <li key={i} className="rounded-control border border-rule bg-subtle p-4 text-small">
                 <p className="text-body-strong text-strong">
                   {i + 1}. {q.question}
                 </p>
@@ -113,12 +113,12 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
       ) : null}
 
       {artifact.type === 'flashcards' && data ? (
-        <section className="mt-8 border-t-2 border-hairline pt-6">
+        <section className="mt-8 border-t-2 border-rule pt-6">
           <h2 className="text-h3 text-strong">Anexo: tarjetas de repaso</h2>
           <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {data.map((card: any, i: number) => (
-              <li key={i} className="space-y-1.5 rounded-control border border-hairline bg-subtle p-4 text-small">
-                <span className="inline-flex rounded-pill bg-primary-tint px-2 text-caption text-primary-on-tint">
+              <li key={i} className="space-y-1.5 rounded-control border border-rule bg-subtle p-4 text-small">
+                <span className="inline-flex rounded-small bg-highlight px-2 font-mono text-caption text-highlight-ink">
                   {card.category || `Tarjeta ${i + 1}`}
                 </span>
                 <p className="text-body-strong text-strong">{card.question}</p>
@@ -130,7 +130,7 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
       ) : null}
 
       {artifact.citations && artifact.citations.length > 0 ? (
-        <section className="mt-10 rounded-control border border-hairline bg-subtle p-5">
+        <section className="mt-10 rounded-control border border-rule bg-subtle p-5">
           <h2 className="flex items-center gap-2 text-label text-strong">
             <Icon name="check" className="size-4 text-success" />
             Fuentes consultadas
@@ -142,7 +142,7 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
             {artifact.citations.map((cite, i) => (
               <li
                 key={i}
-                className="inline-flex items-center gap-1 rounded-small border border-hairline bg-surface px-2.5 py-1 text-small text-default"
+                className="inline-flex items-center gap-1 rounded-small border border-rule bg-surface px-2.5 py-1 text-small text-default"
               >
                 <Icon name="attach" className="size-3.5 text-muted" />
                 {cite}
@@ -152,7 +152,7 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
         </section>
       ) : null}
 
-      <footer className="mt-10 flex items-center justify-between border-t border-hairline pt-3 text-caption text-muted">
+      <footer className="mt-10 flex items-center justify-between border-t border-rule pt-3 text-caption text-muted">
         <span>{info.label}</span>
         <span>Material de estudio</span>
       </footer>

@@ -24,8 +24,8 @@ interface NotebookSummaryPanelProps {
 function Group({title, children}: {title: string; children: React.ReactNode}) {
   return (
     <div>
-      <h4 className="text-label text-muted">{title}</h4>
-      <div className="mt-1 text-body text-default">{children}</div>
+      <h4 className="border-b border-rule pb-1 font-mono text-caption uppercase tracking-widest text-muted">{title}</h4>
+      <div className="mt-2 max-w-reading font-sans text-body text-default">{children}</div>
     </div>
   );
 }
@@ -89,18 +89,21 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
   return (
     <Card flush>
       <div className="flex flex-wrap items-center gap-2 p-3 sm:px-5">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           aria-expanded={open}
           aria-controls={bodyId}
           onClick={toggle}
-          className="inline-flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-control text-left text-h3 text-strong"
+          className="min-w-0 flex-1 !justify-start px-0 font-display text-h2"
+          leadingIcon={
+            <Icon
+              name="chevron-down"
+              className={`size-5 shrink-0 text-muted transition-transform duration-[120ms] ${open ? '' : '-rotate-90'}`}
+            />
+          }
         >
-          <Icon name="chevron-down"
-            className={`size-5 shrink-0 text-muted transition-transform duration-[120ms] ${open ? '' : '-rotate-90'}`}
-          />
           Resumen del cuaderno
-        </button>
+        </Button>
         {analysis ? <SimulatedBadge /> : null}
         <Button
           size="sm"
@@ -131,7 +134,7 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
           {analysis ? (
             <>
               <Summary analysis={analysis} />
-              <p className="text-small text-muted">Analizado: {analysis.analyzedAt}</p>
+              <p className="font-mono text-caption text-muted">Analizado: {analysis.analyzedAt}</p>
             </>
           ) : (
             <p className="text-body text-muted">

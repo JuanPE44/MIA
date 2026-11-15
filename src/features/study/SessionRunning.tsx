@@ -41,7 +41,11 @@ export function SessionRunning({session}: {session: SessionState}) {
   }, [session.stageIndex]);
 
   return (
-    <section aria-label="Sesión en curso" className="mx-auto w-full max-w-[560px] space-y-6">
+    <section
+      aria-label="Sesión en curso"
+      data-theme="dark"
+      className="mx-auto w-full max-w-narrow space-y-6 rounded-card border border-rule bg-page p-5 text-default sm:p-8 [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,var(--mia-rule)_31px,var(--mia-rule)_32px)]"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         {blindadoOn ? (
           <StatusBadge variant="success">
@@ -66,13 +70,13 @@ export function SessionRunning({session}: {session: SessionState}) {
       ) : null}
 
       {blindadoOn ? (
-        <p className="text-small text-muted">
+        <p className="font-mono text-small text-muted">
           Salidas de la sesión: <span className="tabular-nums text-strong">{tabLeaves}</span>
         </p>
       ) : null}
 
       <div className="space-y-4 text-center">
-        <h2 ref={headingRef} tabIndex={-1} className="text-h2 text-strong outline-none">
+        <h2 ref={headingRef} tabIndex={-1} className="font-display text-h1 text-strong outline-none">
           {stageLabel(stage, session.config.cycles)}
         </h2>
         {between ? <p className="text-small text-muted">Etapa lista para empezar.</p> : null}
@@ -174,7 +178,7 @@ function TabLeftDialog({
 function SessionLog({session, stages}: {session: SessionState; stages: Stage[]}) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-label text-strong">Registro</span>
+      <span className="font-mono text-caption uppercase tracking-widest text-muted">Registro</span>
       <ol aria-label="Registro de la sesión" className="flex flex-wrap gap-1.5">
         {stages.map((st, i) => {
           const state = i < session.stageIndex ? 'completado' : i === session.stageIndex ? 'en curso' : 'pendiente';
@@ -237,9 +241,9 @@ function MicroQuestion() {
   }, []);
 
   return (
-    <Card className="space-y-3 p-5">
+    <Card className="space-y-3 bg-surface p-5">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-h3 text-strong">Micro-pregunta de descanso</h3>
+        <h3 className="font-display text-h2 text-strong">Micro-pregunta de descanso</h3>
         <SimulatedBadge />
       </div>
       {!hasSources ? (

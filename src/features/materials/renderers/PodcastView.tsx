@@ -61,19 +61,18 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[720px] space-y-4">
-      <div className="flex items-center justify-between gap-3 rounded-card border border-primary-tint-border bg-primary-tint p-4 text-primary-on-tint sm:p-5">
+    <div className="mx-auto w-full max-w-reading space-y-4">
+      <div className="flex items-center justify-between gap-3 rounded-card border-[1.5px] border-ink bg-primary-tint p-4 text-primary-on-tint shadow-offset sm:p-5">
         <div className="flex min-w-0 items-center gap-3">
-          <button
-            type="button"
+          <IconButton
+            variant="primary"
             onClick={toggle}
             aria-label={playing ? 'Pausar audio' : 'Reproducir audio'}
-            className="relative flex size-12 shrink-0 items-center justify-center rounded-pill bg-primary text-on-primary transition-colors duration-[120ms] hover:bg-primary-hover"
-          >
-            {playing ? <Icon name="pause" className="size-5" /> : <Icon name="play" className="ml-0.5 size-5" />}
-          </button>
+            className="size-12"
+            icon={playing ? <Icon name="pause" weight="fill" className="size-5" /> : <Icon name="play" weight="fill" className="ml-0.5 size-5" />}
+          />
           <div className="min-w-0">
-            <h2 className="text-body-strong">Audio resumen</h2>
+            <h2 className="font-display text-h2">Audio resumen</h2>
             <p className="text-small" role="status">
               {playing ? 'Reproduciendo con voz sintetizada en español' : 'En pausa'}
             </p>
@@ -91,7 +90,7 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
         />
       </div>
 
-      <ol className="space-y-3">
+      <ol className="space-y-3 border-l border-rule pl-4">
         {lines.map((line, idx) => {
           const host = line.speaker?.includes('Sofía');
           const current = playing && index === idx;
@@ -101,19 +100,19 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
                 type="button"
                 onClick={() => playLine(idx)}
                 aria-current={current || undefined}
-                className={`block min-h-11 w-full rounded-control border p-4 text-left transition-colors duration-[120ms] ${
+                className={`block min-h-11 w-full rounded-control border p-4 text-left transition-colors duration-[120ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                   current
-                    ? 'border-primary bg-primary-tint'
+                    ? 'border-ink bg-highlight text-highlight-ink shadow-offset'
                     : host
-                      ? 'border-hairline bg-surface hover:border-control'
-                      : 'border-hairline bg-subtle hover:border-control'
+                      ? 'border-rule bg-surface hover:border-ink'
+                      : 'border-rule bg-subtle hover:border-ink'
                 }`}
               >
-                <span className="mb-1 flex items-center justify-between text-caption">
-                  <span className={host ? 'text-primary-text' : 'text-strong'}>{line.speaker}</span>
-                  {line.timestamp ? <span className="text-muted">{line.timestamp}</span> : null}
+                <span className="mb-1 flex items-center justify-between font-mono text-caption uppercase tracking-widest">
+                  <span className={current ? 'text-highlight-ink' : host ? 'text-primary-text' : 'text-strong'}>{line.speaker}</span>
+                  {line.timestamp ? <span className={current ? 'text-highlight-ink' : 'text-muted'}>{line.timestamp}</span> : null}
                 </span>
-                <span className="block text-small text-default">{line.text}</span>
+                <span className={`block text-small ${current ? 'text-highlight-ink' : 'text-default'}`}>{line.text}</span>
               </button>
             </li>
           );
