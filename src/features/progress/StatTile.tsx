@@ -8,18 +8,15 @@ interface StatTileProps {
   hint?: string;
 }
 
-/** Metric card: icon in a tint circle, tabular value, label and optional explanation (spec 6.3). */
+/** Metric card: duotone icon, big mono value, mono unit label and optional explanation. */
 export function StatTile({icon, value, label, hint}: StatTileProps) {
   return (
     <Card className="flex h-full flex-col gap-2">
-      <span
-        aria-hidden
-        className="flex size-9 items-center justify-center rounded-pill bg-primary-tint text-primary-on-tint [&>svg]:size-5"
-      >
+      <span aria-hidden className="text-primary-text [&>svg]:size-6">
         {icon}
       </span>
-      <p className="text-h1 text-strong tabular-nums">{value}</p>
-      <p className="text-small text-default">{label}</p>
+      <p className="font-mono text-h1 font-semibold text-strong tabular-nums">{value}</p>
+      <p className="font-mono text-caption uppercase tracking-wide text-default">{label}</p>
       {hint ? <p className="text-small text-muted">{hint}</p> : null}
     </Card>
   );
