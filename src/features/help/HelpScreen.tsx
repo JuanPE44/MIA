@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState, type KeyboardEvent} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Card, Chip, IconButton, SimulatedBadge, Textarea} from '../../ui';
+import {Button, Card, Chip, Highlight, IconButton, Reveal, RevealItem, SimulatedBadge, Textarea} from '../../ui';
 import {ErrorMessage, PendingMessage, UserMessage} from '../chat/ChatMessage';
 import {Markdown} from '../chat/markdown';
 import {
-  FAQ,
   QUICK_ACTIONS,
   REQUEST_REPLY,
   loadMessages,
@@ -14,6 +13,7 @@ import {
   type HelpMessage,
   type HelpRequest,
 } from './helpModel';
+import {FaqAccordion} from './FaqAccordion';
 import {RequestCard} from './RequestCard';
 import {Icon} from '../../ui/Icon';
 
@@ -24,7 +24,7 @@ function AssistantReply({message}: {message: HelpMessage}) {
         aria-hidden
         className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-pill bg-primary-tint text-primary-on-tint"
       >
-        <Icon name="sparkles" className="size-4" />
+        <Icon name="sparkles" weight="duotone" className="size-4" />
       </span>
       <div className="min-w-0 flex-1 space-y-3">
         <Markdown text={message.text} className="text-body text-default" />
@@ -136,13 +136,19 @@ export function HelpScreen() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-h1 text-strong">Ayuda</h1>
+    <Reveal className="mx-auto w-full max-w-wide space-y-6">
+      <RevealItem>
+        <header className="border-b border-rule pb-6">
+          <h1 className="font-display text-display text-strong">
+            <Highlight trigger="mount" delay={0.15}>Ayuda</Highlight> cuando la necesites
+          </h1>
+        </header>
+      </RevealItem>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <RevealItem className="grid gap-6 lg:grid-cols-3">
         <section aria-labelledby="help-chat" className="space-y-4 lg:col-span-2">
           <div className="flex items-center justify-between gap-3">
-            <h2 id="help-chat" className="text-h2 text-strong">
+            <h2 id="help-chat" className="font-display text-h2 text-strong">
               Asistente
             </h2>
             {messages.length > 0 ? (
@@ -195,7 +201,7 @@ export function HelpScreen() {
                 e.preventDefault();
                 send(input);
               }}
-              className="flex items-end gap-2 rounded-card border border-control bg-surface p-2"
+              className="flex items-end gap-2 rounded-card border border-control bg-surface p-2 focus-within:border-ink"
             >
               <div className="min-w-0 flex-1 [&_label]:sr-only [&_textarea]:border-0 [&_textarea]:bg-transparent">
                 <Textarea
@@ -221,7 +227,7 @@ export function HelpScreen() {
 
         <div className="space-y-6">
           <section aria-labelledby="help-requests" className="space-y-3">
-            <h2 id="help-requests" className="text-h2 text-strong">
+            <h2 id="help-requests" className="font-display text-h2 text-strong">
               Mis solicitudes
             </h2>
             {requests.length === 0 ? (
@@ -238,23 +244,13 @@ export function HelpScreen() {
           </section>
 
           <section aria-labelledby="help-faq" className="space-y-3">
-            <h2 id="help-faq" className="text-h2 text-strong">
+            <h2 id="help-faq" className="font-display text-h2 text-strong">
               Preguntas frecuentes
             </h2>
-            <div className="divide-y divide-hairline rounded-card border border-hairline bg-surface">
-              {FAQ.map((item) => (
-                <details key={item.q} className="group px-4">
-                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 text-label text-strong [&::-webkit-details-marker]:hidden">
-                    {item.q}
-                    <Icon name="chevron-down" className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
-                  </summary>
-                  <p className="pb-3 text-small text-default">{item.a}</p>
-                </details>
-              ))}
-            </div>
+            <FaqAccordion />
           </section>
         </div>
-      </div>
-    </div>
+      </RevealItem>
+    </Reveal>
   );
 }

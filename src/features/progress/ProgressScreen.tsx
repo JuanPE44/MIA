@@ -9,6 +9,7 @@ import {buildWeek, hasActivity, toDailyLogs} from './progressModel';
 import {StatTile} from './StatTile';
 import {WeeklyChart} from './WeeklyChart';
 import {Icon} from '../../ui/Icon';
+import {Highlight, Reveal, RevealItem} from '../../ui';
 
 const number = new Intl.NumberFormat('es');
 
@@ -54,16 +55,20 @@ export function ProgressScreen() {
     navigate(activeNotebook ? paths.notebookSegment(activeNotebook.id, 'ESTUDIO') : paths.notebooks());
 
   return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="text-h1 text-strong">Tu progreso</h1>
-        <p className="mt-1 text-body text-muted">Resumen de toda tu cuenta, no de un cuaderno en particular.</p>
+    <Reveal className="mx-auto w-full max-w-wide space-y-8">
+      <RevealItem as="div">
+      <header className="border-b border-rule pb-6">
+        <h1 className="font-display text-display text-strong">
+          Tu <Highlight trigger="mount" delay={0.15}>progreso</Highlight>
+        </h1>
+        <p className="mt-2 text-body text-muted">Resumen de toda tu cuenta, no de un cuaderno en particular.</p>
       </header>
+      </RevealItem>
 
       {!hasActivity(stats, week) ? (
         <Card>
           <EmptyState
-            icon={<Icon name="progress" />}
+            icon={<Icon name="progress" weight="duotone" />}
             title="Empieza una sesión para ver tu progreso"
             description="Cuando estudies, aquí vas a ver tu racha, tus minutos y tu semana."
             action={
@@ -75,13 +80,15 @@ export function ProgressScreen() {
         </Card>
       ) : null}
 
+      <RevealItem>
       <section aria-labelledby="progress-today" className="grid gap-4 lg:grid-cols-3">
         <Card className="space-y-3 lg:col-span-2">
-          <h2 id="progress-today" className="text-h2 text-strong">
+          <h2 id="progress-today" className="font-display text-h2 text-strong">
             Hoy
           </h2>
           <p className="text-body text-default tabular-nums">
-            <span className="text-h1 text-strong">{minutes}</span> / {goal} min
+            <span className="font-mono text-display font-semibold text-strong">{minutes}</span>{' '}
+            <span className="font-mono text-small text-muted">/ {goal} min</span>
           </p>
           <div
             role="progressbar"
@@ -90,7 +97,7 @@ export function ProgressScreen() {
             aria-valuemax={goal}
             aria-valuenow={Math.min(minutes, goal)}
             aria-valuetext={`${minutes} de ${goal} minutos`}
-            className="h-3 w-full overflow-hidden rounded-pill bg-subtle"
+            className="h-3 w-full overflow-hidden rounded-pill border border-rule bg-subtle"
           >
             <div
               className={`h-full rounded-pill transition-[width] duration-[120ms] ${met ? 'bg-success' : 'bg-primary'}`}
@@ -99,7 +106,7 @@ export function ProgressScreen() {
           </div>
           {met ? (
             <p className="flex items-center gap-2 text-label text-success">
-              <Icon name="success" className="size-5" /> Meta de hoy cumplida
+              <Icon name="success" weight="duotone" className="size-5" /> Meta de hoy cumplida
             </p>
           ) : (
             <p className="text-small text-muted">Te faltan {goal - minutes} min para tu meta de hoy.</p>
@@ -119,7 +126,7 @@ export function ProgressScreen() {
             ))}
           </SelectField>
           <div>
-            <p className="mb-2 text-label text-strong">Registrar estudio manual</p>
+            <p className="mb-2 font-mono text-caption uppercase tracking-wide text-strong">Registrar estudio manual</p>
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" onClick={() => logMinutes(15)}>
                 +15 min
@@ -131,7 +138,9 @@ export function ProgressScreen() {
           </div>
         </Card>
       </section>
+      </RevealItem>
 
+      <RevealItem>
       <section aria-labelledby="progress-stats">
         <h2 id="progress-stats" className="sr-only">
           Tus números
@@ -139,26 +148,26 @@ export function ProgressScreen() {
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
           <li>
             <StatTile
-              icon={<Icon name="streak" />}
+              icon={<Icon name="streak" weight="duotone" />}
               value={number.format(stats.currentStreakDays)}
               label={stats.currentStreakDays === 1 ? 'día de racha' : 'días de racha'}
             />
           </li>
           <li>
-            <StatTile icon={<Icon name="sparkles" />} value={number.format(stats.xpPoints)} label="XP" />
+            <StatTile icon={<Icon name="sparkles" weight="duotone" />} value={number.format(stats.xpPoints)} label="XP" />
           </li>
           <li>
-            <StatTile icon={<Icon name="clock" />} value={number.format(stats.totalFocusHours)} label="horas totales" />
+            <StatTile icon={<Icon name="clock" weight="duotone" />} value={number.format(stats.totalFocusHours)} label="horas totales" />
           </li>
           <li>
-            <StatTile icon={<Icon name="timer" />} value={number.format(stats.sessionsCompleted)} label="sesiones" />
+            <StatTile icon={<Icon name="timer" weight="duotone" />} value={number.format(stats.sessionsCompleted)} label="sesiones" />
           </li>
           <li>
-            <StatTile icon={<Icon name="materials" />} value={number.format(stats.flashcardsMastered)} label="tarjetas dominadas" />
+            <StatTile icon={<Icon name="materials" weight="duotone" />} value={number.format(stats.flashcardsMastered)} label="tarjetas dominadas" />
           </li>
           <li>
             <StatTile
-              icon={<Icon name="shield-warning" />}
+              icon={<Icon name="shield-warning" weight="duotone" />}
               value={number.format(stats.tamperAttemptsBlocked)}
               label="salidas de pestaña"
               hint="Veces que saliste de la pestaña durante una sesión en modo blindado."
@@ -166,15 +175,18 @@ export function ProgressScreen() {
           </li>
         </ul>
       </section>
+      </RevealItem>
 
+      <RevealItem>
       <section aria-labelledby="progress-week">
         <Card className="space-y-4">
-          <h2 id="progress-week" className="flex items-center gap-2 text-h2 text-strong">
-            <Icon name="book" className="size-5 text-primary-text" /> Esta semana
+          <h2 id="progress-week" className="flex items-center gap-2 font-display text-h2 text-strong">
+            <Icon name="book" weight="duotone" className="size-5 text-primary-text" /> Esta semana
           </h2>
           <WeeklyChart week={week} goal={goal} />
         </Card>
       </section>
-    </div>
+      </RevealItem>
+    </Reveal>
   );
 }
