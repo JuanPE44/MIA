@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState, type KeyboardEvent} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Card, Chip, Highlight, IconButton, Reveal, RevealItem, SimulatedBadge, Textarea} from '../../ui';
+import {Button, Card, Chip, Highlight, IconButton, Page, PageHeader, Reveal, RevealItem, SimulatedBadge, Textarea} from '../../ui';
 import {ErrorMessage, PendingMessage, UserMessage} from '../chat/ChatMessage';
 import {Markdown} from '../chat/markdown';
 import {
@@ -136,13 +136,13 @@ export function HelpScreen() {
   };
 
   return (
-    <Reveal className="mx-auto w-full max-w-wide space-y-6">
+    <Page>
+    <Reveal className="space-y-6">
       <RevealItem>
-        <header className="border-b border-rule pb-6">
-          <h1 className="font-display text-display text-strong">
-            <Highlight trigger="mount" delay={0.15}>Ayuda</Highlight> cuando la necesites
-          </h1>
-        </header>
+        <PageHeader
+          className="border-b border-rule pb-6"
+          title={<><Highlight trigger="mount" delay={0.15}>Ayuda</Highlight> cuando la necesites</>}
+        />
       </RevealItem>
 
       <RevealItem className="grid gap-6 lg:grid-cols-3">
@@ -252,5 +252,6 @@ export function HelpScreen() {
         </div>
       </RevealItem>
     </Reveal>
+    </Page>
   );
 }

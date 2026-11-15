@@ -1,7 +1,7 @@
 import type {Folder} from '../../types';
 import {Button, Menu} from '../../ui';
 import {countLabels} from './libraryModel';
-import {Icon, resolveItemIcon} from '../../ui/Icon';
+import {Icon} from '../../ui/Icon';
 
 interface FolderHeaderProps {
   folder: Folder;
@@ -12,15 +12,16 @@ interface FolderHeaderProps {
 
 export function FolderHeader({folder, notebookCount, onNewNotebook, onDelete}: FolderHeaderProps) {
   return (
-    <section aria-labelledby="folder-header-title" className="overflow-hidden rounded-card border border-rule bg-surface">
+    <section aria-labelledby="folder-header-title" className="overflow-hidden border-b border-rule">
       {folder.coverImage ? (
         <img src={folder.coverImage} alt="" className="aspect-[16/5] max-h-56 w-full object-cover" />
       ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
         <div className="min-w-0">
-          <h2 id="folder-header-title" className="text-h2 text-strong">
-            <Icon name={resolveItemIcon(folder.icon, 'folder')} weight="duotone" className="mr-2 inline size-6 align-[-0.2em]" />
-            {folder.name}
+          <span className="font-mono text-caption uppercase tracking-widest text-muted">Carpeta</span>
+          <h2 id="folder-header-title" className="flex items-center gap-2 font-display text-h2 text-strong">
+            <Icon name="folder-open" weight="duotone" className="size-6 shrink-0 text-ink" />
+            <span className="min-w-0 truncate">{folder.name}</span>
           </h2>
           <p className="font-mono text-small text-muted">{countLabels.notebooks(notebookCount)}</p>
         </div>

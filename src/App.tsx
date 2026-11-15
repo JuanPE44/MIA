@@ -96,7 +96,7 @@ export default function App() {
       <TopBar />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-content w-full mx-auto px-4 sm:px-6 lg:px-10 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
+      <main className="w-full flex-1 px-4 sm:px-6 lg:px-12 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
         {isNotFound && <NotFound />}
 

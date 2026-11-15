@@ -61,7 +61,7 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-reading space-y-4">
+    <div className="w-full max-w-reading space-y-4">
       <div className="flex items-center justify-between gap-3 rounded-card border-[1.5px] border-ink bg-primary-tint p-4 text-primary-on-tint shadow-offset sm:p-5">
         <div className="flex min-w-0 items-center gap-3">
           <IconButton

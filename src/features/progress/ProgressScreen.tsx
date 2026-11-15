@@ -8,7 +8,7 @@ import {buildWeek, hasActivity, toDailyLogs} from './progressModel';
 import {StatTile} from './StatTile';
 import {WeeklyChart} from './WeeklyChart';
 import {Icon} from '../../ui/Icon';
-import {Highlight, Reveal, RevealItem} from '../../ui';
+import {Highlight, Page, PageHeader, Reveal, RevealItem} from '../../ui';
 
 const number = new Intl.NumberFormat('es');
 
@@ -54,14 +54,13 @@ export function ProgressScreen() {
     navigate(activeNotebook ? paths.notebookSegment(activeNotebook.id, 'ESTUDIO') : paths.notebooks());
 
   return (
-    <Reveal className="mx-auto w-full max-w-wide space-y-8">
+    <Page>
+    <Reveal className="space-y-8">
       <RevealItem as="div">
-      <header className="border-b border-rule pb-6">
-        <h1 className="font-display text-display text-strong">
-          Tu <Highlight trigger="mount" delay={0.15}>progreso</Highlight>
-        </h1>
+      <div className="border-b border-rule pb-6">
+        <PageHeader title={<>Tu <Highlight trigger="mount" delay={0.15}>progreso</Highlight></>} />
         <p className="mt-2 text-body text-muted">Resumen de toda tu cuenta, no de un cuaderno en particular.</p>
-      </header>
+      </div>
       </RevealItem>
 
       {!hasActivity(stats, week) ? (
@@ -187,5 +186,6 @@ export function ProgressScreen() {
       </section>
       </RevealItem>
     </Reveal>
+    </Page>
   );
 }

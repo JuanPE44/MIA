@@ -1,5 +1,5 @@
 import {Link} from 'react-router';
-import {Icon, resolveItemIcon} from '../../ui';
+import {AppMark, Icon, resolveItemIcon} from '../../ui';
 import {cx} from '../../ui/internal/cx';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
@@ -31,9 +31,10 @@ export function SideRail() {
       <Link
         to={paths.notebooks()}
         aria-label="MIA, ir a Biblioteca"
-        className="self-start rounded-small px-2 font-display text-h1 font-medium tracking-tight text-strong"
+        className="inline-flex items-center gap-2 self-start rounded-small px-2 font-display text-h1 font-medium tracking-tight text-strong"
       >
-        <span className="bg-highlight px-1.5 text-highlight-ink">MIA</span>
+        <AppMark size={28} />
+        <span>MIA</span>
       </Link>
 
       <nav aria-label="Principal">

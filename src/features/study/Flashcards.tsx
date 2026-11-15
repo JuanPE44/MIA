@@ -46,7 +46,7 @@ export function Flashcards() {
 
   if (deck.length === 0) {
     return (
-      <Card className="mx-auto w-full max-w-reading p-6">
+      <Card className="w-full max-w-reading p-6">
         <EmptyState
           icon={<Icon name="materials" />}
           title="Crea un material de Tarjetas"
@@ -82,7 +82,7 @@ export function Flashcards() {
     const pending = deck.filter((d) => !masteredCardIds.has(d.id));
     const mastered = deck.length - pending.length;
     return (
-      <Card className="mx-auto w-full max-w-narrow space-y-5 p-6">
+      <Card className="w-full max-w-narrow space-y-5 p-6">
         <h2 className="text-h1 text-strong">Terminaste el mazo</h2>
         <p className="text-body text-default">
           Dominas {mastered} de {deck.length} tarjetas.
@@ -119,7 +119,7 @@ export function Flashcards() {
   const isMastered = masteredCardIds.has(current.id);
 
   return (
-    <div className="mx-auto w-full max-w-narrow space-y-5">
+    <div className="w-full max-w-narrow space-y-5">
       <h2 className="sr-only">Tarjetas</h2>
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-label text-muted">

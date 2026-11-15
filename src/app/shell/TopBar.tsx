@@ -1,6 +1,7 @@
 import {Link} from 'react-router';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
+import {AppMark} from '../../ui';
 import {cx} from '../../ui/internal/cx';
 import {AccountMenu} from './AccountMenu';
 import {activeNavFor, NAV_LINKS} from './nav';
@@ -17,13 +18,14 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 h-14 border-b border-rule bg-surface lg:hidden">
-      <div className="mx-auto flex h-full w-full max-w-content items-center gap-4 px-4 sm:px-6">
+      <div className="flex h-full w-full max-w-content items-center gap-4 px-4 sm:px-6">
         <Link
           to={paths.notebooks()}
           aria-label="MIA, ir a Biblioteca"
-          className="rounded-small font-display text-h2 font-medium tracking-tight text-strong"
+          className="inline-flex items-center gap-2 rounded-small font-display text-h2 font-medium tracking-tight text-strong"
         >
-          <span className="bg-highlight px-1.5 text-highlight-ink">MIA</span>
+          <AppMark size={22} />
+          <span>MIA</span>
         </Link>
 
         <nav aria-label="Principal" className="hidden h-full sm:block">
@@ -50,7 +52,7 @@ export function TopBar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
-          <TodayChip />
+          <TodayChip compact />
           <AccountMenu />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import {BottomTabBar, Tabs, type NavTabItem} from '../../ui';
+import {BottomTabBar, Page, Tabs, type NavTabItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths, SEGMENT_SLUGS} from '../routes';
@@ -24,7 +24,8 @@ export function NotebookLayout({children}: {children: ReactNode}) {
   const {activeNotebook, activeSegment, currentThreads, isFocusModeActive, isAddSourceOpen, closeAddSource} =
     useAppState();
 
-  if (!activeNotebook || isFocusModeActive) return <>{children}</>;
+  if (!activeNotebook) return <>{children}</>;
+  if (isFocusModeActive) return <Page>{children}</Page>;
 
   const counts: Partial<Record<MainSegment, number>> = {
     CHAT: currentThreads.length > 1 ? currentThreads.length : undefined,
@@ -41,7 +42,7 @@ export function NotebookLayout({children}: {children: ReactNode}) {
   const activeId = SEGMENT_SLUGS[activeSegment];
 
   return (
-    <div className="flex flex-col gap-5">
+    <Page className="flex flex-col gap-5">
       <div>
         <NotebookHeader />
         {!phone ? <Tabs aria-label="Secciones del cuaderno" items={tabs} activeId={activeId} /> : null}
@@ -55,6 +56,6 @@ export function NotebookLayout({children}: {children: ReactNode}) {
           activeId={activeId}
         />
       ) : null}
-    </div>
+    </Page>
   );
 }

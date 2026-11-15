@@ -12,7 +12,7 @@ export function SessionSummary({summary}: {summary: SessionSummaryData}) {
     {label: 'Salidas de la sesión', value: summary.tabLeaves},
   ];
   return (
-    <Card className="mx-auto w-full max-w-narrow space-y-6 p-6">
+    <Card className="w-full max-w-narrow space-y-6 p-6">
       <h2 className="text-h1 text-strong">
         <Highlight trigger="mount">Sesión terminada</Highlight>
       </h2>

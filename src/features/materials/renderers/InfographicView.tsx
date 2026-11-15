@@ -9,7 +9,7 @@ interface InfographicData {
 export function InfographicView({data}: {data: InfographicData}) {
   const pillars = Array.isArray(data.pillars) ? data.pillars : [];
   return (
-    <div className="mx-auto w-full max-w-reading space-y-5">
+    <div className="w-full max-w-reading space-y-5">
       {data.highlightStat ? (
         <div className="rounded-card border-[1.5px] border-ink bg-surface p-6 text-center shadow-offset">
           <p className="font-display text-display text-strong">

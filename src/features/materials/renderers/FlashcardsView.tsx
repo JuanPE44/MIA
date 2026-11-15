@@ -33,7 +33,7 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
   const face = 'absolute inset-0 flex flex-col justify-between overflow-auto rounded-card border p-5 [backface-visibility:hidden] sm:p-8';
 
   return (
-    <div className="mx-auto w-full max-w-narrow space-y-4">
+    <div className="w-full max-w-narrow space-y-4">
       <div className="[perspective:1200px]">
         <button
           type="button"

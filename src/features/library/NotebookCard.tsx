@@ -8,12 +8,14 @@ import {Icon, resolveItemIcon} from '../../ui/Icon';
 interface NotebookCardProps {
   notebook: Notebook;
   folder?: Folder;
+  /** Show the folder chip (hide it when the card is already inside its folder group). Default true. */
+  showFolder?: boolean;
   onOpen: (notebookId: string) => void;
   onMove: (notebook: Notebook) => void;
   onDelete: (notebook: Notebook) => void;
 }
 
-export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: NotebookCardProps) {
+export function NotebookCard({notebook, folder, showFolder = true, onOpen, onMove, onDelete}: NotebookCardProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const sources = notebook.sources.length;
 
@@ -62,7 +64,7 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
         >
           <p className="text-small text-muted">{notebook.subject}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-            {folder ? (
+            {folder && showFolder ? (
               <Chip size="sm" variant="outline" className="max-w-full" icon={<Icon name={resolveItemIcon(folder.icon, 'folder')} />}>
                 <span className="truncate">{folder.name}</span>
               </Chip>

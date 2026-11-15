@@ -336,7 +336,7 @@ export function ChatScreen() {
       </Dialog>
 
       {/* Conversation */}
-      <div className="mx-auto flex w-full min-w-0 max-w-wide flex-1 flex-col">
+      <div className="flex w-full min-w-0 flex-1 flex-col">
         <h1 className="sr-only">Chat: {currentActiveThread.title}</h1>
         <div className="min-h-[40vh] flex-1">
           {body}

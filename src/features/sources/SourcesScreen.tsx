@@ -81,7 +81,7 @@ export function SourcesScreen() {
   };
 
   return (
-    <div className="mx-auto flex max-w-wide flex-col gap-5">
+    <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-h2 text-strong">Fuentes ({total})</h2>
         {total > 0 ? (

@@ -44,7 +44,7 @@ export function SessionRunning({session}: {session: SessionState}) {
     <section
       aria-label="Sesión en curso"
       data-theme="dark"
-      className="mx-auto w-full max-w-narrow space-y-6 rounded-card border border-rule bg-page p-5 text-default sm:p-8 [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,var(--mia-rule)_31px,var(--mia-rule)_32px)]"
+      className="w-full max-w-narrow space-y-6 rounded-card border border-rule bg-page p-5 text-default sm:p-8 [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,var(--mia-rule)_31px,var(--mia-rule)_32px)]"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         {blindadoOn ? (

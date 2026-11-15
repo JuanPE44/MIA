@@ -38,7 +38,7 @@ export function QuizView({questions}: {questions: QuizQuestion[]}) {
   const correct = questions.filter((q, i) => selected[i] === q.correctAnswer).length;
 
   return (
-    <div className="mx-auto w-full max-w-reading space-y-5">
+    <div className="w-full max-w-reading space-y-5">
       <div className="flex flex-col gap-3 rounded-card border-[1.5px] border-ink bg-surface p-4 shadow-offset sm:flex-row sm:items-center sm:justify-between sm:p-5">
         <div>
           <h2 className="font-display text-h2 text-strong">Cuestionario con autoevaluación</h2>

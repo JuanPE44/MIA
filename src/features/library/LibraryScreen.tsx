@@ -2,7 +2,7 @@ import {useMemo, useRef, useState, type ReactNode} from 'react';
 import {useSearchParams} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import type {Notebook} from '../../types';
-import {Button, ConfirmDialog, EmptyState, Highlight, Menu, TextField, useToast} from '../../ui';
+import {Button, ConfirmDialog, EmptyState, Highlight, Menu, Page, PageHeader, TextField, useToast} from '../../ui';
 import {FolderFilter} from './FolderFilter';
 import {FolderHeader} from './FolderHeader';
 import {MoveNotebookDialog} from './MoveNotebookDialog';
@@ -11,7 +11,7 @@ import {NewNotebookDialog} from './NewNotebookDialog';
 import {NotebookCard} from './NotebookCard';
 import {NotebookGrid} from './NotebookGrid';
 import {LOOSE_FILTER, countLabels, isLoose, matchesQuery} from './libraryModel';
-import {Icon, resolveItemIcon} from '../../ui/Icon';
+import {Icon} from '../../ui/Icon';
 
 /** "Mis cuadernos" (S2): folders + notebooks, search, filter, create/move/delete with undo. */
 export function LibraryScreen() {
@@ -112,11 +112,12 @@ export function LibraryScreen() {
   const folderToDelete = folders.find((f) => f.id === deletingFolderId);
   const folderToDeleteCount = notebooks.filter((nb) => nb.folderId === deletingFolderId).length;
 
-  const renderCard = (nb: Notebook) => (
+  const renderCard = (nb: Notebook, inGroup = false) => (
     <NotebookCard
       key={nb.id}
       notebook={nb}
       folder={folderOf(nb)}
+      showFolder={!inGroup}
       onOpen={handleOpenNotebook}
       onMove={setMoving}
       onDelete={setDeleting}
@@ -186,24 +187,28 @@ export function LibraryScreen() {
           onNewNotebook={() => setNewNotebookOpen(true)}
           onDelete={() => setDeletingFolderId(selectedFolder.id)}
         />
-        <NotebookGrid>{visible.map(renderCard)}</NotebookGrid>
+        <NotebookGrid>{visible.map((nb) => renderCard(nb, true))}</NotebookGrid>
       </>
     );
   } else {
     // Todos (grouped by folder, loose last) or Sin carpeta (single group).
     const groups = [
-      ...(selected === LOOSE_FILTER ? [] : folders.map((f) => ({id: f.id, title: f.name, icon: resolveItemIcon(f.icon, 'folder'), items: visible.filter((nb) => nb.folderId === f.id)}))),
-      {id: LOOSE_FILTER, title: 'Sin carpeta', icon: 'folder-open' as const, items: visible.filter((nb) => isLoose(nb, folders))},
+      ...(selected === LOOSE_FILTER ? [] : folders.map((f) => ({id: f.id, title: f.name, items: visible.filter((nb) => nb.folderId === f.id)}))),
+      {id: LOOSE_FILTER, title: 'Sin carpeta', items: visible.filter((nb) => isLoose(nb, folders))},
     ].filter((g) => g.items.length > 0);
     body = (
       <>
         {groups.map((g) => (
           <section key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-4">
-            <h2 id={`group-${g.id}`} className="text-h2 text-strong">
-              <Icon name={g.icon} weight="duotone" className="mr-2 inline size-6 align-[-0.2em]" />{g.title}{' '}
-              <span className="font-mono text-small text-muted">{g.items.length}</span>
-            </h2>
-            <NotebookGrid>{g.items.map(renderCard)}</NotebookGrid>
+            <div className="flex flex-col gap-1 border-b border-rule pb-2">
+              <span className="font-mono text-caption uppercase tracking-widest text-muted">Carpeta</span>
+              <h2 id={`group-${g.id}`} className="flex items-center gap-2 font-display text-h2 text-strong">
+                <Icon name="folder-open" weight="duotone" className="size-6 shrink-0 text-ink" />
+                <span className="min-w-0 truncate">{g.title}</span>
+                <span className="font-mono text-small font-normal text-muted">{countLabels.notebooks(g.items.length)}</span>
+              </h2>
+            </div>
+            <NotebookGrid>{g.items.map((nb) => renderCard(nb, g.id !== LOOSE_FILTER))}</NotebookGrid>
           </section>
         ))}
       </>
@@ -211,48 +216,50 @@ export function LibraryScreen() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-content flex-col gap-6 pb-16">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 ref={headingRef} tabIndex={-1} className="text-display text-strong outline-none">
+    <Page className="flex flex-col gap-6 pb-16">
+      <PageHeader
+        headingRef={headingRef}
+        title={
+          <>
             Mis <Highlight trigger="mount">cuadernos</Highlight>
-          </h1>
-          <p className="mt-2 font-mono text-small text-muted">
-            {countLabels.folders(folders.length)} · {countLabels.notebooks(notebooks.length)} ·{' '}
-            {countLabels.sources(totalSources)}
-          </p>
-        </div>
-        <div className="hidden items-center gap-2 sm:flex">
-          <Button variant="secondary" leadingIcon={<Icon name="folder-add" />} onClick={() => setNewFolderOpen(true)}>
-            Nueva carpeta
-          </Button>
-          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
-            Nuevo cuaderno
-          </Button>
-        </div>
-        <div className="flex items-center gap-2 sm:hidden">
-          <Button variant="primary" fullWidth leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
-            Nuevo cuaderno
-          </Button>
-          <Menu
-            label="Más acciones"
-            items={[{id: 'folder', label: 'Nueva carpeta', icon: <Icon name="folder-add" />, onSelect: () => setNewFolderOpen(true)}]}
-          />
-        </div>
-      </header>
+          </>
+        }
+        meta={`${countLabels.folders(folders.length)} · ${countLabels.notebooks(notebooks.length)} · ${countLabels.sources(totalSources)}`}
+        actions={
+          <div className="flex items-center gap-2 sm:hidden">
+            <Button variant="primary" fullWidth leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+              Nuevo cuaderno
+            </Button>
+            <Menu
+              label="Más acciones"
+              items={[{id: 'folder', label: 'Nueva carpeta', icon: <Icon name="folder-add" />, onSelect: () => setNewFolderOpen(true)}]}
+            />
+          </div>
+        }
+      />
 
       {!accountEmpty ? (
         <>
-          <div role="search" className="max-w-narrow">
-            <TextField
-              type="search"
-              label="Buscar cuadernos"
-              placeholder="Buscar por nombre, materia o carpeta"
-              leadingIcon={<Icon name="search" />}
-              value={query}
-              onChange={(e) => updateParams({q: e.target.value})}
-              autoComplete="off"
-            />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div role="search" className="w-full min-w-0 max-w-narrow sm:flex-1 [&_label]:sr-only">
+              <TextField
+                type="search"
+                label="Buscar cuadernos"
+                placeholder="Buscar por nombre, materia o carpeta"
+                leadingIcon={<Icon name="search" />}
+                value={query}
+                onChange={(e) => updateParams({q: e.target.value})}
+                autoComplete="off"
+              />
+            </div>
+            <div className="hidden items-center gap-2 sm:ml-auto sm:flex">
+              <Button variant="ghost" leadingIcon={<Icon name="folder-add" />} onClick={() => setNewFolderOpen(true)}>
+                Nueva carpeta
+              </Button>
+              <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+                Nuevo cuaderno
+              </Button>
+            </div>
           </div>
           <p role="status" aria-live="polite" className={query.trim() ? 'text-small text-muted' : 'sr-only'}>
             {query.trim() ? `${countLabels.notebooks(visible.length)} encontrados` : ''}
@@ -317,6 +324,6 @@ export function LibraryScreen() {
         onCancel={() => setDeletingFolderId(null)}
         onConfirm={confirmDeleteFolder}
       />
-    </div>
+    </Page>
   );
 }
