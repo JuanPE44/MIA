@@ -40,8 +40,10 @@ interface StudySessionApi {
   setSettings: (next: StudySettings) => void;
   session: SessionState | null;
   summary: SessionSummaryData | null;
-  /** Times the student left the tab while Modo blindado was on. */
+  /** Times the student left (tab or window) while Modo blindado was on. */
   tabLeaves: number;
+  /** How the most recent leave happened. */
+  leaveReason: LeaveReason;
   tabLeftOpen: boolean;
   dismissTabLeft: () => void;
   fullscreenUnsupported: boolean;
@@ -67,6 +69,12 @@ export function useStudySession(): StudySessionApi {
 }
 
 const SHORT_BREAK_MINUTES = 5;
+/** Leave signals closer than this are the same leave. */
+const LEAVE_DEDUPE_MS = 1000;
+/** Grace period before treating a fullscreen exit as a deliberate Escape. */
+const FULLSCREEN_EXIT_SETTLE_MS = 300;
+
+export type LeaveReason = 'tab' | 'window';
 
 function debugRequested(search: string): boolean {
   return import.meta.env.DEV && new URLSearchParams(search).has('debug');
@@ -88,6 +96,7 @@ export function StudySessionProvider({children}: {children: ReactNode}) {
   const [summary, setSummary] = useState<SessionSummaryData | null>(null);
   const [tabLeaves, setTabLeaves] = useState(0);
   const [tabLeftOpen, setTabLeftOpen] = useState(false);
+  const [leaveReason, setLeaveReason] = useState<LeaveReason>('tab');
   const [fullscreenUnsupported, setFullscreenUnsupported] = useState(false);
   const [announcement, setAnnouncement] = useState('');
   const [masteredCardIds, setMasteredCardIds] = useState<ReadonlySet<string>>(new Set());
@@ -229,21 +238,64 @@ export function StudySessionProvider({children}: {children: ReactNode}) {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [active]);
 
-  // Modo blindado: warn (sound + counter + alertdialog on return) when the tab is left.
+  // Modo blindado: warn (sound + counter + alertdialog on return) when the student leaves:
+  // hiding the tab or switching to another window (blur). Exiting fullscreen on
+  // purpose (Escape) is an allowed exit: it turns Modo blindado off, no penalty.
   // Covers pause and the wait between stages, not only the running clock.
   useEffect(() => {
     if (!active || !isFocusModeActive) return;
-    const onVisibility = () => {
-      if (!document.hidden) return;
+    // One leave often fires several events (blur + visibilitychange). Count it
+    // once until the student is back.
+    let away = false;
+    let lastLeaveAt = 0;
+    let wasFullscreen = document.fullscreenElement !== null;
+    let fullscreenTimer: number | undefined;
+
+    const registerLeave = (reason: LeaveReason) => {
+      const now = Date.now();
+      if (away || now - lastLeaveAt < LEAVE_DEDUPE_MS) return;
+      away = true;
+      lastLeaveAt = now;
       soundManager.playTamperWarning();
       tabLeavesRef.current += 1;
       setTabLeaves(tabLeavesRef.current);
+      setLeaveReason(reason);
       setTabLeftOpen(true);
       patchStats((s) => ({tamperAttemptsBlocked: s.tamperAttemptsBlocked + 1}));
     };
+    const markBack = () => {
+      if (!document.hidden && document.hasFocus()) away = false;
+    };
+
+    const onVisibility = () => (document.hidden ? registerLeave('tab') : markBack());
+    const onBlur = () => registerLeave('window');
+    const onFullscreen = () => {
+      const isFullscreen = document.fullscreenElement !== null;
+      const exited = wasFullscreen && !isFullscreen;
+      wasFullscreen = isFullscreen;
+      // Ignore the exit triggered by the app itself (exitBlindado / session end).
+      if (!exited || !latest.current.isFocusModeActive) return;
+      // Switching tabs can also drop fullscreen, and the events may arrive in any
+      // order. Wait a moment: if the student left, that leave already counted.
+      window.clearTimeout(fullscreenTimer);
+      fullscreenTimer = window.setTimeout(() => {
+        const leftMeanwhile = away || document.hidden || !document.hasFocus() || Date.now() - lastLeaveAt < LEAVE_DEDUPE_MS;
+        if (!leftMeanwhile && latest.current.isFocusModeActive) exitBlindado();
+      }, FULLSCREEN_EXIT_SETTLE_MS);
+    };
+
     document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [active, isFocusModeActive, patchStats]);
+    document.addEventListener('fullscreenchange', onFullscreen);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', markBack);
+    return () => {
+      window.clearTimeout(fullscreenTimer);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('fullscreenchange', onFullscreen);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', markBack);
+    };
+  }, [active, isFocusModeActive, patchStats, exitBlindado]);
 
   // Never leave the app stuck in focus mode if the provider goes away.
   useEffect(
@@ -260,6 +312,7 @@ export function StudySessionProvider({children}: {children: ReactNode}) {
       session,
       summary,
       tabLeaves,
+      leaveReason,
       tabLeftOpen,
       dismissTabLeft: () => setTabLeftOpen(false),
       fullscreenUnsupported,
@@ -275,7 +328,7 @@ export function StudySessionProvider({children}: {children: ReactNode}) {
       markCardMastered,
     }),
     [
-      settings, session, summary, tabLeaves, tabLeftOpen, fullscreenUnsupported, announcement,
+      settings, session, summary, tabLeaves, leaveReason, tabLeftOpen, fullscreenUnsupported, announcement,
       blindadoOn, debug, start, dispatch, finish, exitBlindado, masteredCardIds, markCardMastered,
     ],
   );

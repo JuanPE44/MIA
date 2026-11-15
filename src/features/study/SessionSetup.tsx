@@ -70,7 +70,7 @@ export function SessionSetup() {
           <div id={explainId}>
             <InlineAlert variant="info">
               Al empezar, la sesión ocupa toda la pantalla y te avisamos con un sonido cada vez que sales de la
-              pestaña. Puedes salir cuando quieras con «Salir del modo blindado» o con Escape: nunca bloqueamos el
+              pestaña o de la ventana. Puedes salir cuando quieras con «Salir del modo blindado» o con Escape: nunca bloqueamos el
               teclado.
             </InlineAlert>
           </div>

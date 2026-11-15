@@ -9,7 +9,7 @@ export function SessionSummary({summary}: {summary: SessionSummaryData}) {
   const items = [
     {label: 'Minutos de estudio', value: summary.minutes},
     {label: 'Bloques completados', value: summary.blocks},
-    {label: 'Salidas de la pestaña', value: summary.tabLeaves},
+    {label: 'Salidas de la sesión', value: summary.tabLeaves},
   ];
   return (
     <Card className="mx-auto w-full max-w-[560px] space-y-6 p-6">
@@ -23,7 +23,7 @@ export function SessionSummary({summary}: {summary: SessionSummaryData}) {
         ))}
       </dl>
       <p className="text-small text-muted">
-        «Salidas de la pestaña» cuenta las veces que cambiaste de pestaña con el modo blindado activado.
+        «Salidas de la sesión» cuenta las veces que cambiaste de pestaña o de ventana con el modo blindado activado.
       </p>
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button variant="primary" className="sm:flex-1" onClick={() => navigate('/progreso')}>

@@ -4,7 +4,7 @@ import {useAppState} from '../../app/AppStateContext';
 import {Button, Card, ConfirmDialog, Dialog, InlineAlert, SimulatedBadge, Spinner, StatusBadge} from '../../ui';
 import {buildStages, currentStage, type SessionState, type Stage} from './sessionMachine';
 import {requestChallenge, type RecallChallenge} from './recallApi';
-import {useStudySession} from './StudySessionProvider';
+import {useStudySession, type LeaveReason} from './StudySessionProvider';
 import {TimerRing} from './TimerRing';
 
 function stageLabel(stage: Stage, cycles: number): string {
@@ -15,7 +15,7 @@ function stageLabel(stage: Stage, cycles: number): string {
 /** S7b: the running session. */
 export function SessionRunning({session}: {session: SessionState}) {
   const {
-    blindadoOn, fullscreenUnsupported, tabLeaves, tabLeftOpen, dismissTabLeft,
+    blindadoOn, fullscreenUnsupported, tabLeaves, leaveReason, tabLeftOpen, dismissTabLeft,
     debug, dispatch, finish, exitBlindado,
   } = useStudySession();
   const [confirmEnd, setConfirmEnd] = useState(false);
@@ -67,7 +67,7 @@ export function SessionRunning({session}: {session: SessionState}) {
 
       {blindadoOn ? (
         <p className="text-small text-muted">
-          Salidas de la pestaña: <span className="tabular-nums text-strong">{tabLeaves}</span>
+          Salidas de la sesión: <span className="tabular-nums text-strong">{tabLeaves}</span>
         </p>
       ) : null}
 
@@ -126,19 +126,34 @@ export function SessionRunning({session}: {session: SessionState}) {
         }}
       />
 
-      <TabLeftDialog open={tabLeftOpen && blindadoOn} count={tabLeaves} onClose={dismissTabLeft} />
+      <TabLeftDialog open={tabLeftOpen && blindadoOn} count={tabLeaves} reason={leaveReason} onClose={dismissTabLeft} />
     </section>
   );
 }
 
-function TabLeftDialog({open, count, onClose}: {open: boolean; count: number; onClose: () => void}) {
+const LEAVE_TITLES: Record<LeaveReason, string> = {
+  tab: 'Saliste de la pestaña',
+  window: 'Cambiaste de ventana',
+};
+
+function TabLeftDialog({
+  open,
+  count,
+  reason,
+  onClose,
+}: {
+  open: boolean;
+  count: number;
+  reason: LeaveReason;
+  onClose: () => void;
+}) {
   const backRef = useRef<HTMLButtonElement>(null);
   return (
     <Dialog
       open={open}
       role="alertdialog"
       size="sm"
-      title="Saliste de la pestaña"
+      title={LEAVE_TITLES[reason]}
       description="Estás en modo blindado: la sesión sigue en marcha. Vuelve a concentrarte."
       onClose={onClose}
       hideCloseButton
@@ -150,7 +165,7 @@ function TabLeftDialog({open, count, onClose}: {open: boolean; count: number; on
       }
     >
       <p className="text-small text-default">
-        Salidas de la pestaña: <span className="tabular-nums text-strong">{count}</span>
+        Salidas de la sesión: <span className="tabular-nums text-strong">{count}</span>
       </p>
     </Dialog>
   );
