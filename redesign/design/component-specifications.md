@@ -84,6 +84,13 @@ Native `<select>` styled as TextField with chevron, for short lists (daily goal,
 
 20 × 20, radius 6 (checkbox) / full (radio), 1.5 `border.control`; checked `primary` fill + white check. Used in bulk selection (edit sources for a material).
 
+### 2.6b Select / RadioGroup / SelectableCard
+
+- **Select**: labelled native `<select>` on FieldShell (label, `helper`, `error`, `size` md/lg, disabled), `appearance-none` with a Phosphor chevron, explicit `bg-surface`/`text-strong` on select and options (dark-safe), focus-visible border, forwards ref + native props.
+- **RadioGroup / Radio**: `fieldset` + `legend` (`legendHidden` for sr-only), controlled `value`/`onChange`, shared `name`. Radio is a native input styled with an ink ring and an ink-blue dot (scale-in, off under reduced motion), optional `description` and `leading` icon, row hit 44, focus-visible outline on the row, disabled 40 % opacity. Arrow-key behavior is native.
+- **SelectableCard**: card-styled choice using a visually hidden native radio inside a label (same `name` groups them; wrap in `role="radiogroup"`). Props: `title`, `description`, `icon`/`iconSlot`, `selected`, `onSelect`, `disabled`. Selected = ink border + `shadow-offset` + `primary.tint` + highlighter mark on the title (`bg-highlight` / `text-highlight-ink`); hover lifts 1 px; focus ring around the card.
+- Left raw on purpose: image-cover pickers (NewFolderDialog) and author-colour swatches (CreateMaterialSheet) are bespoke visual radios.
+
 ### 2.7 SegmentedControl
 
 - Container `bg.subtle`, radius `pill`, padding 4; segments 32 h (hit 44), label 14/500; selected segment `bg.surface` + elevation 1 + `text.strong`.

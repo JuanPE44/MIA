@@ -1,9 +1,9 @@
 import {useRef, useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
 import {useTheme, type ThemeMode} from '../../app/providers/ThemeProvider';
-import {Button, Highlight, Reveal, RevealItem, SegmentedControl, Spinner} from '../../ui';
+import {Button, Highlight, Reveal, RevealItem, SegmentedControl, SelectableCard, Spinner} from '../../ui';
 import type {UserType} from '../../types';
-import {Icon, type IconName} from '../../ui/Icon';
+import {Icon} from '../../ui/Icon';
 
 const NOTEBOOKS_KEY = 'focused_notebooks_frecuente_v2';
 const LOADING_MS = 250;
@@ -83,22 +83,30 @@ export function WelcomeScreen() {
 
           <RevealItem>
             {firstRun ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <ChoiceCard
+              <div role="radiogroup" aria-label="Cómo quieres empezar" className="grid gap-4 sm:grid-cols-2">
+                <SelectableCard
+                  name="user-type"
+                  value="nuevo"
                   icon="add"
+                  iconSlot={pending === 'nuevo' ? <Spinner /> : undefined}
                   title="Empezar desde cero"
                   description="Una biblioteca vacía para armar tus propios cuadernos."
-                  loading={pending === 'nuevo'}
+                  selected={pending === 'nuevo'}
                   disabled={pending === 'frecuente'}
-                  onClick={() => enter('nuevo')}
+                  aria-busy={pending === 'nuevo' || undefined}
+                  onSelect={() => enter('nuevo')}
                 />
-                <ChoiceCard
+                <SelectableCard
+                  name="user-type"
+                  value="frecuente"
                   icon="notebook"
+                  iconSlot={pending === 'frecuente' ? <Spinner /> : undefined}
                   title="Probar con datos de ejemplo"
                   description="Cuadernos, fuentes y progreso de muestra para explorar."
-                  loading={pending === 'frecuente'}
+                  selected={pending === 'frecuente'}
                   disabled={pending === 'nuevo'}
-                  onClick={() => enter('frecuente')}
+                  aria-busy={pending === 'frecuente' || undefined}
+                  onSelect={() => enter('frecuente')}
                 />
               </div>
             ) : (
@@ -110,33 +118,5 @@ export function WelcomeScreen() {
         </Reveal>
       </main>
     </div>
-  );
-}
-
-interface ChoiceCardProps {
-  icon: IconName;
-  title: string;
-  description: string;
-  loading: boolean;
-  disabled: boolean;
-  onClick: () => void;
-}
-
-/** User-type choice: a whole-card button with ink border and hard offset on hover. */
-function ChoiceCard({icon, title, description, loading, disabled, onClick}: ChoiceCardProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
-      className="flex flex-col items-start gap-3 rounded-card border border-rule bg-surface p-5 text-left outline-none transition-[box-shadow,border-color,translate] duration-[120ms] hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none"
-    >
-      <span aria-hidden className="flex size-10 items-center justify-center rounded-control bg-tile-azul">
-        {loading ? <Spinner /> : <Icon name={icon} weight="duotone" className="size-6 text-ink" />}
-      </span>
-      <span className="font-display text-h3 text-strong">{title}</span>
-      <span className="text-small text-muted">{description}</span>
-    </button>
   );
 }

@@ -2,8 +2,7 @@ import {useMemo} from 'react';
 import {useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
-import {Button, Card, EmptyState, useToast} from '../../ui';
-import {SelectField} from '../library/SelectField';
+import {Button, Card, EmptyState, Select, useToast} from '../../ui';
 import {GOAL_OPTIONS, useDailyGoal} from './dailyGoal';
 import {buildWeek, hasActivity, toDailyLogs} from './progressModel';
 import {StatTile} from './StatTile';
@@ -114,7 +113,7 @@ export function ProgressScreen() {
         </Card>
 
         <Card className="space-y-4">
-          <SelectField
+          <Select
             label="Meta diaria"
             value={goal}
             onChange={(e) => setGoal(Number(e.target.value))}
@@ -124,7 +123,7 @@ export function ProgressScreen() {
                 {g} min
               </option>
             ))}
-          </SelectField>
+          </Select>
           <div>
             <p className="mb-2 font-mono text-caption uppercase tracking-wide text-strong">Registrar estudio manual</p>
             <div className="flex flex-wrap gap-2">

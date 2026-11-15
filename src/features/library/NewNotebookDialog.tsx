@@ -1,7 +1,6 @@
 import {useId, useRef, useState, type FormEvent} from 'react';
 import type {Folder, Notebook} from '../../types';
-import {Button, Dialog, IconPicker, Textarea, TextField} from '../../ui';
-import {SelectField} from './SelectField';
+import {Button, Dialog, IconPicker, Select, Textarea, TextField} from '../../ui';
 import {NOTEBOOK_ICONS} from './libraryModel';
 
 interface NewNotebookDialogProps {
@@ -80,14 +79,14 @@ export function NewNotebookDialog({folders, initialFolderId, onClose, onCreate}:
           autoComplete="off"
         />
         <TextField label="Materia (opcional)" value={subject} onChange={(e) => setSubject(e.target.value)} autoComplete="off" />
-        <SelectField label="Carpeta (opcional)" value={folderId} onChange={(e) => setFolderId(e.target.value)}>
+        <Select label="Carpeta (opcional)" value={folderId} onChange={(e) => setFolderId(e.target.value)}>
           <option value="">Sin carpeta</option>
           {folders.map((f) => (
             <option key={f.id} value={f.id}>
               {f.name}
             </option>
           ))}
-        </SelectField>
+        </Select>
         <Textarea
           label="Descripción (opcional)"
           value={description}

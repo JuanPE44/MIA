@@ -1,6 +1,6 @@
 import {useId, useState, type FormEvent} from 'react';
 import type {Folder, Notebook} from '../../types';
-import {Button, Dialog, Icon, resolveItemIcon, type IconName} from '../../ui';
+import {Button, Dialog, Icon, Radio, RadioGroup, resolveItemIcon, type IconName} from '../../ui';
 
 interface MoveNotebookDialogProps {
   notebook: Notebook;
@@ -12,7 +12,6 @@ interface MoveNotebookDialogProps {
 
 export function MoveNotebookDialog({notebook, folders, onClose, onMove}: MoveNotebookDialogProps) {
   const formId = useId();
-  const groupName = useId();
   const current = notebook.folderId && folders.some((f) => f.id === notebook.folderId) ? notebook.folderId : '';
   const [target, setTarget] = useState(current);
 
@@ -43,27 +42,16 @@ export function MoveNotebookDialog({notebook, folders, onClose, onMove}: MoveNot
       }
     >
       <form id={formId} noValidate onSubmit={submit}>
-        <fieldset>
-          <legend className="sr-only">Carpeta de destino</legend>
-          <div className="flex flex-col gap-1">
-            {options.map((o) => (
-              <label
-                key={o.id || 'none'}
-                className="flex min-h-11 cursor-pointer items-center gap-3 rounded-control px-3 hover:bg-subtle has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-focus"
-              >
-                <input
-                  type="radio"
-                  name={groupName}
-                  checked={target === o.id}
-                  onChange={() => setTarget(o.id)}
-                  className="size-5 accent-[var(--mia-primary)]"
-                />
-                <Icon name={o.icon} weight="duotone" className="size-5" />
-                <span className="text-body text-strong">{o.label}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <RadioGroup legend="Carpeta de destino" legendHidden value={target} onChange={setTarget}>
+          {options.map((o) => (
+            <Radio
+              key={o.id || 'none'}
+              value={o.id}
+              label={o.label}
+              leading={<Icon name={o.icon} weight="duotone" className="size-5" />}
+            />
+          ))}
+        </RadioGroup>
       </form>
     </Dialog>
   );

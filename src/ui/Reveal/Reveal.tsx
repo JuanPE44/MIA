@@ -1,9 +1,9 @@
 import type {ReactNode} from 'react';
 import {motion, useReducedMotion, type Variants} from 'motion/react';
 
-type Tag = 'div' | 'ul' | 'ol' | 'section' | 'li';
+type Tag = 'div' | 'ul' | 'ol' | 'section' | 'li' | 'dl' | 'dt' | 'dd';
 
-const TAGS = {div: motion.div, ul: motion.ul, ol: motion.ol, section: motion.section, li: motion.li} as const;
+const TAGS = {div: motion.div, ul: motion.ul, ol: motion.ol, section: motion.section, li: motion.li, dl: motion.dl, dt: motion.dt, dd: motion.dd} as const;
 
 export interface RevealProps {
   children: ReactNode;
