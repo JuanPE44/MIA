@@ -46,7 +46,7 @@ export function Flashcards() {
 
   if (deck.length === 0) {
     return (
-      <Card className="mx-auto w-full max-w-[720px] p-6">
+      <Card className="mx-auto w-full max-w-reading p-6">
         <EmptyState
           icon={<Icon name="materials" />}
           title="Crea un material de Tarjetas"
@@ -82,8 +82,8 @@ export function Flashcards() {
     const pending = deck.filter((d) => !masteredCardIds.has(d.id));
     const mastered = deck.length - pending.length;
     return (
-      <Card className="mx-auto w-full max-w-[560px] space-y-5 p-6">
-        <h2 className="text-h2 text-strong">Terminaste el mazo</h2>
+      <Card className="mx-auto w-full max-w-narrow space-y-5 p-6">
+        <h2 className="text-h1 text-strong">Terminaste el mazo</h2>
         <p className="text-body text-default">
           Dominas {mastered} de {deck.length} tarjetas.
         </p>
@@ -119,10 +119,10 @@ export function Flashcards() {
   const isMastered = masteredCardIds.has(current.id);
 
   return (
-    <div className="mx-auto w-full max-w-[560px] space-y-5">
+    <div className="mx-auto w-full max-w-narrow space-y-5">
       <h2 className="sr-only">Tarjetas</h2>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-label text-muted">
+        <span className="font-mono text-label text-muted">
           {index + 1} de {round.length}
         </span>
         <div className="flex items-center gap-2">
@@ -135,15 +135,15 @@ export function Flashcards() {
         type="button"
         onClick={() => setFlipped((f) => !f)}
         className={[
-          'flex aspect-[3/2] w-full flex-col justify-between rounded-card border p-6 text-center shadow-elevation-1',
-          flipped ? 'border-primary-tint-border bg-primary-tint' : 'border-hairline bg-surface',
+          'flex aspect-[3/2] w-full flex-col justify-between rounded-card border-[1.5px] border-ink p-6 text-center shadow-offset focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus',
+          flipped ? 'bg-highlight text-highlight-ink' : 'bg-surface',
         ].join(' ')}
       >
-        <span className="text-caption text-muted">{flipped ? 'Respuesta' : 'Pregunta'}</span>
-        <span aria-live="polite" className="text-h2 text-strong">
+        <span className={`font-mono text-caption uppercase tracking-widest ${flipped ? '' : 'text-muted'}`}>{flipped ? 'Respuesta' : 'Pregunta'}</span>
+        <span aria-live="polite" className={`font-display text-h1 ${flipped ? '' : 'text-strong'}`}>
           {flipped ? current.card.answer : current.card.question}
         </span>
-        <span className="text-caption text-muted">Pulsa o usa Espacio / Enter para voltear</span>
+        <span className={`text-caption ${flipped ? '' : 'text-muted'}`}>Pulsa o usa Espacio / Enter para voltear</span>
       </button>
 
       {current.card.hint ? (

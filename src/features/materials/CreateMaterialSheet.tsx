@@ -148,19 +148,19 @@ export function CreateMaterialSheet({type, notebookId, notebookTitle, sources, o
         </div>
 
         <div>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             aria-expanded={customizeOpen}
             aria-controls={panelId}
             onClick={() => setCustomizeOpen((open) => !open)}
-            className="flex min-h-11 w-full items-center gap-2 rounded-control text-body-strong text-strong"
+            className="!justify-start px-0"
+            leadingIcon={<Icon name="chevron-down" className={cx('size-4 transition-transform', customizeOpen && 'rotate-180')} />}
           >
-            <Icon name="chevron-down" className={cx('size-4 transition-transform', customizeOpen && 'rotate-180')} />
             Personalizar
-          </button>
+          </Button>
           <div id={panelId} role="region" aria-label="Personalizar" hidden={!customizeOpen} className="mt-3 flex flex-col gap-5">
             <fieldset className="flex flex-col gap-4">
-              <legend className="text-caption font-medium text-muted">Contenido</legend>
+              <legend className="font-mono text-caption uppercase tracking-widest text-muted">Contenido</legend>
               <div>
                 <p id={qualityId} className="mb-2 text-label text-strong">
                   Calidad
@@ -190,7 +190,7 @@ export function CreateMaterialSheet({type, notebookId, notebookTitle, sources, o
             </fieldset>
 
             <fieldset className="flex flex-col gap-1">
-              <legend className="mb-1 text-caption font-medium text-muted">Estilo</legend>
+              <legend className="mb-1 font-mono text-caption uppercase tracking-widest text-muted">Estilo</legend>
               <Switch
                 checked={personalization.keepTitles}
                 onCheckedChange={(keepTitles) => patch({keepTitles})}
@@ -216,7 +216,7 @@ export function CreateMaterialSheet({type, notebookId, notebookTitle, sources, o
                         onClick={() => patch({authorHighlightColor: option.id})}
                         className={cx(
                           'inline-flex min-h-11 items-center gap-2 rounded-pill border px-3 text-label text-strong',
-                          selectedColor ? 'border-strong' : 'border-hairline',
+                          selectedColor ? 'border-ink bg-primary-tint' : 'border-rule',
                         )}
                       >
                         <span aria-hidden className="size-4 rounded-pill border border-hairline" style={{backgroundColor: option.bg}} />
@@ -256,7 +256,7 @@ export function CreateMaterialSheet({type, notebookId, notebookTitle, sources, o
             </fieldset>
 
             <fieldset>
-              <legend className="mb-1 text-caption font-medium text-muted">Fuentes</legend>
+              <legend className="mb-1 font-mono text-caption uppercase tracking-widest text-muted">Fuentes</legend>
               <Switch
                 checked={personalization.citeSources}
                 onCheckedChange={(citeSources) => patch({citeSources})}

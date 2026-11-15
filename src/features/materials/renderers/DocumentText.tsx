@@ -99,7 +99,7 @@ export function DocumentText({text, highlightColor}: {text: string; highlightCol
       flush();
       b++;
       blocks.push(
-        <h3 key={key} id={`doc-${slug(m[1])}`} className="mt-4 text-body-strong text-primary-on-tint">
+        <h3 key={key} id={`doc-${slug(m[1])}`} className="mt-4 font-display text-h3 text-primary-on-tint">
           {renderInline(m[1], highlightColor, key)}
         </h3>,
       );
@@ -108,7 +108,7 @@ export function DocumentText({text, highlightColor}: {text: string; highlightCol
       flush();
       b++;
       blocks.push(
-        <h2 key={key} id={`doc-${slug(m[1])}`} className="mt-6 border-b border-hairline pb-1 text-h3 text-strong">
+        <h2 key={key} id={`doc-${slug(m[1])}`} className="mt-6 border-b border-rule pb-1 font-display text-h2 text-strong">
           {renderInline(m[1], highlightColor, key)}
         </h2>,
       );
@@ -122,7 +122,7 @@ export function DocumentText({text, highlightColor}: {text: string; highlightCol
         i++;
       }
       blocks.push(
-        <blockquote key={key} className="rounded-r-control border-l-4 border-primary bg-primary-tint py-1 pl-3 pr-2 italic text-primary-on-tint">
+        <blockquote key={key} className="rounded-r-control border-l-4 border-ink bg-subtle py-1 pl-3 pr-2 font-display italic text-default">
           {renderInline(quote.join('\n'), highlightColor, key)}
         </blockquote>,
       );
@@ -152,7 +152,7 @@ export function DocumentText({text, highlightColor}: {text: string; highlightCol
   flush();
 
   return (
-    <div className="flex flex-col gap-3 text-body text-default [&>h2:first-child]:mt-0 [&>h3:first-child]:mt-0">
+    <div className="flex flex-col gap-3 max-w-reading text-body text-default [&>h2:first-child]:mt-0 [&>h3:first-child]:mt-0">
       {blocks.map((block, idx) => (
         <Fragment key={idx}>{block}</Fragment>
       ))}

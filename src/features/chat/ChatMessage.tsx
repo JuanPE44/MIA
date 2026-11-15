@@ -1,5 +1,5 @@
 import {useState, type ReactNode} from 'react';
-import {Button, Chip, IconButton, InlineAlert, SimulatedBadge, Spinner, Textarea} from '../../ui';
+import {Button, Chip, CitationChip, IconButton, InlineAlert, SimulatedBadge, Spinner, Textarea} from '../../ui';
 import {AI_SIMULATED} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {Markdown} from './markdown';
@@ -11,9 +11,9 @@ function AssistantAvatar() {
   return (
     <span
       aria-hidden
-      className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-pill bg-primary-tint text-primary-on-tint"
+      className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-small border border-ink bg-highlight text-highlight-ink"
     >
-      <Icon name="sparkles" className="size-4" />
+      <Icon name="sparkles" weight="fill" className="size-4" />
     </span>
   );
 }
@@ -22,7 +22,7 @@ function AssistantAvatar() {
 export function UserMessage({message}: {message: ChatMessageData}) {
   return (
     <div className="flex justify-end">
-      <p className="max-w-[80%] whitespace-pre-wrap break-words rounded-card rounded-br-[4px] bg-primary-tint px-4 py-2 text-body text-strong">
+      <p className="max-w-narrow whitespace-pre-wrap break-words rounded-card rounded-br-small border border-ink bg-surface px-4 py-2 text-body text-strong shadow-offset">
         {message.text}
       </p>
     </div>
@@ -34,7 +34,7 @@ export function PendingMessage() {
   return (
     <div className="flex gap-3" role="status">
       <AssistantAvatar />
-      <p className="flex items-center gap-2 text-body text-muted">
+      <p className="flex items-center gap-2 font-mono text-small text-muted">
         <Spinner size={16} />
         Pensando…
       </p>
@@ -98,31 +98,32 @@ export function AssistantMessage({
     const chunk = chunks.find((c) => c.index === index);
     if (!chunk) return null;
     return (
-      <button
-        type="button"
+      <CitationChip
+        n={index}
         onClick={() => onOpenChunk(chunk)}
         aria-label={`Ver fuente ${index}: ${chunk.sourceTitle}`}
-        className="mx-0.5 inline-flex min-w-5 items-center justify-center rounded-small bg-primary-tint px-1 text-caption text-primary-on-tint hover:bg-subtle pointer-coarse:min-h-6"
-      >
-        {index}
-      </button>
+        className="mx-0.5 pointer-coarse:min-h-6"
+      />
     );
   };
 
+  const readingClass = 'font-sans text-[1.0625rem] leading-[1.75rem] text-default';
+
   return (
-    <div className="flex gap-3">
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-8">
+    <div className="flex min-w-0 gap-3">
       <AssistantAvatar />
       <div className="min-w-0 flex-1">
         {message.isGroundingWarning || isUnknown ? (
           <InlineAlert variant="warning">
-            <Markdown text={message.text} className="text-body text-default" renderCitation={renderCitation} />
+            <Markdown text={message.text} className={readingClass} renderCitation={renderCitation} />
           </InlineAlert>
         ) : (
-          <Markdown text={message.text} className="text-body text-default" renderCitation={renderCitation} />
+          <Markdown text={message.text} className={readingClass} renderCitation={renderCitation} />
         )}
 
         {chunks.length > 0 || citedOnly.length > 0 ? (
-          <ul className="mt-3 flex flex-wrap gap-2" aria-label="Fuentes citadas">
+          <ul className={`mt-3 flex flex-wrap gap-2 ${chunks.length > 0 ? 'lg:hidden' : ''}`} aria-label="Fuentes citadas">
             {chunks.map((chunk) => (
               <li key={chunk.index}>
                 <button
@@ -131,8 +132,8 @@ export function AssistantMessage({
                   aria-label={`Ver fuente ${chunk.index}: ${chunk.sourceTitle}, ${chunk.location}`}
                   className="relative rounded-pill pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-['']"
                 >
-                  <Chip variant="outline" size="sm" icon={<Icon name="document" />} className="hover:bg-subtle">
-                    <span className="max-w-[16rem] truncate">
+                  <Chip variant="outline" size="sm" icon={<Icon name="document" />} className="hover:border-ink">
+                    <span className="max-w-3xs truncate">
                       Fuente {chunk.index} · {chunk.sourceTitle}
                     </span>
                   </Chip>
@@ -142,7 +143,7 @@ export function AssistantMessage({
             {citedOnly.map((title) => (
               <li key={title}>
                 <Chip variant="outline" size="sm" icon={<Icon name="document" />}>
-                  <span className="max-w-[16rem] truncate">{title}</span>
+                  <span className="max-w-3xs truncate">{title}</span>
                 </Chip>
               </li>
             ))}
@@ -243,6 +244,27 @@ export function AssistantMessage({
           </form>
         ) : null}
       </div>
+    </div>
+    {chunks.length > 0 ? (
+      <aside aria-label="Notas al margen" className="mt-3 hidden space-y-3 lg:block">
+        {chunks.map((chunk) => (
+          <button
+            key={chunk.index}
+            type="button"
+            onClick={() => onOpenChunk(chunk)}
+            aria-label={`Ver fuente ${chunk.index}: ${chunk.sourceTitle}, ${chunk.location}`}
+            className="block w-full rounded-small border-l-2 border-ink bg-subtle px-3 py-2 text-left transition-[box-shadow,translate] duration-[120ms] hover:-translate-x-px hover:-translate-y-px hover:shadow-offset focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            <span className="flex items-center gap-2">
+              <CitationChip n={chunk.index} />
+              <span className="min-w-0 truncate font-mono text-caption text-muted">{chunk.location}</span>
+            </span>
+            <span className="mt-1 block truncate text-label text-strong">{chunk.sourceTitle}</span>
+            <span className="mt-1 line-clamp-3 font-display text-small italic text-default">{chunk.snippet}</span>
+          </button>
+        ))}
+      </aside>
+    ) : null}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {motion, useReducedMotion} from 'motion/react';
 import {Button, InlineAlert} from '../../../ui';
 import {Icon} from '../../../ui/Icon';
 
@@ -18,6 +19,7 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const reduced = useReducedMotion();
 
   const card = cards[index] ?? cards[0];
   if (!card) return null;
@@ -31,38 +33,39 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
   const face = 'absolute inset-0 flex flex-col justify-between overflow-auto rounded-card border p-5 [backface-visibility:hidden] sm:p-8';
 
   return (
-    <div className="mx-auto w-full max-w-[560px] space-y-4">
+    <div className="mx-auto w-full max-w-narrow space-y-4">
       <div className="[perspective:1200px]">
         <button
           type="button"
           onClick={() => setFlipped((v) => !v)}
-          className="relative block aspect-[3/2] min-h-[240px] w-full cursor-pointer select-none rounded-card text-center"
+          className="relative block aspect-[3/2] min-h-60 w-full cursor-pointer select-none rounded-card text-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
         >
           <span className="sr-only">
             {flipped ? 'Mostrando la respuesta. Pulsa para volver a la pregunta.' : 'Mostrando la pregunta. Pulsa para ver la respuesta.'}
           </span>
-          <span
+          <motion.span
             aria-hidden
-            className={`absolute inset-0 block transition-transform duration-[300ms] ease-standard [transform-style:preserve-3d] motion-reduce:transition-none ${
-              flipped ? '[transform:rotateY(180deg)]' : ''
-            }`}
+            className="absolute inset-0 block [transform-style:preserve-3d]"
+            initial={false}
+            animate={{rotateY: flipped && !reduced ? 180 : 0}}
+            transition={reduced ? {duration: 0} : {type: 'spring', stiffness: 170, damping: 18, mass: 0.9}}
           >
-            <span className={`${face} border-hairline bg-surface shadow-elevation-1`}>
-              <span className="flex items-center justify-between text-caption text-muted">
+            <span className={`${face} border-ink bg-surface shadow-offset ${reduced && flipped ? 'hidden' : ''}`}>
+              <span className="flex items-center justify-between font-mono text-caption uppercase tracking-widest text-muted">
                 <span>Pregunta</span>
-                <span className="rounded-pill bg-subtle px-2 py-0.5 text-default">{card.category || 'Concepto'}</span>
+                <span className="rounded-pill bg-subtle px-2 py-0.5 normal-case tracking-normal text-default">{card.category || 'Concepto'}</span>
               </span>
-              <span className="my-4 text-h2 text-strong">{card.question}</span>
+              <span className="my-4 font-display text-h1 text-strong">{card.question}</span>
               <span className="text-caption text-muted">Pulsa para ver la respuesta</span>
             </span>
             <span
-              className={`${face} border-primary-tint-border bg-primary-tint text-primary-on-tint [transform:rotateY(180deg)]`}
+              className={`${face} border-ink bg-highlight text-highlight-ink shadow-offset ${reduced ? (flipped ? '' : 'hidden') : '[transform:rotateY(180deg)]'}`}
             >
-              <span className="text-caption">Respuesta</span>
-              <span className="my-4 text-h2">{card.answer}</span>
+              <span className="font-mono text-caption uppercase tracking-widest">Respuesta</span>
+              <span className="my-4 font-display text-h1">{card.answer}</span>
               <span className="text-caption">Pulsa para volver a la pregunta</span>
             </span>
-          </span>
+          </motion.span>
           {/* Visible face as real text for assistive tech (the 3D faces above are decorative). */}
           <span className="sr-only">{flipped ? card.answer : card.question}</span>
         </button>
@@ -78,7 +81,7 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
         <Button variant="secondary" leadingIcon={<Icon name="chevron-left" className="size-4" />} onClick={() => go(-1)}>
           Anterior
         </Button>
-        <p className="text-small text-muted" aria-live="polite">
+        <p className="font-mono text-small text-muted" aria-live="polite">
           {index + 1} de {cards.length}
         </p>
         <Button variant="secondary" trailingIcon={<Icon name="chevron-right" className="size-4" />} onClick={() => go(1)}>

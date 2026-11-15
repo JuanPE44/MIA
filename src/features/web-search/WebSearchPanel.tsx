@@ -4,6 +4,8 @@ import {
   Button,
   Card,
   InlineAlert,
+  Reveal,
+  RevealItem,
   SegmentedControl,
   SimulatedBadge,
   Spinner,
@@ -11,7 +13,6 @@ import {
   TextField,
   useToast,
 } from '../../ui';
-import {HIT_44} from '../../ui/internal/cx';
 import {Markdown} from '../chat/markdown';
 import {
   MODE_OPTIONS,
@@ -128,20 +129,16 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
 
       {turns.length === 0 ? (
         <div className="flex flex-col gap-2">
-          <p className="text-label text-muted">Prueba con</p>
-          <ul className="flex flex-wrap gap-2">
+          <p className="font-mono text-caption uppercase tracking-widest text-muted">Prueba con</p>
+          <Reveal as="ul" className="flex flex-wrap gap-2">
             {SUGGESTIONS[mode].map((s) => (
-              <li key={s}>
-                <button
-                  type="button"
-                  onClick={() => start(s)}
-                  className={`${HIT_44} rounded-pill border border-control bg-surface px-3 py-1.5 text-left text-label text-default hover:bg-subtle`}
-                >
+              <RevealItem as="li" key={s}>
+                <Button variant="secondary" size="sm" onClick={() => start(s)} className="h-auto whitespace-normal py-1.5 text-left">
                   {s}
-                </button>
-              </li>
+                </Button>
+              </RevealItem>
             ))}
-          </ul>
+          </Reveal>
         </div>
       ) : null}
 
@@ -152,9 +149,9 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
             const added = addedIds.includes(turn.id);
             return (
               <li key={turn.id}>
-                <Card className="flex flex-col gap-3">
+                <Card className="flex flex-col gap-3 border-l-4 border-l-ink">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="min-w-0 flex-1 text-body-strong text-strong">{turn.query}</p>
+                    <p className="min-w-0 flex-1 font-display text-h3 text-strong">{turn.query}</p>
                     {verdict ? <StatusBadge variant={verdict.variant}>{verdict.label}</StatusBadge> : null}
                     {turn.status === 'done' ? <SimulatedBadge /> : null}
                   </div>
@@ -183,10 +180,10 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
 
                   {turn.status === 'done' ? (
                     <>
-                      <Markdown text={turn.reply ?? ''} className="text-body text-default" />
+                      <Markdown text={turn.reply ?? ''} className="max-w-reading font-sans text-body text-default" />
                       {turn.sources && turn.sources.length > 0 ? (
                         <div>
-                          <p className="text-label text-muted">Fuentes</p>
+                          <p className="font-mono text-caption uppercase tracking-widest text-muted">Fuentes</p>
                           <ul className="mt-1 flex flex-col gap-1">
                             {turn.sources.map((s) => (
                               <li key={s.url}>
@@ -208,7 +205,7 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
                           </ul>
                         </div>
                       ) : null}
-                      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-hairline pt-3">
+                      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-rule pt-3">
                         <Button
                           size="sm"
                           variant="ghost"

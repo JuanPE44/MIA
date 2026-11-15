@@ -47,7 +47,7 @@ export function Composer({
         e.preventDefault();
         if (canSend) onSend();
       }}
-      className="rounded-card border border-control bg-surface p-2"
+      className="rounded-card border-[1.5px] border-ink bg-surface p-2 shadow-offset focus-within:bg-surface"
     >
       <div className="flex items-end gap-2">
         <div className="min-w-0 flex-1 [&_label]:sr-only [&_textarea]:border-0 [&_textarea]:bg-transparent">
@@ -77,13 +77,9 @@ export function Composer({
           {blocked ? disabledReason : 'Enter envía · Mayús+Enter agrega una línea'}
         </p>
         <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={onOpenSources}
-            className="relative inline-flex h-8 items-center rounded-control px-2 text-label text-primary-text underline-offset-2 hover:underline pointer-coarse:h-11"
-          >
+          <Button variant="ghost" size="sm" onClick={onOpenSources} className="font-mono">
             Fuentes activas: {activeSources} de {totalSources}
-          </button>
+          </Button>
           <Button
             variant="ghost"
             size="sm"

@@ -35,25 +35,33 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
   ];
 
   return (
-    <div ref={wrapperRef} className="h-full">
+    <div ref={wrapperRef} className="group/stack relative isolate h-full pb-2 pr-2">
+      <span
+        aria-hidden
+        className="absolute inset-0 -z-10 translate-x-2 translate-y-2 rotate-1 rounded-card border border-rule bg-subtle transition-transform duration-[120ms] group-hover/stack:translate-x-2.5 group-hover/stack:rotate-2 motion-reduce:transition-none"
+      />
+      <span
+        aria-hidden
+        className="absolute inset-0 -z-10 translate-x-1 translate-y-1 -rotate-1 rounded-card border border-rule bg-surface transition-transform duration-[120ms] group-hover/stack:translate-y-1.5 group-hover/stack:-rotate-2 motion-reduce:transition-none"
+      />
       <InteractiveCard
         className="h-full"
         href={paths.artifact(notebookId, artifact.id)}
         onClick={handleClick}
         title={
           <span className="flex items-center gap-3 pr-10">
-            <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
+            <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control border border-rule text-strong ${info.tileClass}`}>
               <Icon name={info.icon} weight="duotone" className="size-5" />
             </span>
             <span className="flex min-w-0 flex-col">
-              <span className="text-caption font-medium text-muted">{info.label}</span>
+              <span className="font-mono text-caption uppercase tracking-widest text-muted">{info.label}</span>
               <span className="line-clamp-2 break-words">{artifact.title}</span>
             </span>
           </span>
         }
         actions={<Menu label={`Más opciones de ${artifact.title}`} items={items} contextTargetRef={wrapperRef} />}
       >
-        <p className="text-small text-muted">
+        <p className="font-mono text-caption text-muted">
           {artifact.createdAt} · {plural(sources, 'fuente', 'fuentes')}
         </p>
         <SimulatedBadge className="mt-2" />
@@ -72,7 +80,7 @@ export function GeneratingCard({job}: {job: MaterialJob}) {
           <Icon name={info.icon} weight="duotone" className="size-5" />
         </span>
         <div className="min-w-0">
-          <p className="text-caption font-medium text-muted">{info.label}</p>
+          <p className="font-mono text-caption uppercase tracking-widest text-muted">{info.label}</p>
           <p role="status" className="flex items-center gap-2 text-h3 text-strong">
             <Spinner size={16} />
             Generando…

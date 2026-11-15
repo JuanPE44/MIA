@@ -15,11 +15,11 @@ export function SessionSetup() {
   const explainId = useId();
 
   return (
-    <Card className="mx-auto w-full max-w-[560px] space-y-6 p-6">
-      <h2 className="text-h2 text-strong">Sesión de estudio</h2>
+    <Card className="mx-auto w-full max-w-narrow space-y-6 p-6">
+      <h2 className="text-h1 text-strong">Sesión de estudio</h2>
 
       <div className="space-y-2">
-        <p id={studyId} className="text-label text-strong">
+        <p id={studyId} className="font-mono text-caption uppercase tracking-widest text-muted">
           Estudio
         </p>
         <SegmentedControl
@@ -32,7 +32,7 @@ export function SessionSetup() {
       </div>
 
       <div className="space-y-2">
-        <p id={longId} className="text-label text-strong">
+        <p id={longId} className="font-mono text-caption uppercase tracking-widest text-muted">
           Descanso largo
         </p>
         <SegmentedControl
@@ -46,9 +46,9 @@ export function SessionSetup() {
         />
       </div>
 
-      <p className="text-small text-muted">Ciclos: 4 · Descanso corto: 5 min</p>
+      <p className="font-mono text-caption text-muted">Ciclos: 4 · Descanso corto: 5 min</p>
 
-      <div className="space-y-3 rounded-card border border-hairline p-4">
+      <div className="space-y-3 rounded-card border border-rule bg-subtle p-4">
         <Switch
           checked={settings.blindado}
           onCheckedChange={(blindado) => setSettings({...settings, blindado})}
@@ -57,15 +57,15 @@ export function SessionSetup() {
           labelPosition="left"
           className="w-full"
         />
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
           aria-expanded={explainOpen}
           aria-controls={explainId}
           onClick={() => setExplainOpen((o) => !o)}
-          className="min-h-touch text-label text-primary-text underline-offset-2 hover:underline"
         >
           ¿Cómo funciona?
-        </button>
+        </Button>
         {explainOpen ? (
           <div id={explainId}>
             <InlineAlert variant="info">

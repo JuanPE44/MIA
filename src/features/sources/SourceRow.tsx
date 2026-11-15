@@ -1,6 +1,6 @@
 import type {SourceItem} from '../../types';
-import {Button, InlineAlert, Menu, StatusBadge, Switch, type MenuItem} from '../../ui';
-import {TYPE_TILE, sourceMeta, typeIcon} from './sourceModel';
+import {Button, InlineAlert, Menu, RevealItem, StatusBadge, Switch, type MenuItem} from '../../ui';
+import {SOURCE_TYPE_LABEL, TYPE_TILE, sourceMeta, typeIcon} from './sourceModel';
 import {Icon} from '../../ui/Icon';
 
 export type SourceStatus = 'analyzing' | 'ready' | 'error';
@@ -25,18 +25,27 @@ export function SourceRow({source, status, onToggle, onViewAnalysis, onAsk, onDe
   ];
 
   return (
-    <li className="px-3 py-2 sm:px-4">
+    <RevealItem
+      as="li"
+      className="relative rounded-card border border-rule bg-surface px-3 pb-2 pt-5 transition-[box-shadow,border-color,translate] duration-[120ms] hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset sm:px-4"
+    >
+      <span
+        aria-hidden
+        className="absolute left-3 top-1 font-mono text-caption uppercase tracking-widest text-muted sm:left-4"
+      >
+        {SOURCE_TYPE_LABEL[source.type]}
+      </span>
       <div className="flex min-h-16 items-center gap-3">
         <span
           aria-hidden
-          className={`inline-flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${TYPE_TILE[source.type]}`}
+          className={`inline-flex size-10 shrink-0 items-center justify-center rounded-control border border-rule text-strong ${TYPE_TILE[source.type]}`}
         >
           {typeIcon(source.type)}
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-body-strong text-strong">{source.title}</p>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="truncate text-small text-muted">{sourceMeta(source)}</p>
+            <p className="truncate font-mono text-caption text-muted">{sourceMeta(source)}</p>
             {status === 'analyzing' ? (
               <StatusBadge variant="info" loading>
                 Analizando…
@@ -77,6 +86,6 @@ export function SourceRow({source, status, onToggle, onViewAnalysis, onAsk, onDe
           No se pudo analizar esta fuente. Puedes seguir usándola en el chat o reintentar el análisis.
         </InlineAlert>
       ) : null}
-    </li>
+    </RevealItem>
   );
 }

@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
 import type {SourceItem} from '../../types';
-import {Button, Card, ConfirmDialog, EmptyState, InlineAlert, Menu, useToast} from '../../ui';
+import {Button, Card, ConfirmDialog, EmptyState, InlineAlert, Menu, Reveal, useToast} from '../../ui';
 import {AnalysisDialog} from './AnalysisDialog';
 import {NotebookSummaryPanel} from './NotebookSummaryPanel';
 import {SourceRow, type SourceStatus} from './SourceRow';
@@ -81,7 +81,7 @@ export function SourcesScreen() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[960px] flex-col gap-5">
+    <div className="mx-auto flex max-w-wide flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-h2 text-strong">Fuentes ({total})</h2>
         {total > 0 ? (
@@ -157,8 +157,7 @@ export function SourcesScreen() {
             </p>
           </div>
 
-          <Card flush>
-            <ul className="divide-y divide-hairline" aria-label="Fuentes del cuaderno">
+          <Reveal as="ul" className="flex flex-col gap-3">
               {sources.map((s) => (
                 <SourceRow
                   key={s.id}
@@ -171,8 +170,7 @@ export function SourcesScreen() {
                   onRetry={() => handleRetrySourceAnalysis(s.id)}
                 />
               ))}
-            </ul>
-          </Card>
+          </Reveal>
 
           <section aria-labelledby="sources-next" className="flex flex-col gap-3">
             <h3 id="sources-next" className="text-h3 text-strong">

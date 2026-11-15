@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Chip, Dialog, EmptyState, IconButton, useToast} from '../../ui';
+import {Button, Dialog, EmptyState, IconButton, Reveal, RevealItem, useToast} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {AssistantMessage, ErrorMessage, PendingMessage, UserMessage} from './ChatMessage';
 import {CitationInspector} from './CitationInspector';
@@ -261,26 +261,25 @@ export function ChatScreen() {
   } else if (messages.length === 0) {
     body = (
       <div className="py-8">
-        <h2 className="text-h2 text-strong">Pregunta sobre tus fuentes</h2>
+        <h2 className="text-h1 text-strong">Pregunta sobre tus fuentes</h2>
         <p className="mt-1 text-body text-muted">Prueba con una de estas preguntas o escribe la tuya.</p>
-        <ul className="mt-4 flex flex-wrap gap-2" aria-label="Preguntas sugeridas">
+        <Reveal as="ul" className="mt-4 flex flex-wrap gap-2" >
           {suggestions.map((s) => (
-            <li key={s}>
-              <button
-                type="button"
+            <RevealItem as="li" key={s}>
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   setInput(s);
                   inputRef.current?.focus();
                 }}
-                className="inline-flex text-left pointer-coarse:min-h-11 pointer-coarse:items-center"
+                className="h-auto whitespace-normal py-1.5 text-left"
               >
-                <Chip variant="outline" className="h-auto min-h-7 whitespace-normal py-1 hover:bg-subtle">
-                  {s}
-                </Chip>
-              </button>
-            </li>
+                {s}
+              </Button>
+            </RevealItem>
           ))}
-        </ul>
+        </Reveal>
       </div>
     );
   } else {
@@ -312,7 +311,7 @@ export function ChatScreen() {
   return (
     <section aria-label="Chat" className="flex flex-col lg:flex-row lg:gap-6">
       {/* Desktop: threads panel */}
-      <aside aria-label="Chats" className="hidden w-[280px] shrink-0 lg:block">
+      <aside aria-label="Chats" className="hidden w-72 shrink-0 lg:block">
         <div className="sticky top-4">{threadsList()}</div>
       </aside>
 
@@ -337,7 +336,7 @@ export function ChatScreen() {
       </Dialog>
 
       {/* Conversation */}
-      <div className="mx-auto flex w-full min-w-0 max-w-[720px] flex-1 flex-col">
+      <div className="mx-auto flex w-full min-w-0 max-w-wide flex-1 flex-col">
         <h1 className="sr-only">Chat: {currentActiveThread.title}</h1>
         <div className="min-h-[40vh] flex-1">
           {body}
@@ -345,7 +344,7 @@ export function ChatScreen() {
         </div>
 
         <div className="sticky bottom-0 z-10 bg-page pb-[var(--mia-bottom-bar,0px)] pt-2">
-          <div className="pb-2">
+          <div className="max-w-reading pb-2">
             <Composer
               value={input}
               onChange={setInput}
