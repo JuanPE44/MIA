@@ -2,7 +2,7 @@ import {useMemo, useRef, useState, type ReactNode} from 'react';
 import {useSearchParams} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import type {Notebook} from '../../types';
-import {Button, ConfirmDialog, EmptyState, Menu, TextField, useToast} from '../../ui';
+import {Button, ConfirmDialog, EmptyState, Highlight, Menu, TextField, useToast} from '../../ui';
 import {FolderFilter} from './FolderFilter';
 import {FolderHeader} from './FolderHeader';
 import {MoveNotebookDialog} from './MoveNotebookDialog';
@@ -200,7 +200,8 @@ export function LibraryScreen() {
         {groups.map((g) => (
           <section key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-4">
             <h2 id={`group-${g.id}`} className="text-h2 text-strong">
-              <Icon name={g.icon} weight="duotone" className="mr-2 inline size-6 align-[-0.2em]" />{g.title} <span className="text-small text-muted">{g.items.length}</span>
+              <Icon name={g.icon} weight="duotone" className="mr-2 inline size-6 align-[-0.2em]" />{g.title}{' '}
+              <span className="font-mono text-small text-muted">{g.items.length}</span>
             </h2>
             <NotebookGrid>{g.items.map(renderCard)}</NotebookGrid>
           </section>
@@ -213,10 +214,10 @@ export function LibraryScreen() {
     <div className="mx-auto flex w-full max-w-content flex-col gap-6 pb-16">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 ref={headingRef} tabIndex={-1} className="text-h1 text-strong outline-none">
-            Mis cuadernos
+          <h1 ref={headingRef} tabIndex={-1} className="text-display text-strong outline-none">
+            Mis <Highlight trigger="mount">cuadernos</Highlight>
           </h1>
-          <p className="mt-1 text-small text-muted">
+          <p className="mt-2 font-mono text-small text-muted">
             {countLabels.folders(folders.length)} · {countLabels.notebooks(notebooks.length)} ·{' '}
             {countLabels.sources(totalSources)}
           </p>
@@ -242,7 +243,7 @@ export function LibraryScreen() {
 
       {!accountEmpty ? (
         <>
-          <div role="search" className="max-w-md">
+          <div role="search" className="max-w-narrow">
             <TextField
               type="search"
               label="Buscar cuadernos"

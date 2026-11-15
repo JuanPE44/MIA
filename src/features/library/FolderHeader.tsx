@@ -12,7 +12,7 @@ interface FolderHeaderProps {
 
 export function FolderHeader({folder, notebookCount, onNewNotebook, onDelete}: FolderHeaderProps) {
   return (
-    <section aria-labelledby="folder-header-title" className="overflow-hidden rounded-card border border-hairline bg-surface">
+    <section aria-labelledby="folder-header-title" className="overflow-hidden rounded-card border border-rule bg-surface">
       {folder.coverImage ? (
         <img src={folder.coverImage} alt="" className="aspect-[16/5] max-h-56 w-full object-cover" />
       ) : null}
@@ -22,7 +22,7 @@ export function FolderHeader({folder, notebookCount, onNewNotebook, onDelete}: F
             <Icon name={resolveItemIcon(folder.icon, 'folder')} weight="duotone" className="mr-2 inline size-6 align-[-0.2em]" />
             {folder.name}
           </h2>
-          <p className="text-small text-muted">{countLabels.notebooks(notebookCount)}</p>
+          <p className="font-mono text-small text-muted">{countLabels.notebooks(notebookCount)}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" leadingIcon={<Icon name="add" />} onClick={onNewNotebook}>

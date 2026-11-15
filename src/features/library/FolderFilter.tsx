@@ -24,7 +24,7 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
     >
       <span className="sr-only">{name}, </span>
       {content}
-      <span aria-hidden className="text-muted">
+      <span aria-hidden className="font-mono text-muted">
         {count}
       </span>
       <span className="sr-only">{count === 1 ? '1 cuaderno' : `${count} cuadernos`}</span>

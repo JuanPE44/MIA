@@ -37,11 +37,11 @@ export function ProfilePanel() {
   };
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5">
+    <form onSubmit={onSubmit} noValidate className="space-y-5 rounded-card border border-rule bg-surface p-4 sm:p-5">
       <div className="flex items-center gap-4">
         <Avatar name={form.name.trim() || 'Estudiante'} size={64} />
         <div>
-          <p className="text-body-strong text-strong">{form.name.trim() || 'Estudiante'}</p>
+          <p className="font-display text-h3 text-strong">{form.name.trim() || 'Estudiante'}</p>
           <p className="text-small text-muted">{form.degree}</p>
         </div>
       </div>

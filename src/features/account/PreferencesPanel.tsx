@@ -19,7 +19,7 @@ export function PreferencesPanel() {
 
   return (
     <div className="space-y-8">
-      <section aria-labelledby="pref-theme" className="space-y-3">
+      <section aria-labelledby="pref-theme" className="space-y-3 rounded-card border border-rule bg-surface p-4 sm:p-5">
         <h2 id="pref-theme" className="text-h2 text-strong">
           Tema
         </h2>
@@ -31,7 +31,7 @@ export function PreferencesPanel() {
         />
       </section>
 
-      <section aria-labelledby="pref-data" className="space-y-3">
+      <section aria-labelledby="pref-data" className="space-y-3 rounded-card border border-rule bg-surface p-4 sm:p-5">
         <h2 id="pref-data" className="text-h2 text-strong">
           Datos
         </h2>
