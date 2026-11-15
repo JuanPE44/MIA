@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {MessagesSquare, Plus} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {Button, Chip, Dialog, EmptyState, IconButton, useToast} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
@@ -7,6 +6,7 @@ import {AssistantMessage, ErrorMessage, PendingMessage, UserMessage} from './Cha
 import {CitationInspector} from './CitationInspector';
 import {Composer} from './Composer';
 import {ThreadsList} from './ThreadsPanel';
+import {Icon} from '../../ui/Icon';
 
 const IMPROVEMENT_PREFIX = 'Solicitud de mejora: ';
 const GENERIC_SUGGESTIONS = [
@@ -230,7 +230,7 @@ export function ChatScreen() {
   if (!hasSources) {
     body = (
       <EmptyState
-        icon={<MessagesSquare />}
+        icon={<Icon name="chats" />}
         title="Añade fuentes para empezar a preguntar"
         description="MIA responde con lo que dicen tus fuentes. Sube un PDF, un enlace o un texto."
         action={
@@ -243,7 +243,7 @@ export function ChatScreen() {
   } else if (!hasActiveSources) {
     body = (
       <EmptyState
-        icon={<MessagesSquare />}
+        icon={<Icon name="chats" />}
         title="No hay fuentes activas para este chat"
         description="Activa al menos una fuente para que MIA pueda responder."
         action={
@@ -320,7 +320,7 @@ export function ChatScreen() {
       <div className="flex h-12 items-center justify-between gap-2 border-b border-hairline lg:hidden">
         <Button
           variant="ghost"
-          leadingIcon={<MessagesSquare aria-hidden className="size-5" />}
+          leadingIcon={<Icon name="chats" className="size-5" />}
           onClick={() => setThreadsOpen(true)}
           className="min-w-0"
         >
@@ -328,7 +328,7 @@ export function ChatScreen() {
         </Button>
         <IconButton
           aria-label="Nuevo chat"
-          icon={<Plus aria-hidden className="size-5" />}
+          icon={<Icon name="add" className="size-5" />}
           onClick={handleStartNewChat}
         />
       </div>

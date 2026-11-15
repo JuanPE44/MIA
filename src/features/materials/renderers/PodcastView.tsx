@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
-import {Pause, Play, RotateCcw} from 'lucide-react';
 import {IconButton} from '../../../ui';
 import {PodcastSpeaker} from '../../../services/audioSynthesizer';
+import {Icon} from '../../../ui/Icon';
 
 interface PodcastLine {
   speaker: 'Sofía (Host)' | 'Lucas (Co-host)';
@@ -70,7 +70,7 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
             aria-label={playing ? 'Pausar audio' : 'Reproducir audio'}
             className="relative flex size-12 shrink-0 items-center justify-center rounded-pill bg-primary text-on-primary transition-colors duration-[120ms] hover:bg-primary-hover"
           >
-            {playing ? <Pause aria-hidden className="size-5" /> : <Play aria-hidden className="ml-0.5 size-5" />}
+            {playing ? <Icon name="pause" className="size-5" /> : <Icon name="play" className="ml-0.5 size-5" />}
           </button>
           <div className="min-w-0">
             <h2 className="text-body-strong">Audio resumen</h2>
@@ -81,7 +81,7 @@ export function PodcastView({lines}: {lines: PodcastLine[]}) {
         </div>
         <IconButton
           aria-label="Reiniciar audio"
-          icon={<RotateCcw aria-hidden className="size-5" />}
+          icon={<Icon name="reset" className="size-5" />}
           onClick={() => {
             run.current++;
             PodcastSpeaker.stop();

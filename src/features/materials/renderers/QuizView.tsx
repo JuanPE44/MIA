@@ -1,6 +1,6 @@
 import {useId, useState} from 'react';
-import {CheckCircle2, XCircle} from 'lucide-react';
 import {Button, InlineAlert} from '../../../ui';
+import {Icon} from '../../../ui/Icon';
 
 interface QuizQuestion {
   question: string;
@@ -81,13 +81,13 @@ export function QuizView({questions}: {questions: QuizQuestion[]}) {
                       <span>{opt}</span>
                       {showResults && isRight ? (
                         <span className="flex shrink-0 items-center gap-1 text-caption text-success">
-                          <CheckCircle2 aria-hidden className="size-4" />
+                          <Icon name="success" className="size-4" />
                           Correcta
                         </span>
                       ) : null}
                       {showResults && isChosen && !isRight ? (
                         <span className="flex shrink-0 items-center gap-1 text-caption text-danger">
-                          <XCircle aria-hidden className="size-4" />
+                          <Icon name="error-circle" className="size-4" />
                           Tu respuesta
                         </span>
                       ) : null}

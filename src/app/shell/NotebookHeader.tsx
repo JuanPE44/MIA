@@ -1,11 +1,11 @@
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router';
-import {ArrowLeft, FileText, Plus} from 'lucide-react';
 import {Breadcrumb, Button, ConfirmDialog, IconButton, Menu, type MenuItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
 import {MoveNotebookDialog} from '../../features/library/MoveNotebookDialog';
+import {Icon, resolveItemIcon} from '../../ui/Icon';
 
 /**
  * Notebook context header. Desktop/tablet: breadcrumb, icon tile, h1, sources
@@ -27,7 +27,7 @@ export function NotebookHeader() {
   const addSource = openAddSource;
 
   const items: MenuItem[] = [
-    ...(phone ? [{id: 'add-source', label: 'Añadir fuente', icon: <Plus />, onSelect: addSource}] : []),
+    ...(phone ? [{id: 'add-source', label: 'Añadir fuente', icon: <Icon name="add" />, onSelect: addSource}] : []),
     // TODO: rename needs a notebook-rename action and dialog; neither exists yet.
     {id: 'rename', label: 'Renombrar (próximamente)', onSelect: () => {}, disabled: true},
     {id: 'move', label: 'Mover a…', onSelect: () => setMoving(true)},
@@ -60,13 +60,13 @@ export function NotebookHeader() {
   if (phone) {
     return (
       <>
-        <div className="flex h-14 items-center gap-1 border-b border-hairline">
+        <div className="flex h-14 items-center gap-1 border-b border-rule">
           <IconButton
             aria-label="Volver a Mis cuadernos"
-            icon={<ArrowLeft aria-hidden className="size-5" />}
+            icon={<Icon name="back" className="size-5" />}
             onClick={() => navigate(paths.notebooks())}
           />
-          <h1 className="min-w-0 flex-1 truncate text-h3 font-semibold text-strong">{nb.title}</h1>
+          <h1 className="min-w-0 flex-1 truncate text-h2 font-medium text-strong">{nb.title}</h1>
           <Menu label={`Opciones de ${nb.title}`} items={items} />
         </div>
         {dialog}
@@ -76,30 +76,33 @@ export function NotebookHeader() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 pb-4">
+      <div className="flex flex-col gap-3 pb-1">
         <Breadcrumb
           items={[
-            {label: 'Mis cuadernos', to: paths.notebooks()},
+            {label: 'Biblioteca', to: paths.notebooks()},
             ...(folder ? [{label: folder.name, to: paths.notebooks()}] : []),
             {label: nb.title},
           ]}
         />
-        <div className="flex items-center gap-3">
+        {/* Editorial masthead: display title, mono metadata, ink rule */}
+        <div className="flex items-end gap-4 border-b-2 border-ink pb-4">
           <span
             aria-hidden
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-control bg-tile-azul text-h2"
+            className="inline-flex size-14 shrink-0 items-center justify-center rounded-card border border-rule bg-tile-azul text-strong shadow-offset"
           >
-            {nb.icon || '📘'}
+            <Icon name={resolveItemIcon(nb.icon, 'notebook')} weight="duotone" className="size-8" />
           </span>
-          <h1 className="min-w-0 flex-1 truncate text-h1 font-semibold text-strong">{nb.title}</h1>
-          <Link
-            to={toSources}
-            className="inline-flex h-8 shrink-0 items-center gap-2 rounded-pill bg-subtle px-3 text-label text-strong hover:bg-hairline"
-          >
-            <FileText aria-hidden className="size-4 text-muted" />
-            {sourcesLabel}
-          </Link>
-          <Button variant="secondary" leadingIcon={<Plus aria-hidden className="size-5" />} onClick={addSource}>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-mono text-caption uppercase tracking-widest text-muted">
+              {nb.subject || 'General'}
+              <span aria-hidden> · </span>
+              <Link to={toSources} className="rounded-small underline-offset-4 hover:underline">
+                {sourcesLabel}
+              </Link>
+            </p>
+            <h1 className="truncate text-display font-medium text-strong">{nb.title}</h1>
+          </div>
+          <Button variant="secondary" leadingIcon={<Icon name="add" className="size-5" />} onClick={addSource}>
             Añadir fuente
           </Button>
           <Menu label={`Opciones de ${nb.title}`} items={items} />

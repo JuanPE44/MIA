@@ -1,6 +1,6 @@
-import {Copy} from 'lucide-react';
 import {Button, Card, useToast} from '../../ui';
 import {REQUEST_NOTE, requestSummary, type HelpRequest} from './helpModel';
+import {Icon} from '../../ui/Icon';
 
 /** Support request (UX-06): sent, pending confirmation, never presented as a real booking. */
 export function RequestCard({request}: {request: HelpRequest}) {
@@ -35,7 +35,7 @@ export function RequestCard({request}: {request: HelpRequest}) {
       </dl>
       <p className="px-4 pt-3 text-small text-muted">{REQUEST_NOTE}</p>
       <div className="px-2 pb-2 pt-1">
-        <Button variant="ghost" size="sm" leadingIcon={<Copy aria-hidden className="size-4" />} onClick={copy}>
+        <Button variant="ghost" size="sm" leadingIcon={<Icon name="copy" className="size-4" />} onClick={copy}>
           Copiar
         </Button>
       </div>

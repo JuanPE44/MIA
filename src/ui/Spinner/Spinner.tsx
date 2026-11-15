@@ -1,5 +1,5 @@
-import {Loader2} from 'lucide-react';
 import {cx} from '../internal/cx';
+import {Icon} from '../Icon';
 
 export interface SpinnerProps {
   size?: 16 | 20 | 24;
@@ -12,8 +12,7 @@ const px = {16: 'size-4', 20: 'size-5', 24: 'size-6'} as const;
 
 export function Spinner({size = 20, label, className}: SpinnerProps) {
   const icon = (
-    <Loader2
-      aria-hidden
+    <Icon name="loader"
       className={cx('animate-spin text-primary-text', px[size], className)}
     />
   );

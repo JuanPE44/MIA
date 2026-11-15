@@ -1,5 +1,4 @@
 import {useEffect, useRef, useState, type KeyboardEvent} from 'react';
-import {ChevronDown, RotateCcw, Send, Sparkles} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {Button, Card, Chip, IconButton, SimulatedBadge, Textarea} from '../../ui';
 import {ErrorMessage, PendingMessage, UserMessage} from '../chat/ChatMessage';
@@ -16,6 +15,7 @@ import {
   type HelpRequest,
 } from './helpModel';
 import {RequestCard} from './RequestCard';
+import {Icon} from '../../ui/Icon';
 
 function AssistantReply({message}: {message: HelpMessage}) {
   return (
@@ -24,7 +24,7 @@ function AssistantReply({message}: {message: HelpMessage}) {
         aria-hidden
         className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-pill bg-primary-tint text-primary-on-tint"
       >
-        <Sparkles className="size-4" />
+        <Icon name="sparkles" className="size-4" />
       </span>
       <div className="min-w-0 flex-1 space-y-3">
         <Markdown text={message.text} className="text-body text-default" />
@@ -146,7 +146,7 @@ export function HelpScreen() {
               Asistente
             </h2>
             {messages.length > 0 ? (
-              <Button variant="ghost" size="sm" leadingIcon={<RotateCcw aria-hidden className="size-4" />} onClick={reset}>
+              <Button variant="ghost" size="sm" leadingIcon={<Icon name="reset" className="size-4" />} onClick={reset}>
                 Nueva conversación
               </Button>
             ) : null}
@@ -212,7 +212,7 @@ export function HelpScreen() {
                 type="submit"
                 variant="primary"
                 aria-label="Enviar consulta"
-                icon={<Send aria-hidden className="size-5" />}
+                icon={<Icon name="send" className="size-5" />}
                 disabled={!input.trim() || loading}
               />
             </form>
@@ -246,7 +246,7 @@ export function HelpScreen() {
                 <details key={item.q} className="group px-4">
                   <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 text-label text-strong [&::-webkit-details-marker]:hidden">
                     {item.q}
-                    <ChevronDown aria-hidden className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
+                    <Icon name="chevron-down" className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
                   </summary>
                   <p className="pb-3 text-small text-default">{item.a}</p>
                 </details>

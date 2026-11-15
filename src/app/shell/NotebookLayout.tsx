@@ -1,5 +1,4 @@
 import type {ReactNode} from 'react';
-import {FileText, Layers, MessageSquare, Timer} from 'lucide-react';
 import {BottomTabBar, Tabs, type NavTabItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
@@ -7,12 +6,13 @@ import {paths, SEGMENT_SLUGS} from '../routes';
 import type {MainSegment} from '../../types';
 import {AddSourceDialog} from '../../features/sources';
 import {NotebookHeader} from './NotebookHeader';
+import {Icon} from '../../ui/Icon';
 
 const SECTIONS: Array<{segment: MainSegment; label: string; icon: ReactNode}> = [
-  {segment: 'CHAT', label: 'Chat', icon: <MessageSquare />},
-  {segment: 'FUENTES', label: 'Fuentes', icon: <FileText />},
-  {segment: 'ARTEFACTOS', label: 'Materiales', icon: <Layers />},
-  {segment: 'ESTUDIO', label: 'Estudiar', icon: <Timer />},
+  {segment: 'CHAT', label: 'Chat', icon: <Icon name="chat" />},
+  {segment: 'FUENTES', label: 'Fuentes', icon: <Icon name="document" />},
+  {segment: 'ARTEFACTOS', label: 'Materiales', icon: <Icon name="materials" />},
+  {segment: 'ESTUDIO', label: 'Estudiar', icon: <Icon name="timer" />},
 ];
 
 /**

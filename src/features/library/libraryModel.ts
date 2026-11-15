@@ -1,9 +1,11 @@
 import type {Folder, Notebook} from '../../types';
+import {FOLDER_ICON_KEYS, NOTEBOOK_ICON_KEYS} from '../../ui/Icon';
 import bannerEmprendimiento from '../../assets/images/folder_emprendimiento_banner_1791726610840.jpg';
 import bannerCuatrimestre from '../../assets/images/folder_cuatrimestre_banner_1791726628989.jpg';
 
-export const FOLDER_ICONS = ['📁', '💼', '📚', '🎓', '🔬', '🚀', '💡', '📊', '🏛️', '🧪', '⚖️', '🎨'] as const;
-export const NOTEBOOK_ICONS = ['📘', '🚀', '💡', '🧠', '📊', '📝', '🔬', '🎓', '💻', '⚡', '🎯', '📌'] as const;
+/** Icon registry keys (see src/ui/Icon); legacy emoji are resolved at read time. */
+export const FOLDER_ICONS = FOLDER_ICON_KEYS;
+export const NOTEBOOK_ICONS = NOTEBOOK_ICON_KEYS;
 
 /** Existing banner images a folder can use as cover (same assets as the legacy flow). */
 export const FOLDER_COVERS = [

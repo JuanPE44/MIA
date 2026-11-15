@@ -1,9 +1,9 @@
 import {useRef, type MouseEvent} from 'react';
-import {BookOpen, FolderInput, Trash2} from 'lucide-react';
 import type {Folder, Notebook} from '../../types';
 import {InteractiveCard, Menu, Chip, type MenuItem} from '../../ui';
 import {paths} from '../../app/routes';
 import {countLabels, tileClassFor} from './libraryModel';
+import {Icon, resolveItemIcon} from '../../ui/Icon';
 
 interface NotebookCardProps {
   notebook: Notebook;
@@ -28,9 +28,9 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
   };
 
   const items: MenuItem[] = [
-    {id: 'open', label: 'Abrir', icon: <BookOpen />, onSelect: open},
-    {id: 'move', label: 'Mover a…', icon: <FolderInput />, onSelect: () => onMove(notebook)},
-    {id: 'delete', label: 'Eliminar', icon: <Trash2 />, danger: true, onSelect: () => onDelete(notebook)},
+    {id: 'open', label: 'Abrir', icon: <Icon name="book" />, onSelect: open},
+    {id: 'move', label: 'Mover a…', icon: <Icon name="folder-move" />, onSelect: () => onMove(notebook)},
+    {id: 'delete', label: 'Eliminar', icon: <Icon name="delete" />, danger: true, onSelect: () => onDelete(notebook)},
   ];
 
   return (
@@ -45,7 +45,7 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
               aria-hidden
               className={`flex size-10 shrink-0 items-center justify-center rounded-control text-xl ${tileClassFor(notebook.id)}`}
             >
-              {notebook.icon || '📘'}
+              <Icon name={resolveItemIcon(notebook.icon, 'notebook')} weight="duotone" className="size-6" />
             </span>
             <span className="min-w-0 line-clamp-2 break-words">{notebook.title}</span>
           </span>
@@ -57,7 +57,7 @@ export function NotebookCard({notebook, folder, onOpen, onMove, onDelete}: Noteb
         <p className="text-small text-muted">{notebook.subject}</p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {folder ? (
-            <Chip size="sm" variant="outline" className="max-w-full" icon={<span>{folder.icon || '📁'}</span>}>
+            <Chip size="sm" variant="outline" className="max-w-full" icon={<Icon name={resolveItemIcon(folder.icon, 'folder')} />}>
               <span className="truncate">{folder.name}</span>
             </Chip>
           ) : null}

@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {Link} from 'react-router';
 import {cx} from '../internal/cx';
+import {withWeight} from '../Tabs/Tabs';
 
 export interface BottomTabItem {
   id: string;
@@ -65,7 +66,7 @@ export function BottomTabBar({items, activeId, 'aria-label': ariaLabel}: BottomT
       aria-label={ariaLabel}
       hidden={typing}
       className={cx(
-        'fixed inset-x-0 bottom-0 z-30 border-t border-hairline bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden',
+        'fixed inset-x-0 bottom-0 z-30 border-t border-rule bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden',
       )}
     >
       <ul className="grid grid-cols-4">
@@ -78,14 +79,14 @@ export function BottomTabBar({items, activeId, 'aria-label': ariaLabel}: BottomT
                 aria-current={active ? 'page' : undefined}
                 className={cx(
                   'relative flex h-16 flex-col items-center justify-center gap-1 text-caption font-semibold',
-                  active ? 'text-primary-text' : 'text-muted',
+                  active ? 'text-strong' : 'text-muted',
                 )}
               >
                 {active ? (
-                  <span aria-hidden className="absolute inset-x-0 top-0 mx-auto h-1 w-8 rounded-pill bg-primary" />
+                  <span aria-hidden className="absolute inset-x-0 top-0 mx-auto h-1 w-8 rounded-pill border-b-2 border-ink bg-highlight" />
                 ) : null}
                 <span aria-hidden className="[&>svg]:size-6">
-                  {item.icon}
+                  {withWeight(item.icon, active)}
                 </span>
                 {item.label}
               </Link>

@@ -1,7 +1,7 @@
-import {MessageSquare} from 'lucide-react';
 import type {SourceItem} from '../../types';
 import {Button, Dialog, InlineAlert, SimulatedBadge} from '../../ui';
 import {sourceMeta} from './sourceModel';
+import {Icon} from '../../ui/Icon';
 
 interface AnalysisDialogProps {
   source: SourceItem | null;
@@ -32,7 +32,7 @@ export function AnalysisDialog({source, onClose, onAsk}: AnalysisDialogProps) {
             </Button>
             <Button
               variant="primary"
-              leadingIcon={<MessageSquare aria-hidden className="size-5" />}
+              leadingIcon={<Icon name="chat" className="size-5" />}
               onClick={() => onAsk(source)}
             >
               Preguntar en el chat

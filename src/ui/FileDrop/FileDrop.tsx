@@ -1,10 +1,10 @@
 import {useId, useRef, useState, type DragEvent} from 'react';
-import {Camera, FileText, UploadCloud, X} from 'lucide-react';
 import {cx} from '../internal/cx';
 import {useIsPhone} from '../internal/useIsPhone';
 import {Button} from '../Button';
 import {IconButton} from '../IconButton';
 import {Spinner} from '../Spinner';
+import {Icon} from '../Icon';
 
 export interface FileDropSelection {
   name: string;
@@ -71,7 +71,7 @@ export function FileDrop({
           aria-hidden
           className="inline-flex size-10 shrink-0 items-center justify-center rounded-control bg-surface text-muted"
         >
-          {selection.busy ? <Spinner size={20} /> : <FileText className="size-5" />}
+          {selection.busy ? <Spinner size={20} /> : <Icon name="document" className="size-5" />}
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-body-strong text-strong">{selection.name}</p>
@@ -80,7 +80,7 @@ export function FileDrop({
         {onRemove ? (
           <IconButton
             aria-label={`Quitar el archivo ${selection.name}`}
-            icon={<X aria-hidden className="size-5" />}
+            icon={<Icon name="close" className="size-5" />}
             onClick={onRemove}
             disabled={disabled}
           />
@@ -108,13 +108,13 @@ export function FileDrop({
           error && 'border-danger',
         )}
       >
-        <UploadCloud aria-hidden className="size-6 text-muted" />
+        <Icon name="upload" className="size-6 text-muted" />
         {phone ? null : <p className="text-body text-default">Arrastra un archivo o</p>}
         <div className="flex flex-wrap justify-center gap-2">
           {phone ? (
             <Button
               variant="secondary"
-              leadingIcon={<Camera aria-hidden className="size-5" />}
+              leadingIcon={<Icon name="camera" className="size-5" />}
               onClick={() => cameraRef.current?.click()}
               disabled={disabled}
             >

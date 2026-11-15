@@ -369,7 +369,7 @@ function useAppStateValue() {
     const fullNotebook: Notebook = {
       id: `nb-${Date.now()}`,
       title: newNb.title || 'Nuevo Cuaderno',
-      icon: newNb.icon || '📘',
+      icon: newNb.icon || 'notebook',
       subject: newNb.subject || 'General',
       description: newNb.description || '',
       category: 'emprendimiento',

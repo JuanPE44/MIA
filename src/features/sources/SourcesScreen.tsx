@@ -1,11 +1,11 @@
 import {useState} from 'react';
-import {ChevronDown, FilePlus2, MessageSquare, Plus} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import type {SourceItem} from '../../types';
 import {Button, Card, ConfirmDialog, EmptyState, InlineAlert, Menu, useToast} from '../../ui';
 import {AnalysisDialog} from './AnalysisDialog';
 import {NotebookSummaryPanel} from './NotebookSummaryPanel';
 import {SourceRow, type SourceStatus} from './SourceRow';
+import {Icon} from '../../ui/Icon';
 
 /** Fuentes (S5): list of sources with grounding switches, status and notebook summary. */
 export function SourcesScreen() {
@@ -85,7 +85,7 @@ export function SourcesScreen() {
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-h2 text-strong">Fuentes ({total})</h2>
         {total > 0 ? (
-          <Button variant="primary" leadingIcon={<Plus aria-hidden className="size-5" />} onClick={openAddSource}>
+          <Button variant="primary" leadingIcon={<Icon name="add" className="size-5" />} onClick={openAddSource}>
             Añadir fuente
           </Button>
         ) : null}
@@ -100,11 +100,11 @@ export function SourcesScreen() {
       {total === 0 ? (
         <Card>
           <EmptyState
-            icon={<FilePlus2 />}
+            icon={<Icon name="document-add" />}
             title="Añade tu primera fuente"
             description="Puedes subir PDF, imágenes, audio o video, pegar un texto, guardar un enlace o buscar en la web. El chat responde con lo que hay en tus fuentes."
             action={
-              <Button variant="primary" leadingIcon={<Plus aria-hidden className="size-5" />} onClick={openAddSource}>
+              <Button variant="primary" leadingIcon={<Icon name="add" className="size-5" />} onClick={openAddSource}>
                 Añadir fuente
               </Button>
             }
@@ -144,7 +144,7 @@ export function SourcesScreen() {
                       {...props}
                       size="sm"
                       variant="secondary"
-                      trailingIcon={<ChevronDown aria-hidden className="size-4" />}
+                      trailingIcon={<Icon name="chevron-down" className="size-4" />}
                     >
                       Elegir
                     </Button>
@@ -199,7 +199,7 @@ export function SourcesScreen() {
               </Button>
               <Button
                 variant="secondary"
-                leadingIcon={<MessageSquare aria-hidden className="size-5" />}
+                leadingIcon={<Icon name="chat" className="size-5" />}
                 onClick={() => goToSegment('CHAT')}
               >
                 Preguntar en el chat

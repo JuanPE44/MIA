@@ -1,11 +1,11 @@
 import {useEffect, useRef, useState} from 'react';
-import {LogOut, Pause, Play, ShieldCheck, ShieldOff} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {Button, Card, ConfirmDialog, Dialog, InlineAlert, SimulatedBadge, Spinner, StatusBadge} from '../../ui';
 import {buildStages, currentStage, type SessionState, type Stage} from './sessionMachine';
 import {requestChallenge, type RecallChallenge} from './recallApi';
 import {useStudySession, type LeaveReason} from './StudySessionProvider';
 import {TimerRing} from './TimerRing';
+import {Icon} from '../../ui/Icon';
 
 function stageLabel(stage: Stage, cycles: number): string {
   if (stage.type === 'study') return `Estudio · ${stage.block} de ${cycles}`;
@@ -45,15 +45,15 @@ export function SessionRunning({session}: {session: SessionState}) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         {blindadoOn ? (
           <StatusBadge variant="success">
-            <ShieldCheck aria-hidden className="size-4" /> Modo blindado: activado
+            <Icon name="shield-check" className="size-4" /> Modo blindado: activado
           </StatusBadge>
         ) : (
           <StatusBadge variant="neutral">
-            <ShieldOff aria-hidden className="size-4" /> Modo blindado: desactivado
+            <Icon name="shield-off" className="size-4" /> Modo blindado: desactivado
           </StatusBadge>
         )}
         {blindadoOn ? (
-          <Button variant="secondary" size="sm" leadingIcon={<LogOut aria-hidden className="size-4" />} onClick={exitBlindado}>
+          <Button variant="secondary" size="sm" leadingIcon={<Icon name="logout" className="size-4" />} onClick={exitBlindado}>
             Salir del modo blindado
           </Button>
         ) : null}
@@ -87,7 +87,7 @@ export function SessionRunning({session}: {session: SessionState}) {
             variant="primary"
             size="lg"
             className="w-full sm:w-auto sm:min-w-44"
-            leadingIcon={between || paused ? <Play aria-hidden className="size-5" /> : <Pause aria-hidden className="size-5" />}
+            leadingIcon={between || paused ? <Icon name="play" className="size-5" /> : <Icon name="pause" className="size-5" />}
             onClick={onPrimary}
           >
             {primaryLabel}

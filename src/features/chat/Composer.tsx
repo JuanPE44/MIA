@@ -1,6 +1,6 @@
 import {useRef, type KeyboardEvent, type RefObject} from 'react';
-import {Globe, Send} from 'lucide-react';
 import {Button, IconButton, Textarea} from '../../ui';
+import {Icon} from '../../ui/Icon';
 
 interface ComposerProps {
   value: string;
@@ -68,7 +68,7 @@ export function Composer({
           type="submit"
           variant="primary"
           aria-label="Enviar pregunta"
-          icon={<Send aria-hidden className="size-5" />}
+          icon={<Icon name="send" className="size-5" />}
           disabled={!canSend}
         />
       </div>
@@ -87,7 +87,7 @@ export function Composer({
           <Button
             variant="ghost"
             size="sm"
-            leadingIcon={<Globe aria-hidden className="size-4" />}
+            leadingIcon={<Icon name="web" className="size-4" />}
             onClick={onSearchWeb}
           >
             Buscar en la web

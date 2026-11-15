@@ -1,10 +1,10 @@
 import {useRef, type MouseEvent} from 'react';
-import {AlertCircle, ExternalLink, Printer, SlidersHorizontal, Trash2} from 'lucide-react';
 import type {StudyArtifact} from '../../types';
 import {Button, Card, InteractiveCard, Menu, SimulatedBadge, Spinner, type MenuItem} from '../../ui';
 import {paths} from '../../app/routes';
 import {materialTypeOf, plural} from './materialModel';
 import type {MaterialJob} from './MaterialsJobs';
+import {Icon} from '../../ui/Icon';
 
 interface MaterialCardProps {
   notebookId: string;
@@ -18,7 +18,6 @@ interface MaterialCardProps {
 export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, onDelete}: MaterialCardProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const info = materialTypeOf(artifact.type);
-  const Icon = info.icon;
   const sources = artifact.citations?.length || 1;
 
   // A real link (middle/ctrl-click keep native behavior); plain clicks navigate client-side.
@@ -29,10 +28,10 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
   };
 
   const items: MenuItem[] = [
-    {id: 'open', label: 'Abrir', icon: <ExternalLink />, onSelect: () => onOpen(artifact)},
-    {id: 'adjust', label: 'Ajustar material', icon: <SlidersHorizontal />, onSelect: () => onAdjust(artifact)},
-    {id: 'print', label: 'Imprimir / PDF', icon: <Printer />, onSelect: () => onPrint(artifact)},
-    {id: 'delete', label: 'Eliminar', icon: <Trash2 />, danger: true, onSelect: () => onDelete(artifact)},
+    {id: 'open', label: 'Abrir', icon: <Icon name="external" />, onSelect: () => onOpen(artifact)},
+    {id: 'adjust', label: 'Ajustar material', icon: <Icon name="adjust" />, onSelect: () => onAdjust(artifact)},
+    {id: 'print', label: 'Imprimir / PDF', icon: <Icon name="print" />, onSelect: () => onPrint(artifact)},
+    {id: 'delete', label: 'Eliminar', icon: <Icon name="delete" />, danger: true, onSelect: () => onDelete(artifact)},
   ];
 
   return (
@@ -44,7 +43,7 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
         title={
           <span className="flex items-center gap-3 pr-10">
             <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
-              <Icon className="size-5" />
+              <Icon name={info.icon} weight="duotone" className="size-5" />
             </span>
             <span className="flex min-w-0 flex-col">
               <span className="text-caption font-medium text-muted">{info.label}</span>
@@ -70,7 +69,7 @@ export function GeneratingCard({job}: {job: MaterialJob}) {
     <Card aria-busy="true" className="h-full">
       <div className="flex items-center gap-3">
         <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
-          <info.icon className="size-5" />
+          <Icon name={info.icon} weight="duotone" className="size-5" />
         </span>
         <div className="min-w-0">
           <p className="text-caption font-medium text-muted">{info.label}</p>
@@ -95,7 +94,7 @@ export function FailedCard({job, onRetry, onDismiss}: {job: MaterialJob; onRetry
   return (
     <Card className="h-full border-danger/30 bg-danger-tint">
       <div role="alert" className="flex items-start gap-3">
-        <AlertCircle aria-hidden className="mt-0.5 size-5 shrink-0 text-danger" />
+        <Icon name="error" className="mt-0.5 size-5 shrink-0 text-danger" />
         <div className="min-w-0">
           <p className="text-body-strong text-strong">No se pudo crear: {info.label.toLowerCase()}</p>
           <p className="text-small text-default">Revisa tu conexión e inténtalo de nuevo.</p>

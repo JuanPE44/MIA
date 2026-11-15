@@ -14,7 +14,7 @@ export function Card({as: Tag = 'div', selected, flush, className, ...rest}: Car
       {...rest}
       className={cx(
         'rounded-card border',
-        selected ? 'border-primary-tint-border bg-primary-tint' : 'border-hairline bg-surface',
+        selected ? 'border-ink bg-primary-tint shadow-offset' : 'border-rule bg-surface',
         !flush && 'p-4 sm:p-5',
         className,
       )}
@@ -65,8 +65,8 @@ export function InteractiveCard({
     <Card
       selected={selected}
       className={cx(
-        'group relative transition-[box-shadow,border-color] duration-[120ms]',
-        'hover:border-control hover:shadow-elevation-1',
+        'group relative transition-[box-shadow,border-color,translate] duration-[120ms]',
+        'hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset',
         className,
       )}
     >

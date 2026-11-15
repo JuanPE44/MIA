@@ -1,4 +1,3 @@
-import {Check, Paperclip} from 'lucide-react';
 import type {StudyArtifact} from '../../../types';
 import {
   FORMAT_OPTIONS,
@@ -9,6 +8,7 @@ import {
   materialTypeOf,
 } from '../materialModel';
 import {DocumentText} from './DocumentText';
+import {Icon} from '../../../ui/Icon';
 
 interface ReadingPageProps {
   artifact: StudyArtifact;
@@ -132,7 +132,7 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
       {artifact.citations && artifact.citations.length > 0 ? (
         <section className="mt-10 rounded-control border border-hairline bg-subtle p-5">
           <h2 className="flex items-center gap-2 text-label text-strong">
-            <Check aria-hidden className="size-4 text-success" />
+            <Icon name="check" className="size-4 text-success" />
             Fuentes consultadas
           </h2>
           <p className="mt-1 text-small text-muted">
@@ -144,7 +144,7 @@ export function ReadingPage({artifact, notebookTitle}: ReadingPageProps) {
                 key={i}
                 className="inline-flex items-center gap-1 rounded-small border border-hairline bg-surface px-2.5 py-1 text-small text-default"
               >
-                <Paperclip aria-hidden className="size-3.5 text-muted" />
+                <Icon name="attach" className="size-3.5 text-muted" />
                 {cite}
               </li>
             ))}

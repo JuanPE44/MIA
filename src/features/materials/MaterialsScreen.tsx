@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router';
-import {Layers} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import type {ArtifactType, StudyArtifact} from '../../types';
@@ -11,6 +10,7 @@ import {useMaterialJobs} from './MaterialsJobs';
 import {MATERIAL_TYPES} from './materialModel';
 import {requestMaterialPrint} from './printMaterial';
 import {TypeTile} from './TypeTile';
+import {Icon} from '../../ui/Icon';
 
 const NO_SOURCES_ID = 'materials-no-sources';
 
@@ -95,7 +95,7 @@ export function MaterialsScreen() {
         {artifacts.length === 0 && mine.length === 0 ? (
           <EmptyState
             headingLevel={3}
-            icon={<Layers />}
+            icon={<Icon name="materials" />}
             title="Todavía no creaste materiales"
             description="Elige un tipo arriba para generar el primero a partir de tus fuentes."
           />

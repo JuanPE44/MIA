@@ -1,6 +1,5 @@
 import {useMemo, useRef, useState, type ReactNode} from 'react';
 import {useSearchParams} from 'react-router';
-import {FolderPlus, Plus, Search, BookOpen, SearchX, FolderOpen} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import type {Notebook} from '../../types';
 import {Button, ConfirmDialog, EmptyState, Menu, TextField, useToast} from '../../ui';
@@ -12,6 +11,7 @@ import {NewNotebookDialog} from './NewNotebookDialog';
 import {NotebookCard} from './NotebookCard';
 import {NotebookGrid} from './NotebookGrid';
 import {LOOSE_FILTER, countLabels, isLoose, matchesQuery} from './libraryModel';
+import {Icon, resolveItemIcon} from '../../ui/Icon';
 
 /** "Mis cuadernos" (S2): folders + notebooks, search, filter, create/move/delete with undo. */
 export function LibraryScreen() {
@@ -128,11 +128,11 @@ export function LibraryScreen() {
   if (accountEmpty) {
     body = (
       <EmptyState
-        icon={<BookOpen />}
+        icon={<Icon name="book" />}
         title="Crea tu primer cuaderno"
         description="Un cuaderno reúne tus fuentes, un chat con IA y material de estudio sobre una materia."
         action={
-          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
             Crear tu primer cuaderno
           </Button>
         }
@@ -141,7 +141,7 @@ export function LibraryScreen() {
   } else if (visible.length === 0 && query.trim()) {
     body = (
       <EmptyState
-        icon={<SearchX />}
+        icon={<Icon name="search-empty" />}
         title={`No hay cuadernos con «${query.trim()}»`}
         description="Revisa la ortografía o prueba con otra palabra."
         action={
@@ -154,11 +154,11 @@ export function LibraryScreen() {
   } else if (visible.length === 0 && selectedFolder) {
     body = (
       <EmptyState
-        icon={<FolderOpen />}
+        icon={<Icon name="folder-open" />}
         title="Esta carpeta está vacía"
         description="Crea un cuaderno aquí o muévelo desde otra carpeta."
         action={
-          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
             Crear cuaderno aquí
           </Button>
         }
@@ -167,11 +167,11 @@ export function LibraryScreen() {
   } else if (visible.length === 0) {
     body = (
       <EmptyState
-        icon={<BookOpen />}
+        icon={<Icon name="book" />}
         title={selected === LOOSE_FILTER ? 'No hay cuadernos sin carpeta' : 'Todavía no hay cuadernos'}
         description="Crea un cuaderno para empezar a estudiar."
         action={
-          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
             Nuevo cuaderno
           </Button>
         }
@@ -192,15 +192,15 @@ export function LibraryScreen() {
   } else {
     // Todos (grouped by folder, loose last) or Sin carpeta (single group).
     const groups = [
-      ...(selected === LOOSE_FILTER ? [] : folders.map((f) => ({id: f.id, title: `${f.icon || '📁'} ${f.name}`, items: visible.filter((nb) => nb.folderId === f.id)}))),
-      {id: LOOSE_FILTER, title: 'Sin carpeta', items: visible.filter((nb) => isLoose(nb, folders))},
+      ...(selected === LOOSE_FILTER ? [] : folders.map((f) => ({id: f.id, title: f.name, icon: resolveItemIcon(f.icon, 'folder'), items: visible.filter((nb) => nb.folderId === f.id)}))),
+      {id: LOOSE_FILTER, title: 'Sin carpeta', icon: 'folder-open' as const, items: visible.filter((nb) => isLoose(nb, folders))},
     ].filter((g) => g.items.length > 0);
     body = (
       <>
         {groups.map((g) => (
           <section key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-4">
             <h2 id={`group-${g.id}`} className="text-h2 text-strong">
-              {g.title} <span className="text-small text-muted">{g.items.length}</span>
+              <Icon name={g.icon} weight="duotone" className="mr-2 inline size-6 align-[-0.2em]" />{g.title} <span className="text-small text-muted">{g.items.length}</span>
             </h2>
             <NotebookGrid>{g.items.map(renderCard)}</NotebookGrid>
           </section>
@@ -222,20 +222,20 @@ export function LibraryScreen() {
           </p>
         </div>
         <div className="hidden items-center gap-2 sm:flex">
-          <Button variant="secondary" leadingIcon={<FolderPlus aria-hidden />} onClick={() => setNewFolderOpen(true)}>
+          <Button variant="secondary" leadingIcon={<Icon name="folder-add" />} onClick={() => setNewFolderOpen(true)}>
             Nueva carpeta
           </Button>
-          <Button variant="primary" leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
             Nuevo cuaderno
           </Button>
         </div>
         <div className="flex items-center gap-2 sm:hidden">
-          <Button variant="primary" fullWidth leadingIcon={<Plus aria-hidden />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" fullWidth leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
             Nuevo cuaderno
           </Button>
           <Menu
             label="Más acciones"
-            items={[{id: 'folder', label: 'Nueva carpeta', icon: <FolderPlus />, onSelect: () => setNewFolderOpen(true)}]}
+            items={[{id: 'folder', label: 'Nueva carpeta', icon: <Icon name="folder-add" />, onSelect: () => setNewFolderOpen(true)}]}
           />
         </div>
       </header>
@@ -247,7 +247,7 @@ export function LibraryScreen() {
               type="search"
               label="Buscar cuadernos"
               placeholder="Buscar por nombre, materia o carpeta"
-              leadingIcon={<Search />}
+              leadingIcon={<Icon name="search" />}
               value={query}
               onChange={(e) => updateParams({q: e.target.value})}
               autoComplete="off"

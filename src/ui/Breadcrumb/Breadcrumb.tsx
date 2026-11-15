@@ -1,7 +1,7 @@
 import {Fragment} from 'react';
 import {Link} from 'react-router';
-import {ChevronRight} from 'lucide-react';
 import {cx} from '../internal/cx';
+import {Icon} from '../Icon';
 
 export interface BreadcrumbItem {
   label: string;
@@ -36,7 +36,7 @@ export function Breadcrumb({items, className}: BreadcrumbProps) {
               </li>
               {!current ? (
                 <li aria-hidden className="flex shrink-0 items-center">
-                  <ChevronRight className="size-4" />
+                  <Icon name="chevron-right" className="size-4" />
                 </li>
               ) : null}
             </Fragment>

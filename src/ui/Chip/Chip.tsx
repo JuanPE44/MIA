@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
-import {Check, X} from 'lucide-react';
 import {cx} from '../internal/cx';
+import {Icon} from '../Icon';
 
 interface ChipBase {
   children: ReactNode;
@@ -39,12 +39,12 @@ export function Chip(props: ChipProps) {
           'relative border pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-[""]',
           'transition-colors duration-[120ms]',
           selected
-            ? 'border-primary-tint-border bg-primary-tint text-primary-on-tint'
-            : 'border-hairline bg-surface text-default hover:border-control',
+            ? 'border-ink bg-highlight text-highlight-ink'
+            : 'border-rule bg-surface text-default hover:border-ink',
           className,
         )}
       >
-        {selected ? <Check aria-hidden className="size-4" /> : iconEl}
+        {selected ? <Icon name="check" weight="bold" className="size-4" /> : iconEl}
         {children}
       </button>
     );
@@ -65,7 +65,7 @@ export function Chip(props: ChipProps) {
             "pointer-coarse:after:absolute pointer-coarse:after:-inset-3 pointer-coarse:after:content-['']",
           )}
         >
-          <X aria-hidden className="size-3.5" />
+          <Icon name="close" className="size-3.5" />
         </button>
       </span>
     );
@@ -75,7 +75,7 @@ export function Chip(props: ChipProps) {
     <span
       className={cx(
         base,
-        variant === 'outline' ? 'border border-hairline text-default' : 'bg-subtle text-default',
+        variant === 'outline' ? 'border border-rule text-default' : 'bg-subtle text-default',
         className,
       )}
     >

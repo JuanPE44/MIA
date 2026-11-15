@@ -1,7 +1,7 @@
 import {useEffect, useId, useState} from 'react';
-import {FlaskConical} from 'lucide-react';
 import {AI_SIMULATED} from '../AI_SIMULATED';
 import {cx} from '../internal/cx';
+import {Icon} from '../Icon';
 
 export const SIMULATED_EXPLANATION = 'Respuesta de ejemplo: la IA todavía no está conectada.';
 
@@ -37,7 +37,7 @@ export function SimulatedBadge({className}: SimulatedBadgeProps) {
         onBlur={() => setPinned(false)}
         className="relative inline-flex h-6 items-center gap-1 rounded-pill bg-simulated-tint px-2 text-caption text-simulated pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2.5 pointer-coarse:after:content-['']"
       >
-        <FlaskConical aria-hidden className="size-3.5" />
+        <Icon name="experiment" className="size-3.5" />
         Simulado
       </button>
       <span

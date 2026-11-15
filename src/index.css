@@ -5,18 +5,3 @@
 /* Legacy `dark:` variants keep working: the ThemeProvider toggles `.dark` on
    <html> alongside `data-theme`. */
 @custom-variant dark (&:where(.dark, .dark *));
-
-/*
- * LEGACY (remove in L10): native form controls are forced to readable token
- * colors in both themes, as the previous hard-coded overrides did. Kept
- * unlayered on purpose so it still wins over legacy utility classes.
- * New primitives opt out with the `data-mia-ui` attribute.
- */
-:where(input, select, textarea, option):not([data-mia-ui]) {
-  color: var(--mia-text-strong);
-}
-
-select:not([data-mia-ui]) option {
-  background-color: var(--mia-bg-surface);
-  color: var(--mia-text-strong);
-}

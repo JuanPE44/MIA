@@ -1,7 +1,7 @@
 import {useId, useState} from 'react';
-import {Play} from 'lucide-react';
 import {Button, Card, InlineAlert, SegmentedControl, Switch} from '../../ui';
 import {useStudySession, type StudySettings} from './StudySessionProvider';
+import {Icon} from '../../ui/Icon';
 
 const STUDY_OPTIONS = [20, 25, 30].map((m) => ({value: String(m), label: `${m} min`}));
 const LONG_BREAK_OPTIONS = [15, 20, 25, 30].map((m) => ({value: String(m), label: `${m} min`}));
@@ -77,7 +77,7 @@ export function SessionSetup() {
         ) : null}
       </div>
 
-      <Button variant="primary" size="lg" pill fullWidth leadingIcon={<Play aria-hidden className="size-5" />} onClick={start}>
+      <Button variant="primary" size="lg" pill fullWidth leadingIcon={<Icon name="play" className="size-5" />} onClick={start}>
         Empezar sesión
       </Button>
     </Card>

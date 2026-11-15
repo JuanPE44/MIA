@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import type {Folder} from '../../types';
-import {Chip} from '../../ui';
+import {Chip, Icon, resolveItemIcon} from '../../ui';
 import {LOOSE_FILTER} from './libraryModel';
 
 interface FolderFilterProps {
@@ -38,7 +38,7 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
         chip(
           f.id,
           <>
-            <span aria-hidden>{f.icon || '📁'}</span>
+            <Icon name={resolveItemIcon(f.icon, 'folder')} />
             <span aria-hidden>{f.name}</span>
           </>,
           counts[f.id] ?? 0,

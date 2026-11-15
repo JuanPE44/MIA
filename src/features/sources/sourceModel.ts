@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react';
 import {createElement} from 'react';
-import {FileText, Film, Image as ImageIcon, Link as LinkIcon, Mic, Type} from 'lucide-react';
 import type {SourceItem, SourceType} from '../../types';
+import {Icon} from '../../ui/Icon';
 
 /** Files above this size trigger the browser-storage warning. */
 export const LARGE_FILE_BYTES = 2 * 1024 * 1024;
@@ -22,12 +22,12 @@ export const SOURCE_TYPE_LABEL: Record<SourceType, string> = {
 };
 
 const TYPE_ICON = {
-  pdf: FileText,
-  image: ImageIcon,
-  audio: Mic,
-  video: Film,
-  link: LinkIcon,
-  text: Type,
+  pdf: 'source-pdf',
+  image: 'source-image',
+  audio: 'source-audio',
+  video: 'source-video',
+  link: 'source-link',
+  text: 'document',
 } as const;
 
 /** Tint tile classes per type (token utilities only). */
@@ -41,7 +41,7 @@ export const TYPE_TILE: Record<SourceType, string> = {
 };
 
 export function typeIcon(type: SourceType, className = 'size-5'): ReactNode {
-  return createElement(TYPE_ICON[type], {'aria-hidden': true, className});
+  return createElement(Icon, {name: TYPE_ICON[type], weight: 'duotone', className});
 }
 
 export function formatBytes(bytes: number): string {

@@ -1,7 +1,7 @@
 import {useId, type ComponentProps, type ReactNode} from 'react';
-import {ChevronDown} from 'lucide-react';
 import {cx} from '../../ui/internal/cx';
 import {FieldShell, fieldBase, fieldBorder} from '../../ui/internal/FieldShell';
+import {Icon} from '../../ui/Icon';
 
 interface SelectFieldProps extends ComponentProps<'select'> {
   label: ReactNode;
@@ -23,8 +23,7 @@ export function SelectField({label, children, id: idProp, className, ...rest}: S
         >
           {children}
         </select>
-        <ChevronDown
-          aria-hidden
+        <Icon name="chevron-down"
           className="pointer-events-none absolute inset-y-0 right-3 my-auto size-5 text-muted"
         />
       </div>

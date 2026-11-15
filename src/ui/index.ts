@@ -23,3 +23,7 @@ export * from './Tabs';
 export * from './BottomTabBar';
 export * from './IconPicker';
 export * from './Checkbox';
+export * from './Icon';
+export * from './CitationChip';
+export * from './Highlight';
+export * from './Reveal';

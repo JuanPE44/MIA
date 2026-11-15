@@ -1,7 +1,7 @@
 import {useRef, useState} from 'react';
-import {Pencil, Plus, Trash2} from 'lucide-react';
 import {Button, ConfirmDialog, Menu, TextField} from '../../ui';
 import type {ChatThread} from '../../types';
+import {Icon} from '../../ui/Icon';
 
 interface ThreadsListProps {
   threads: ChatThread[];
@@ -44,7 +44,7 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
       <Button
         variant="primary"
         fullWidth
-        leadingIcon={<Plus aria-hidden className="size-5" />}
+        leadingIcon={<Icon name="add" className="size-5" />}
         onClick={onNewChat}
       >
         Nuevo chat
@@ -97,8 +97,8 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
                   <Menu
                     label={`Opciones de ${thread.title}`}
                     items={[
-                      {id: 'rename', label: 'Renombrar', icon: <Pencil />, onSelect: () => startRename(thread)},
-                      {id: 'delete', label: 'Eliminar', icon: <Trash2 />, danger: true, onSelect: () => setDeleting(thread)},
+                      {id: 'rename', label: 'Renombrar', icon: <Icon name="edit" />, onSelect: () => startRename(thread)},
+                      {id: 'delete', label: 'Eliminar', icon: <Icon name="delete" />, danger: true, onSelect: () => setDeleting(thread)},
                     ]}
                   />
                 </>

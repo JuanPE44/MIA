@@ -1,13 +1,13 @@
-import {Settings, User} from 'lucide-react';
 import {Tabs, type NavTabItem} from '../../ui';
 import {PreferencesPanel} from './PreferencesPanel';
 import {ProfilePanel} from './ProfilePanel';
+import {Icon} from '../../ui/Icon';
 
 export type AccountTab = 'perfil' | 'preferencias';
 
 const ITEMS: NavTabItem[] = [
-  {id: 'perfil', label: 'Perfil', to: '/cuenta/perfil', icon: <User />},
-  {id: 'preferencias', label: 'Preferencias', to: '/cuenta/preferencias', icon: <Settings />},
+  {id: 'perfil', label: 'Perfil', to: '/cuenta/perfil', icon: <Icon name="user" />},
+  {id: 'preferencias', label: 'Preferencias', to: '/cuenta/preferencias', icon: <Icon name="settings" />},
 ];
 
 /** "Cuenta" (S11): Perfil and Preferencias as URL-addressable tabs. No plan labels (UX-28). */

@@ -1,5 +1,4 @@
 import {useEffect, useId, useRef, useState} from 'react';
-import {ChevronDown} from 'lucide-react';
 import type {ArtifactPersonalization, ArtifactType, SourceItem} from '../../types';
 import {Button, Checkbox, Dialog, SegmentedControl, Switch} from '../../ui';
 import {cx} from '../../ui/internal/cx';
@@ -16,6 +15,7 @@ import {
   plural,
   savePersonalization,
 } from './materialModel';
+import {Icon} from '../../ui/Icon';
 
 interface CreateMaterialSheetProps {
   type: ArtifactType | null;
@@ -155,7 +155,7 @@ export function CreateMaterialSheet({type, notebookId, notebookTitle, sources, o
             onClick={() => setCustomizeOpen((open) => !open)}
             className="flex min-h-11 w-full items-center gap-2 rounded-control text-body-strong text-strong"
           >
-            <ChevronDown aria-hidden className={cx('size-4 transition-transform', customizeOpen && 'rotate-180')} />
+            <Icon name="chevron-down" className={cx('size-4 transition-transform', customizeOpen && 'rotate-180')} />
             Personalizar
           </button>
           <div id={panelId} role="region" aria-label="Personalizar" hidden={!customizeOpen} className="mt-3 flex flex-col gap-5">

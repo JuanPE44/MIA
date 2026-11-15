@@ -1,0 +1,493 @@
+{
+ "a11y-login": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 3,
+  "noName": 0,
+  "titleOnly": 0,
+  "inputs": 0,
+  "unlabeled": 0,
+  "imgs": 2,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 14,
+  "smallFont": {
+   "11": 6
+  },
+  "contrastChecked": 14,
+  "contrastLow": 2,
+  "lows": [
+   "Negro|4.35|12px",
+   "Acceso directo a tus carpeta|2.63|11px"
+  ],
+  "smallTargets": 2,
+  "under24": 0,
+  "dialogs": 0,
+  "h1": 1,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "a11y-explorer": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 14,
+  "noName": 0,
+  "titleOnly": 2,
+  "inputs": 1,
+  "unlabeled": 1,
+  "imgs": 5,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 77,
+  "smallFont": {
+   "9": 1,
+   "10": 3,
+   "11": 20
+  },
+  "contrastChecked": 77,
+  "contrastLow": 20,
+  "lows": [
+   "Negro|4.35|12px",
+   "·|2.82|11px",
+   "Contenedores temáticos de cu|2.51|11px",
+   "1|1.00|11px",
+   "cuaderno|1.00|11px",
+   "Emprendimiento & Negocios|1.00|30px"
+  ],
+  "smallTargets": 12,
+  "under24": 0,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "a11y-chat": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 29,
+  "noName": 0,
+  "titleOnly": 6,
+  "inputs": 1,
+  "unlabeled": 1,
+  "imgs": 3,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 87,
+  "smallFont": {
+   "10": 21,
+   "11": 20
+  },
+  "contrastChecked": 85,
+  "contrastLow": 19,
+  "lows": [
+   "Negro|4.35|12px",
+   "2|4.41|10px",
+   "3|4.41|10px",
+   "×|4.33|12px",
+   "3|3.71|10px",
+   "•|2.51|11px"
+  ],
+  "smallTargets": 23,
+  "under24": 9,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "a11y-FUENTES": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 37,
+  "noName": 0,
+  "titleOnly": 6,
+  "inputs": 3,
+  "unlabeled": 0,
+  "imgs": 3,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 158,
+  "smallFont": {
+   "9": 6,
+   "10": 22,
+   "11": 31
+  },
+  "contrastChecked": 141,
+  "contrastLow": 20,
+  "lows": [
+   "Negro|4.35|12px",
+   "3|4.41|10px",
+   "3|4.41|10px",
+   "×|4.33|12px",
+   "3|3.71|10px",
+   "Cargar de Galería / Fotos|3.20|12px"
+  ],
+  "smallTargets": 31,
+  "under24": 2,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "a11y-ARTEFACTOS": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 41,
+  "noName": 0,
+  "titleOnly": 10,
+  "inputs": 0,
+  "unlabeled": 0,
+  "imgs": 3,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 113,
+  "smallFont": {
+   "9": 5,
+   "10": 34,
+   "11": 19
+  },
+  "contrastChecked": 103,
+  "contrastLow": 29,
+  "lows": [
+   "Negro|4.35|12px",
+   "5|4.41|10px",
+   "3|4.41|10px",
+   "×|4.33|12px",
+   "3|3.71|10px",
+   "Quiz|2.47|11px"
+  ],
+  "smallTargets": 27,
+  "under24": 2,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "a11y-ESTUDIO": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 24,
+  "noName": 0,
+  "titleOnly": 0,
+  "inputs": 1,
+  "unlabeled": 1,
+  "imgs": 3,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 148,
+  "smallFont": {
+   "10": 29,
+   "11": 30
+  },
+  "contrastChecked": 131,
+  "contrastLow": 20,
+  "lows": [
+   "Negro|4.35|12px",
+   "3|4.41|10px",
+   "×|4.33|12px",
+   "3|3.71|10px",
+   "55|3.65|16px",
+   "m|3.65|16px"
+  ],
+  "smallTargets": 18,
+  "under24": 2,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "kbd-login-tab-order": [
+  "BUTTON:Blanco|outline=auto/1px|shadow=true",
+  "BUTTON:Negro|outline=auto/1px|shadow=false",
+  "BUTTON:Empezar|outline=auto/3px|shadow=true",
+  "BODY:MIA\nMi Inteligenci|outline=none/3px|shadow=false",
+  "BUTTON:Blanco|outline=auto/1px|shadow=true",
+  "BUTTON:Negro|outline=auto/1px|shadow=false"
+ ],
+ "kbd-explorer-tab-order": [
+  "BUTTON:Blanco|outline=auto/1px",
+  "BUTTON:Negro|outline=auto/1px",
+  "BUTTON:Google Search|outline=auto/1px",
+  "BUTTON:Soporte IA|outline=auto/1px",
+  "BUTTON:Salir|outline=auto/1px",
+  "BUTTON:+ Nueva Carpeta|outline=auto/1px",
+  "BUTTON:+ Nuevo Cuaderno|outline=auto/1px",
+  "INPUT:|outline=none/1px"
+ ],
+ "kbd-notebook-card-semantics": {
+  "tag": "DIV",
+  "tabindex": null,
+  "role": null
+ },
+ "modal-newfolder": {
+  "role": 0,
+  "active": "INPUT:ej. 1er Cuatrimestre, Finales de Economía...",
+  "escapeClosed": false
+ },
+ "validation-folder-empty": {
+  "disabled": false,
+  "foldersBefore": "Carpetas (2)"
+ },
+ "validation-folder-empty-after": {
+  "modalStillOpen": true,
+  "alertShown": 0,
+  "foldersAfter": "Carpetas (2)"
+ },
+ "validation-notebook-empty": {
+  "disabled": false,
+  "requiredAttrs": 1
+ },
+ "validation-notebook-empty-after": {
+  "openedWorkspace": false,
+  "title": "Carpetas y Cuadernos de Estudio"
+ },
+ "delete-folder": {
+  "before": "Carpetas (2)",
+  "after": "Carpetas (2)",
+  "nativeConfirm": 1,
+  "customConfirm": false
+ },
+ "delete-folder-notebook-survives": true,
+ "delete-source": {
+  "before": 3,
+  "after": 3,
+  "nativeConfirm": 2,
+  "customConfirm": false
+ },
+ "delete-artifact": {
+  "before": 5,
+  "after": 5,
+  "nativeConfirm": 3,
+  "customConfirm": false
+ },
+ "chat-loading": {
+  "sendDisabled": true,
+  "inputDisabled": false,
+  "bodyHasSpinner": true
+ },
+ "chat-error-500": {
+  "alertRoleCount": 0,
+  "lastBubble": "o inventó nada 1 Eric Ries - El Método Lean Startup (Capítulos 1 al 4) (Pág. 1, Párrafo 1) 20:20 Mejorar Google Protección y Fidelidad: Anclaje a fuentes • Manejo estricto de citas • Sin alucinaciones Presiona Enter para enviar Mi Inteligencia Artificial FUENTES → ANÁLISIS → ARTEFACTOS → ESTUDIO ACTIVO PERFIL Plan Pro • Estado de Cuenta PLAN ACTUAL Plan Universitario Pro 🔥 6 días ⏱️ 55m / 60m hoy"
+ },
+ "chat-network-fail": {
+  "tail": "orar Google Protección y Fidelidad: Anclaje a fuentes • Manejo estricto de citas • Sin alucinaciones Presiona Enter para enviar Mi Inteligencia Artificial FUENTES → ANÁLISIS → ARTEFACTOS → ESTUDIO ACTIVO PERFIL Plan Pro • Estado de Cuenta PLAN ACTUAL Plan Universitario Pro 🔥 6 días ⏱️ 55m / 60m hoy"
+ },
+ "chat-empty-send-disabled": true,
+ "responsive-768": {
+  "login": {
+   "sw": 768,
+   "cw": 768
+  },
+  "explorer": {
+   "sw": 768,
+   "cw": 768
+  },
+  "chat": {
+   "sw": 882,
+   "cw": 768,
+   "tabsVisibleInViewport": [
+    "CHAT:in",
+    "FUENTES:in",
+    "ARTEFACTOS:in",
+    "ESTUDIO:in"
+   ],
+   "offenders": [
+    "DIV.flex.items-center|right=882",
+    "DIV.flex.items-center|right=882",
+    "SPAN.hidden.sm:inline-block|right=799",
+    "BUTTON.flex.items-center|right=882",
+    "svg.[object.SVGAnimatedString]|right=834"
+   ]
+  },
+  "FUENTES": 882,
+  "ARTEFACTOS": 882,
+  "ESTUDIO": 882,
+  "fixedBottom": [
+   "|h=48|top=896",
+   "PERFIL Plan |h=83|top=941"
+  ],
+  "viewportH": 1024
+ },
+ "responsive-390": {
+  "login": {
+   "sw": 390,
+   "cw": 390
+  },
+  "explorer": {
+   "sw": 456,
+   "cw": 390
+  },
+  "chat": {
+   "sw": 521,
+   "cw": 390,
+   "tabsVisibleInViewport": [
+    "CHAT:in",
+    "FUENTES:in",
+    "ARTEFACTOS:clipped",
+    "ESTUDIO:clipped"
+   ],
+   "offenders": [
+    "DIV.flex.items-center|right=521",
+    "BUTTON.flex.items-center|right=429",
+    "svg.[object.SVGAnimatedString]|right=418",
+    "path.[object.SVGAnimatedString]|right=411",
+    "rect.[object.SVGAnimatedString]|right=416"
+   ]
+  },
+  "FUENTES": 521,
+  "ARTEFACTOS": 521,
+  "ESTUDIO": 521,
+  "fixedBottom": [
+   "|h=48|top=716",
+   "PERFIL Plan |h=79|top=765"
+  ],
+  "viewportH": 844
+ },
+ "responsive-320": {
+  "login": {
+   "sw": 362,
+   "cw": 320
+  },
+  "explorer": {
+   "sw": 456,
+   "cw": 320
+  },
+  "chat": {
+   "sw": 521,
+   "cw": 320,
+   "tabsVisibleInViewport": [
+    "CHAT:in",
+    "FUENTES:in",
+    "ARTEFACTOS:clipped",
+    "ESTUDIO:clipped"
+   ],
+   "offenders": [
+    "DIV.flex.items-center|right=521",
+    "DIV.inline-flex.items-center|right=329",
+    "BUTTON.flex.items-center|right=326",
+    "BUTTON.flex.items-center|right=385",
+    "svg.[object.SVGAnimatedString]|right=362"
+   ]
+  },
+  "FUENTES": 521,
+  "ARTEFACTOS": 521,
+  "ESTUDIO": 521,
+  "fixedBottom": [
+   "|h=48|top=716",
+   "PERFIL Plan |h=90|top=754"
+  ],
+  "viewportH": 844
+ },
+ "a11y-explorer-dark": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 14,
+  "noName": 0,
+  "titleOnly": 2,
+  "inputs": 1,
+  "unlabeled": 1,
+  "imgs": 5,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 77,
+  "smallFont": {
+   "9": 1,
+   "10": 3,
+   "11": 20
+  },
+  "contrastChecked": 77,
+  "contrastLow": 4,
+  "lows": [
+   "·|2.82|11px",
+   "💼|1.01|20px",
+   "Clic derecho para mover|3.21|9px",
+   "📚|1.01|20px"
+  ],
+  "smallTargets": 12,
+  "under24": 0,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "a11y-chat-dark": {
+  "lang": "en",
+  "title": "Mi Inteligencia Artificial",
+  "buttons": 29,
+  "noName": 0,
+  "titleOnly": 6,
+  "inputs": 1,
+  "unlabeled": 1,
+  "imgs": 3,
+  "noAlt": 0,
+  "emptyAlt": 0,
+  "textNodes": 87,
+  "smallFont": {
+   "10": 21,
+   "11": 20
+  },
+  "contrastChecked": 85,
+  "contrastLow": 12,
+  "lows": [
+   "2|4.41|10px",
+   "3|4.41|10px",
+   "×|4.33|12px",
+   "3|3.71|10px",
+   "Archivo / Origen citado:|1.41|10px",
+   "11:22 AM|2.58|10px"
+  ],
+  "smallTargets": 23,
+  "under24": 9,
+  "dialogs": 0,
+  "h1": 0,
+  "landmarks": {
+   "main": 1,
+   "nav": 0,
+   "header": 1
+  },
+  "scrollW": 1440,
+  "clientW": 1440
+ },
+ "task-generate-quiz-clicks-from-login": 5,
+ "task-start-focus-clicks-from-login": 6,
+ "focus-after-start": {
+  "navbarHidden": true,
+  "fullscreen": false,
+  "modal": true,
+  "text": "MIA Mi Inteligencia Artificial Mis Carpetas 🚀 Emprendedorismo: Metodología Lean Startup y Canvas Blanco Negro Google Search Soporte IA 6d 55m Juan Salir CHAT 2 FUENTES 3 ARTEFACTOS 5 ESTUDIO 🚀 ECONOMÍA & NEGOCIOS Contexto de Estudio Activo Emprendedorismo: Metodología Lean Startup y Canvas + Añadir Fuentes PDF · Videos · Enlaces · Textos 3 fuentes CHATS ACTIVOS: Preguntas Conceptuales Lean 3 × Dudas sobre Canvas y MVP 3 × (Todos los chats comparten las fuentes y artefactos del cuaderno) + Inic"
+ }
+}

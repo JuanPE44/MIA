@@ -1,5 +1,7 @@
 import {createRoot} from 'react-dom/client';
-import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource-variable/fraunces/full.css';
+import '@fontsource-variable/hanken-grotesk';
+import '@fontsource-variable/jetbrains-mono';
 import {BrowserRouter} from 'react-router';
 import App from './App.tsx';
 import {AppStateProvider} from './app/AppStateContext.tsx';

@@ -10,11 +10,11 @@ import {
   type RefObject,
 } from 'react';
 import {createPortal} from 'react-dom';
-import {MoreVertical} from 'lucide-react';
 import {cx} from '../internal/cx';
 import {useIsPhone} from '../internal/useIsPhone';
 import {IconButton} from '../IconButton';
 import '../ui.css';
+import {Icon} from '../Icon';
 
 export interface MenuItem {
   id: string;
@@ -108,7 +108,7 @@ export function Menu({items, label = 'Más opciones', renderTrigger, contextTarg
       {...triggerProps}
       ref={triggerProps.ref}
       aria-label={label}
-      icon={<MoreVertical aria-hidden className="size-5" />}
+      icon={<Icon name="more" className="size-5" />}
       className={className}
     />
   );

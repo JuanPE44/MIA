@@ -1,9 +1,9 @@
 import {useState, type ReactNode} from 'react';
-import {BookOpen, FileText, Globe, Sparkles, ThumbsDown, ThumbsUp} from 'lucide-react';
 import {Button, Chip, IconButton, InlineAlert, SimulatedBadge, Spinner, Textarea} from '../../ui';
 import {AI_SIMULATED} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {Markdown} from './markdown';
+import {Icon} from '../../ui/Icon';
 
 const UNKNOWN_ANSWER = 'Lo siento, no tengo acceso a esa información en mis manuales.';
 
@@ -13,7 +13,7 @@ function AssistantAvatar() {
       aria-hidden
       className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-pill bg-primary-tint text-primary-on-tint"
     >
-      <Sparkles className="size-4" />
+      <Icon name="sparkles" className="size-4" />
     </span>
   );
 }
@@ -131,7 +131,7 @@ export function AssistantMessage({
                   aria-label={`Ver fuente ${chunk.index}: ${chunk.sourceTitle}, ${chunk.location}`}
                   className="relative rounded-pill pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-['']"
                 >
-                  <Chip variant="outline" size="sm" icon={<FileText />} className="hover:bg-subtle">
+                  <Chip variant="outline" size="sm" icon={<Icon name="document" />} className="hover:bg-subtle">
                     <span className="max-w-[16rem] truncate">
                       Fuente {chunk.index} · {chunk.sourceTitle}
                     </span>
@@ -141,7 +141,7 @@ export function AssistantMessage({
             ))}
             {citedOnly.map((title) => (
               <li key={title}>
-                <Chip variant="outline" size="sm" icon={<FileText />}>
+                <Chip variant="outline" size="sm" icon={<Icon name="document" />}>
                   <span className="max-w-[16rem] truncate">{title}</span>
                 </Chip>
               </li>
@@ -154,7 +154,7 @@ export function AssistantMessage({
             <Button
               variant="secondary"
               size="sm"
-              leadingIcon={<Globe aria-hidden className="size-4" />}
+              leadingIcon={<Icon name="web" className="size-4" />}
               onClick={() => onSearchWeb(lastQuestion)}
             >
               Buscar en la web
@@ -170,7 +170,7 @@ export function AssistantMessage({
                 size="sm"
                 aria-label="Respuesta útil"
                 aria-pressed={message.feedback === 'positive'}
-                icon={<ThumbsUp aria-hidden className={`size-4 ${message.feedback === 'positive' ? 'fill-current' : ''}`} />}
+                icon={<Icon name="thumbs-up" className={`size-4 ${message.feedback === 'positive' ? 'fill-current' : ''}`} />}
                 className={message.feedback === 'positive' ? 'text-primary-text' : 'text-muted'}
                 onClick={() => onFeedback(message.feedback === 'positive' ? null : 'positive')}
               />
@@ -178,7 +178,7 @@ export function AssistantMessage({
                 size="sm"
                 aria-label="Respuesta no útil"
                 aria-pressed={message.feedback === 'negative'}
-                icon={<ThumbsDown aria-hidden className={`size-4 ${message.feedback === 'negative' ? 'fill-current' : ''}`} />}
+                icon={<Icon name="thumbs-down" className={`size-4 ${message.feedback === 'negative' ? 'fill-current' : ''}`} />}
                 className={message.feedback === 'negative' ? 'text-primary-text' : 'text-muted'}
                 onClick={() => onFeedback(message.feedback === 'negative' ? null : 'negative')}
               />
@@ -196,7 +196,7 @@ export function AssistantMessage({
             <Button
               variant="ghost"
               size="sm"
-              leadingIcon={<BookOpen aria-hidden className="size-4" />}
+              leadingIcon={<Icon name="book" className="size-4" />}
               onClick={onCreateArtifact}
             >
               Crear un material con esto

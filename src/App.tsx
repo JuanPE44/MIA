@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Navigate } from 'react-router';
 import { WelcomeScreen } from './features/welcome';
 import { ProgressScreen } from './features/progress';
@@ -11,7 +11,8 @@ import { StudyScreen, StudySessionProvider } from './features/study';
 import { WebSearchDialog } from './features/web-search';
 import { useAppState } from './app/AppStateContext';
 import { NotFound, paths } from './app/routes';
-import { TopBar, NotebookLayout } from './app/shell';
+import { TopBar, SideRail, NotebookLayout } from './app/shell';
+import { useToast } from './ui/Toast';
 import { MaterialsJobsProvider, MaterialsScreen, MaterialViewer } from './features/materials';
 
 export default function App() {
@@ -56,6 +57,12 @@ export default function App() {
     handleUpdateThreadMessages,
   } = useAppState();
 
+  // Focus-mode warning: same text/duration as before, shown as a warning Toast.
+  const toast = useToast();
+  useEffect(() => {
+    if (focusWarningToast) toast.show({ message: focusWarningToast, variant: 'warning', duration: 3500 });
+  }, [focusWarningToast, toast]);
+
   // Session gate (T4.2 / A3): no session → Bienvenida at ANY URL. The URL is kept,
   // so after "Empezar" the requested screen renders. Reload → Bienvenida again.
   if (!currentUser) {
@@ -80,22 +87,16 @@ export default function App() {
       {viewingMaterial && activeNotebook ? (
         <MaterialViewer />
       ) : (
-    <div className="min-h-screen font-sans selection:bg-primary selection:text-on-primary flex flex-col bg-page text-strong transition-colors duration-200">
-      {/* Global top bar (hides itself in Focus mode) */}
+    <div className="min-h-screen font-sans selection:bg-highlight selection:text-highlight-ink text-strong lg:flex">
+      {/* Desktop rail (lg+); hides itself in Focus mode */}
+      <SideRail />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+      {/* Top bar for phone/tablet (< lg); hides itself in Focus mode */}
       <TopBar />
 
-      {/* Focus mode warning banner toast */}
-      {focusWarningToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-300">
-          <div className="px-5 py-3 rounded-2xl shadow-2xl border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/90 text-rose-900 dark:text-rose-100 flex items-center gap-3 font-extrabold text-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0" />
-            <span>{focusWarningToast}</span>
-          </div>
-        </div>
-      )}
-
       {/* Main Container */}
-      <main className="flex-1 max-w-content w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
+      <main className="flex-1 max-w-content w-full mx-auto px-4 sm:px-6 lg:px-10 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
         {isNotFound && <NotFound />}
 
@@ -134,6 +135,7 @@ export default function App() {
           </StudySessionProvider>
         )}
       </main>
+      </div>
 
       {/* Agente de Búsqueda Google en Vivo (Grounding en Tiempo Real con Gemini 3.8 Flash invocado desde el Chat) (hidden in Focus mode) */}
       {!isFocusModeActive && (

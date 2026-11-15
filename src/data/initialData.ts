@@ -16,7 +16,7 @@ export const INITIAL_FOLDERS: Folder[] = [
     id: 'folder-emp',
     name: 'Emprendimiento & Negocios',
     color: 'indigo',
-    icon: '💼',
+    icon: 'briefcase',
     createdAt: '2026-09-01',
     coverImage: bannerEmprendimiento
   },
@@ -24,7 +24,7 @@ export const INITIAL_FOLDERS: Folder[] = [
     id: 'folder-cuatrimestre',
     name: '1er Cuatrimestre 2026',
     color: 'emerald',
-    icon: '📚',
+    icon: 'book',
     createdAt: '2026-09-10',
     coverImage: bannerCuatrimestre
   }
@@ -39,7 +39,7 @@ export const INITIAL_NOTEBOOKS: Notebook[] = [
     subject: 'Economía & Negocios',
     category: 'emprendimiento',
     color: 'indigo',
-    icon: '🚀',
+    icon: 'rocket',
     createdAt: '2026-09-15',
     updatedAt: '2026-10-05',
     sources: [

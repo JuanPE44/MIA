@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router';
-import {ChevronLeft, Copy, Printer, SlidersHorizontal, ZoomIn, ZoomOut} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import type {StudyArtifact} from '../../types';
@@ -14,6 +13,7 @@ import {InfographicView} from './renderers/InfographicView';
 import {PodcastView} from './renderers/PodcastView';
 import {QuizView} from './renderers/QuizView';
 import {ReadingPage} from './renderers/ReadingPage';
+import {Icon} from '../../ui/Icon';
 
 type ViewMode = 'lectura' | 'interactivo';
 
@@ -153,9 +153,9 @@ export function MaterialViewer() {
     <Menu
       label="Más acciones del material"
       items={[
-        {id: 'copy', label: 'Copiar', icon: <Copy aria-hidden />, onSelect: () => void copyText()},
-        {id: 'print', label: 'Imprimir / PDF', icon: <Printer aria-hidden />, onSelect: print},
-        {id: 'adjust', label: 'Ajustar material', icon: <SlidersHorizontal aria-hidden />, onSelect: () => setAdjustOpen(true)},
+        {id: 'copy', label: 'Copiar', icon: <Icon name="copy" />, onSelect: () => void copyText()},
+        {id: 'print', label: 'Imprimir / PDF', icon: <Icon name="print" />, onSelect: print},
+        {id: 'adjust', label: 'Ajustar material', icon: <Icon name="adjust" />, onSelect: () => setAdjustOpen(true)},
       ]}
     />
   );
@@ -163,7 +163,7 @@ export function MaterialViewer() {
   return (
     <div className="flex min-h-dvh flex-col bg-page text-strong">
       <header className="flex min-h-14 flex-wrap items-center gap-2 border-b border-hairline bg-surface px-2 sm:px-4">
-        <IconButton aria-label="Volver a materiales" icon={<ChevronLeft aria-hidden className="size-5" />} onClick={closeViewer} />
+        <IconButton aria-label="Volver a materiales" icon={<Icon name="chevron-left" className="size-5" />} onClick={closeViewer} />
         <h1 className="min-w-0 flex-1 truncate text-h3 text-strong">{artifact.title}</h1>
         <SimulatedBadge />
         {interactive ? (
@@ -180,7 +180,7 @@ export function MaterialViewer() {
         <div className="flex items-center rounded-control border border-hairline">
           <IconButton
             aria-label="Reducir zoom"
-            icon={<ZoomOut aria-hidden className="size-4" />}
+            icon={<Icon name="zoom-out" className="size-4" />}
             size="sm"
             disabled={zoom <= ZOOM_MIN}
             onClick={() => setZoom((value) => Math.max(ZOOM_MIN, value - 10))}
@@ -190,7 +190,7 @@ export function MaterialViewer() {
           </span>
           <IconButton
             aria-label="Aumentar zoom"
-            icon={<ZoomIn aria-hidden className="size-4" />}
+            icon={<Icon name="zoom-in" className="size-4" />}
             size="sm"
             disabled={zoom >= ZOOM_MAX}
             onClick={() => setZoom((value) => Math.min(ZOOM_MAX, value + 10))}
@@ -200,13 +200,13 @@ export function MaterialViewer() {
           overflow
         ) : (
           <>
-            <Button variant="ghost" size="sm" leadingIcon={<Copy aria-hidden className="size-4" />} onClick={() => void copyText()}>
+            <Button variant="ghost" size="sm" leadingIcon={<Icon name="copy" className="size-4" />} onClick={() => void copyText()}>
               Copiar
             </Button>
-            <Button variant="ghost" size="sm" leadingIcon={<Printer aria-hidden className="size-4" />} onClick={print}>
+            <Button variant="ghost" size="sm" leadingIcon={<Icon name="print" className="size-4" />} onClick={print}>
               Imprimir / PDF
             </Button>
-            <Button variant="secondary" size="sm" leadingIcon={<SlidersHorizontal aria-hidden className="size-4" />} onClick={() => setAdjustOpen(true)}>
+            <Button variant="secondary" size="sm" leadingIcon={<Icon name="adjust" className="size-4" />} onClick={() => setAdjustOpen(true)}>
               Ajustar material
             </Button>
           </>

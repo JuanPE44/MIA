@@ -1,10 +1,10 @@
 import {useRef, useState} from 'react';
 import {Link} from 'react-router';
-import {Brain} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import {Button, Card, EmptyState, InlineAlert, SimulatedBadge, Textarea} from '../../ui';
 import {requestChallenge, type RecallChallenge} from './recallApi';
+import {Icon} from '../../ui/Icon';
 
 type Phase = 'idle' | 'loading' | 'question' | 'compared' | 'error';
 
@@ -22,7 +22,7 @@ export function ActiveRecall() {
     return (
       <Card className="mx-auto w-full max-w-[720px] p-6">
         <EmptyState
-          icon={<Brain aria-hidden />}
+          icon={<Icon name="brain" />}
           title="Necesitas al menos una fuente"
           description="El repaso activo hace preguntas sobre tus fuentes. Agrega una para empezar."
           action={

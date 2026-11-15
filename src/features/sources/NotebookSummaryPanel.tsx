@@ -1,7 +1,7 @@
 import {useId, useState} from 'react';
-import {ChevronDown, RefreshCw} from 'lucide-react';
 import type {Notebook, SourceAnalysis} from '../../types';
 import {Button, Card, InlineAlert, SimulatedBadge} from '../../ui';
+import {Icon} from '../../ui/Icon';
 
 const storageKey = (notebookId: string) => `mia_sources_summary_open_${notebookId}`;
 
@@ -96,8 +96,7 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
           onClick={toggle}
           className="inline-flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-control text-left text-h3 text-strong"
         >
-          <ChevronDown
-            aria-hidden
+          <Icon name="chevron-down"
             className={`size-5 shrink-0 text-muted transition-transform duration-[120ms] ${open ? '' : '-rotate-90'}`}
           />
           Resumen del cuaderno
@@ -106,7 +105,7 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
         <Button
           size="sm"
           variant="secondary"
-          leadingIcon={<RefreshCw aria-hidden className="size-4" />}
+          leadingIcon={<Icon name="refresh" className="size-4" />}
           loading={analyzing}
           onClick={onAnalyze}
         >

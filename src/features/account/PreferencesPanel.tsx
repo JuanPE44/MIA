@@ -1,13 +1,13 @@
 import {useState} from 'react';
-import {Monitor, Moon, Sun} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {useTheme, type ThemeMode} from '../../app/providers/ThemeProvider';
 import {Button, ConfirmDialog, SegmentedControl, useToast} from '../../ui';
+import {Icon} from '../../ui/Icon';
 
 const THEME_OPTIONS = [
-  {value: 'light' as const, label: 'Claro', icon: <Sun aria-hidden className="size-4" />},
-  {value: 'dark' as const, label: 'Oscuro', icon: <Moon aria-hidden className="size-4" />},
-  {value: 'system' as const, label: 'Sistema', icon: <Monitor aria-hidden className="size-4" />},
+  {value: 'light' as const, label: 'Claro', icon: <Icon name="theme-light" className="size-4" />},
+  {value: 'dark' as const, label: 'Oscuro', icon: <Icon name="theme-dark" className="size-4" />},
+  {value: 'system' as const, label: 'Sistema', icon: <Icon name="theme-system" className="size-4" />},
 ];
 
 /** Preferencias tab: theme and example-data reset (UX-15: separated from the profile). */

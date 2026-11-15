@@ -8,11 +8,12 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import {AlertCircle, AlertTriangle, CheckCircle2, Info, X} from 'lucide-react';
+import {motion, useReducedMotion} from 'motion/react';
 import {cx} from '../internal/cx';
 import {Button} from '../Button';
 import {IconButton} from '../IconButton';
 import '../ui.css';
+import {Icon} from '../Icon';
 
 export type ToastVariant = 'info' | 'success' | 'warning' | 'danger';
 
@@ -43,12 +44,13 @@ export function useToast(): ToastApi {
   return ctx;
 }
 
-const icons = {info: Info, success: CheckCircle2, warning: AlertTriangle, danger: AlertCircle} as const;
-const iconColor = {
-  info: 'text-primary-text',
-  success: 'text-success',
-  warning: 'text-warning',
-  danger: 'text-danger',
+const icons = {info: 'info', success: 'success', warning: 'warning', danger: 'error'} as const;
+/** Sticky-note look: highlighter yellow for info/success, tinted paper for warning/danger. */
+const note = {
+  info: 'border-ink bg-highlight text-highlight-ink',
+  success: 'border-ink bg-highlight text-highlight-ink',
+  warning: 'border-warning bg-warning-tint text-strong',
+  danger: 'border-danger bg-danger-tint text-strong',
 } as const;
 
 export function ToastProvider({children}: {children: ReactNode}) {
@@ -92,7 +94,8 @@ export function ToastProvider({children}: {children: ReactNode}) {
 
 function ToastView({toast, onDismiss}: {toast: ActiveToast; onDismiss: () => void}) {
   const variant = toast.variant ?? 'info';
-  const Icon = icons[variant];
+  const iconName = icons[variant];
+  const reduced = useReducedMotion();
   const total = toast.duration ?? (toast.action ? 8000 : 5000);
   const remaining = useRef(total);
   const startedAt = useRef(0);
@@ -124,21 +127,25 @@ function ToastView({toast, onDismiss}: {toast: ActiveToast; onDismiss: () => voi
   }, [start]);
 
   return (
-    <div
+    <motion.div
       onMouseEnter={pause}
       onMouseLeave={resume}
       onFocus={pause}
       onBlur={resume}
+      initial={reduced ? false : {opacity: 0, y: 14, rotate: -4, scale: 0.96}}
+      animate={{opacity: 1, y: 0, rotate: reduced ? 0 : -1, scale: 1}}
+      transition={{type: 'spring', stiffness: 380, damping: 26}}
       className={cx(
-        'mia-anim-toast pointer-events-auto flex w-full max-w-[400px] items-center gap-3 rounded-control',
-        'border border-hairline bg-surface-raised py-2 pl-4 pr-2 text-strong shadow-elevation-2',
+        'pointer-events-auto flex w-full max-w-[400px] items-center gap-3 rounded-small border-[1.5px]',
+        'py-2.5 pl-4 pr-2 shadow-offset',
+        note[variant],
       )}
     >
-      <Icon aria-hidden className={cx('size-5 shrink-0', iconColor[variant])} />
+      <Icon name={iconName} weight="fill" className="size-5 shrink-0" />
       <p className="min-w-0 flex-1 text-small">{toast.message}</p>
       {toast.action ? (
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
           onClick={() => {
             toast.action?.onAction();
@@ -150,11 +157,12 @@ function ToastView({toast, onDismiss}: {toast: ActiveToast; onDismiss: () => voi
       ) : null}
       <IconButton
         aria-label="Cerrar aviso"
-        icon={<X aria-hidden className="size-4" />}
+        icon={<Icon name="close" className="size-4" />}
         size="sm"
         tooltip={false}
         onClick={onDismiss}
+        className="text-current hover:bg-black/10"
       />
-    </div>
+    </motion.div>
   );
 }

@@ -1,14 +1,4 @@
-import {
-  Award,
-  BookOpen,
-  FileText,
-  Headphones,
-  HelpCircle,
-  Layers,
-  Presentation,
-  Sparkles,
-  type LucideIcon,
-} from 'lucide-react';
+import type {IconName} from '../../ui/Icon';
 import type {ArtifactPersonalization, ArtifactType, StudyArtifact} from '../../types';
 
 export interface MaterialTypeInfo {
@@ -18,21 +8,21 @@ export interface MaterialTypeInfo {
   /** Lowercase noun for sentences: "Crear <noun>". */
   noun: string;
   description: string;
-  icon: LucideIcon;
+  icon: IconName;
   /** Literal class so Tailwind can see it. */
   tileClass: string;
 }
 
 /** The 8 material types, in the order of the legacy buttons. */
 export const MATERIAL_TYPES: MaterialTypeInfo[] = [
-  {id: 'resumen', label: 'Resumen', noun: 'resumen', description: 'Las ideas clave, condensadas', icon: FileText, tileClass: 'bg-tile-durazno'},
-  {id: 'cuestionario', label: 'Cuestionario', noun: 'cuestionario', description: 'Preguntas con soluciones', icon: HelpCircle, tileClass: 'bg-tile-lima'},
-  {id: 'flashcards', label: 'Tarjetas', noun: 'tarjetas', description: 'Tarjetas de memoria para repasar', icon: Layers, tileClass: 'bg-tile-azul'},
-  {id: 'guia', label: 'Guía', noun: 'guía', description: 'Hoja de ruta paso a paso', icon: BookOpen, tileClass: 'bg-tile-violeta'},
-  {id: 'modelo_examen', label: 'Modelo de examen', noun: 'modelo de examen', description: 'Un simulacro de prueba', icon: Award, tileClass: 'bg-tile-rosa'},
-  {id: 'audio_podcast', label: 'Audio', noun: 'audio', description: 'Un podcast para escuchar', icon: Headphones, tileClass: 'bg-tile-violeta'},
-  {id: 'infografia', label: 'Infografía', noun: 'infografía', description: 'Esquema visual con pilares', icon: Sparkles, tileClass: 'bg-tile-lima'},
-  {id: 'presentacion', label: 'Presentación', noun: 'presentación', description: 'Diapositivas con los conceptos', icon: Presentation, tileClass: 'bg-tile-azul'},
+  {id: 'resumen', label: 'Resumen', noun: 'resumen', description: 'Las ideas clave, condensadas', icon: 'document', tileClass: 'bg-tile-durazno'},
+  {id: 'cuestionario', label: 'Cuestionario', noun: 'cuestionario', description: 'Preguntas con soluciones', icon: 'help', tileClass: 'bg-tile-lima'},
+  {id: 'flashcards', label: 'Tarjetas', noun: 'tarjetas', description: 'Tarjetas de memoria para repasar', icon: 'materials', tileClass: 'bg-tile-azul'},
+  {id: 'guia', label: 'Guía', noun: 'guía', description: 'Hoja de ruta paso a paso', icon: 'book', tileClass: 'bg-tile-violeta'},
+  {id: 'modelo_examen', label: 'Modelo de examen', noun: 'modelo de examen', description: 'Un simulacro de prueba', icon: 'award', tileClass: 'bg-tile-rosa'},
+  {id: 'audio_podcast', label: 'Audio', noun: 'audio', description: 'Un podcast para escuchar', icon: 'headphones', tileClass: 'bg-tile-violeta'},
+  {id: 'infografia', label: 'Infografía', noun: 'infografía', description: 'Esquema visual con pilares', icon: 'sparkles', tileClass: 'bg-tile-lima'},
+  {id: 'presentacion', label: 'Presentación', noun: 'presentación', description: 'Diapositivas con los conceptos', icon: 'presentation', tileClass: 'bg-tile-azul'},
 ];
 
 export const materialTypeOf = (type: ArtifactType): MaterialTypeInfo =>

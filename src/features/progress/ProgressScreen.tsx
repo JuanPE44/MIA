@@ -1,6 +1,5 @@
 import {useMemo} from 'react';
 import {useNavigate} from 'react-router';
-import {BarChart3, BookOpen, CheckCircle2, Clock, Flame, Layers, ShieldAlert, Sparkles, Timer} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import {Button, Card, EmptyState, useToast} from '../../ui';
@@ -9,6 +8,7 @@ import {GOAL_OPTIONS, useDailyGoal} from './dailyGoal';
 import {buildWeek, hasActivity, toDailyLogs} from './progressModel';
 import {StatTile} from './StatTile';
 import {WeeklyChart} from './WeeklyChart';
+import {Icon} from '../../ui/Icon';
 
 const number = new Intl.NumberFormat('es');
 
@@ -63,11 +63,11 @@ export function ProgressScreen() {
       {!hasActivity(stats, week) ? (
         <Card>
           <EmptyState
-            icon={<BarChart3 />}
+            icon={<Icon name="progress" />}
             title="Empieza una sesión para ver tu progreso"
             description="Cuando estudies, aquí vas a ver tu racha, tus minutos y tu semana."
             action={
-              <Button variant="primary" onClick={goStudy} leadingIcon={<Timer aria-hidden className="size-5" />}>
+              <Button variant="primary" onClick={goStudy} leadingIcon={<Icon name="timer" className="size-5" />}>
                 {activeNotebook ? 'Ir a Estudiar' : 'Ir a Mis cuadernos'}
               </Button>
             }
@@ -99,7 +99,7 @@ export function ProgressScreen() {
           </div>
           {met ? (
             <p className="flex items-center gap-2 text-label text-success">
-              <CheckCircle2 aria-hidden className="size-5" /> Meta de hoy cumplida
+              <Icon name="success" className="size-5" /> Meta de hoy cumplida
             </p>
           ) : (
             <p className="text-small text-muted">Te faltan {goal - minutes} min para tu meta de hoy.</p>
@@ -139,26 +139,26 @@ export function ProgressScreen() {
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
           <li>
             <StatTile
-              icon={<Flame />}
+              icon={<Icon name="streak" />}
               value={number.format(stats.currentStreakDays)}
               label={stats.currentStreakDays === 1 ? 'día de racha' : 'días de racha'}
             />
           </li>
           <li>
-            <StatTile icon={<Sparkles />} value={number.format(stats.xpPoints)} label="XP" />
+            <StatTile icon={<Icon name="sparkles" />} value={number.format(stats.xpPoints)} label="XP" />
           </li>
           <li>
-            <StatTile icon={<Clock />} value={number.format(stats.totalFocusHours)} label="horas totales" />
+            <StatTile icon={<Icon name="clock" />} value={number.format(stats.totalFocusHours)} label="horas totales" />
           </li>
           <li>
-            <StatTile icon={<Timer />} value={number.format(stats.sessionsCompleted)} label="sesiones" />
+            <StatTile icon={<Icon name="timer" />} value={number.format(stats.sessionsCompleted)} label="sesiones" />
           </li>
           <li>
-            <StatTile icon={<Layers />} value={number.format(stats.flashcardsMastered)} label="tarjetas dominadas" />
+            <StatTile icon={<Icon name="materials" />} value={number.format(stats.flashcardsMastered)} label="tarjetas dominadas" />
           </li>
           <li>
             <StatTile
-              icon={<ShieldAlert />}
+              icon={<Icon name="shield-warning" />}
               value={number.format(stats.tamperAttemptsBlocked)}
               label="salidas de pestaña"
               hint="Veces que saliste de la pestaña durante una sesión en modo blindado."
@@ -170,7 +170,7 @@ export function ProgressScreen() {
       <section aria-labelledby="progress-week">
         <Card className="space-y-4">
           <h2 id="progress-week" className="flex items-center gap-2 text-h2 text-strong">
-            <BookOpen aria-hidden className="size-5 text-primary-text" /> Esta semana
+            <Icon name="book" className="size-5 text-primary-text" /> Esta semana
           </h2>
           <WeeklyChart week={week} goal={goal} />
         </Card>

@@ -1,5 +1,4 @@
 import {useState, type FormEvent} from 'react';
-import {Check, Copy, ExternalLink, Plus, Search} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {
   Button,
@@ -23,6 +22,7 @@ import {
   type SearchMode,
   type SearchTurn,
 } from './searchModel';
+import {Icon} from '../../ui/Icon';
 
 interface WebSearchPanelProps {
   /** Prefills the question field (e.g. from the Chat composer). */
@@ -111,7 +111,7 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
         <div className="min-w-0 flex-1">
           <TextField
             label="Tu pregunta"
-            leadingIcon={<Search aria-hidden />}
+            leadingIcon={<Icon name="search" />}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -196,7 +196,7 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
                                   rel="noopener noreferrer"
                                   className="inline-flex min-h-8 items-center gap-1.5 text-small text-primary-text underline pointer-coarse:min-h-11"
                                 >
-                                  <ExternalLink aria-hidden className="size-4 shrink-0" />
+                                  <Icon name="external" className="size-4 shrink-0" />
                                   <span>
                                     {s.title || s.domain}
                                     <span className="text-muted"> · {s.domain}</span>
@@ -212,7 +212,7 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
                         <Button
                           size="sm"
                           variant="ghost"
-                          leadingIcon={copiedId === turn.id ? <Check aria-hidden className="size-4" /> : <Copy aria-hidden className="size-4" />}
+                          leadingIcon={copiedId === turn.id ? <Icon name="check" className="size-4" /> : <Icon name="copy" className="size-4" />}
                           onClick={() => copy(turn)}
                         >
                           {copiedId === turn.id ? 'Copiado' : 'Copiar'}
@@ -220,7 +220,7 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
                         <Button
                           size="sm"
                           variant="primary"
-                          leadingIcon={added ? <Check aria-hidden className="size-4" /> : <Plus aria-hidden className="size-4" />}
+                          leadingIcon={added ? <Icon name="check" className="size-4" /> : <Icon name="add" className="size-4" />}
                           disabled={added || !activeNotebook}
                           disabledReason={added ? 'Ya está en Fuentes' : 'Abre un cuaderno para añadirla'}
                           onClick={() => addAsSource(turn)}

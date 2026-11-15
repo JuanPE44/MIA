@@ -1,11 +1,11 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router';
-import {Award, Layers, Lightbulb} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import {Button, Card, EmptyState, InlineAlert, StatusBadge, useToast} from '../../ui';
 import type {FlashcardItem} from '../../types';
 import {useStudySession} from './StudySessionProvider';
+import {Icon} from '../../ui/Icon';
 
 const XP_PER_CARD = 15;
 
@@ -48,7 +48,7 @@ export function Flashcards() {
     return (
       <Card className="mx-auto w-full max-w-[720px] p-6">
         <EmptyState
-          icon={<Layers aria-hidden />}
+          icon={<Icon name="materials" />}
           title="Crea un material de Tarjetas"
           description="Aún no hay un mazo en este cuaderno. Genéralo desde Materiales a partir de tus fuentes."
           action={
@@ -151,7 +151,7 @@ export function Flashcards() {
           <Button
             variant="ghost"
             size="sm"
-            leadingIcon={<Lightbulb aria-hidden className="size-4" />}
+            leadingIcon={<Icon name="idea" className="size-4" />}
             aria-expanded={hintShown}
             onClick={() => setHintShown((h) => !h)}
           >
@@ -165,7 +165,7 @@ export function Flashcards() {
         <Button variant="secondary" disabled={index === 0} onClick={() => setIndex(index - 1)}>
           Anterior
         </Button>
-        <Button variant="primary" leadingIcon={<Award aria-hidden className="size-4" />} onClick={master}>
+        <Button variant="primary" leadingIcon={<Icon name="award" className="size-4" />} onClick={master}>
           La domino (+{XP_PER_CARD} XP)
         </Button>
         <Button variant="secondary" onClick={advance}>

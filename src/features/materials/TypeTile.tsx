@@ -1,3 +1,4 @@
+import {Icon} from '../../ui/Icon';
 import type {MaterialTypeInfo} from './materialModel';
 
 interface TypeTileProps {
@@ -10,7 +11,6 @@ interface TypeTileProps {
 
 /** One of the 8 "Crear material" tiles. */
 export function TypeTile({info, disabled, describedBy, onSelect}: TypeTileProps) {
-  const Icon = info.icon;
   return (
     <button
       type="button"
@@ -24,7 +24,7 @@ export function TypeTile({info, disabled, describedBy, onSelect}: TypeTileProps)
       }`}
     >
       <span aria-hidden className={`flex size-10 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
-        <Icon className="size-6" />
+        <Icon name={info.icon} weight="duotone" className="size-6" />
       </span>
       <span className="text-body-strong text-strong">{info.label}</span>
       <span className="text-small text-muted">{info.description}</span>

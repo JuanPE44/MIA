@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import {AlertCircle} from 'lucide-react';
+import {Icon} from '../Icon';
 
 interface FieldShellProps {
   id: string;
@@ -29,7 +29,7 @@ export function FieldShell({id, label, helper, error, counter, children}: FieldS
       {children}
       {error ? (
         <p id={errorId(id)} className="mt-1 flex items-start gap-1.5 text-small text-danger">
-          <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
+          <Icon name="error" className="mt-0.5 size-4 shrink-0" />
           <span>{error}</span>
         </p>
       ) : null}

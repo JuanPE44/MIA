@@ -1,6 +1,6 @@
 import {useId, useState, type FormEvent} from 'react';
 import type {Folder, Notebook} from '../../types';
-import {Button, Dialog} from '../../ui';
+import {Button, Dialog, Icon, resolveItemIcon, type IconName} from '../../ui';
 
 interface MoveNotebookDialogProps {
   notebook: Notebook;
@@ -22,7 +22,7 @@ export function MoveNotebookDialog({notebook, folders, onClose, onMove}: MoveNot
     if (target !== current) onMove(target || null);
   };
 
-  const options = [{id: '', label: 'Sin carpeta', icon: '📄'}, ...folders.map((f) => ({id: f.id, label: f.name, icon: f.icon || '📁'}))];
+  const options = [{id: '', label: 'Sin carpeta', icon: 'folder-open' as IconName}, ...folders.map((f) => ({id: f.id, label: f.name, icon: resolveItemIcon(f.icon, 'folder')}))];
 
   return (
     <Dialog
@@ -58,7 +58,7 @@ export function MoveNotebookDialog({notebook, folders, onClose, onMove}: MoveNot
                   onChange={() => setTarget(o.id)}
                   className="size-5 accent-[var(--mia-primary)]"
                 />
-                <span aria-hidden>{o.icon}</span>
+                <Icon name={o.icon} weight="duotone" className="size-5" />
                 <span className="text-body text-strong">{o.label}</span>
               </label>
             ))}

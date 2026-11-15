@@ -15,113 +15,138 @@
 /* ---------------------------------------------------------------------------
  * Light theme (default)
  * ------------------------------------------------------------------------ */
+/* Tinta y resaltador — light: warm paper, blue ink, one highlighter accent */
 :root,
 [data-theme="light"] {
   color-scheme: light;
 
   /* Backgrounds (§2.1 bg.*) */
-  --mia-bg-page: #FAFAFA;
-  --mia-bg-surface: #FFFFFF;
-  --mia-bg-surface-raised: #FFFFFF;
-  --mia-bg-subtle: #F4F5F7;
+  --mia-bg-page: #F6F1E7;
+  --mia-bg-surface: #FFFDF8;
+  --mia-bg-surface-raised: #FFFDF8;
+  --mia-bg-subtle: #EFE8DA;
 
   /* Text (§2.1 text.*) */
-  --mia-text-strong: #1E242C;
-  --mia-text-default: #323C4B;
-  --mia-text-muted: #5B6677;
+  --mia-text-strong: #1B1A17;
+  --mia-text-default: #2E2B26;
+  --mia-text-muted: #6B655A;
   --mia-text-on-primary: #FFFFFF;
 
   /* Borders (§2.1 border.*) */
-  --mia-border-hairline: #EDEEF0;
-  --mia-border-control: #8A93A1;
+  --mia-border-hairline: #E4DCCB;
+  --mia-border-control: #9A917F;
 
-  /* Primary (§2.1 primary.*) */
-  --mia-primary: #0066FF;
-  --mia-primary-hover: #0050CC;
-  --mia-primary-text: #0066FF;
-  --mia-primary-tint: #E6F0FF;
-  --mia-primary-on-tint: #0050CC;
-  --mia-primary-tint-border: #3385FF;
+  /* Ink + rule (editorial layer) */
+  --mia-ink: #1B1A17;
+  --mia-rule: #E4DCCB;
+
+  /* Highlighter: ONLY a background behind dark text, never a text color */
+  --mia-highlight: #E8FF5A;
+  --mia-highlight-ink: #1B1A17;
+
+  /* Primary = ink blue (§2.1 primary.*) */
+  --mia-primary: #2340D8;
+  --mia-primary-hover: #1A30A8;
+  --mia-primary-text: #2340D8;
+  --mia-primary-tint: #E7EAFB;
+  --mia-primary-on-tint: #1A30A8;
+  --mia-primary-tint-border: #6C80EE;
 
   /* Focus (§2.1 focus, §8.3) */
-  --mia-focus: #0066FF;
+  --mia-focus: #2340D8;
 
   /* Status (§2.1) */
-  --mia-danger: #B42318;
-  --mia-danger-tint: #FEF3F2;
-  --mia-success: #067647;
-  --mia-success-tint: #ECFDF3;
-  --mia-warning: #93370D;
-  --mia-warning-tint: #FFFAEB;
+  --mia-danger: #BC3B26;
+  --mia-danger-tint: #FBE9E4;
+  --mia-success: #2B7549;
+  --mia-success-tint: #E4F2E8;
+  --mia-warning: #8A4B0B;
+  --mia-warning-tint: #FBF0D5;
   --mia-simulated: #5B21B6;
-  --mia-simulated-tint: #F5F3FF;
-  --mia-accent-star: #FFC805;
+  --mia-simulated-tint: #F1ECFA;
+  --mia-accent-star: #C77A12;
 
-  /* Notebook / folder icon tiles (§2.2) — never behind text */
-  --mia-tile-azul: #E1E9FE;
-  --mia-tile-durazno: #FFEED2;
-  --mia-tile-lima: #ECF5D6;
-  --mia-tile-rosa: #FFE4F1;
-  --mia-tile-violeta: #EDE9FE;
-  --mia-tile-gris: #F4F5F7;
+  /* Notebook / folder icon tiles (§2.2) — paper-tinted, never behind small text */
+  --mia-tile-azul: #DDE3F5;
+  --mia-tile-durazno: #F6E5C8;
+  --mia-tile-lima: #E6EDC9;
+  --mia-tile-rosa: #F3DDD7;
+  --mia-tile-violeta: #E5DDF1;
+  --mia-tile-gris: #EAE3D5;
 
-  /* Elevation (§4) — light uses shadows */
-  --mia-shadow-color: 30 36 44;
-  --mia-elevation-1: 0 2px 8px rgb(var(--mia-shadow-color) / 6%);
-  --mia-elevation-2: 0 8px 24px rgb(var(--mia-shadow-color) / 10%);
+  /* Paper texture (page background only) */
+  --mia-paper-dot: rgb(27 26 23 / 4%);
+
+  /* Elevation (§4) — soft shadows + hard offset */
+  --mia-shadow-color: 27 26 23;
+  --mia-elevation-1: 0 2px 8px rgb(var(--mia-shadow-color) / 7%);
+  --mia-elevation-2: 0 8px 24px rgb(var(--mia-shadow-color) / 11%);
   --mia-elevation-3: 0 16px 48px rgb(var(--mia-shadow-color) / 16%);
+  --mia-offset-color: var(--mia-ink);
+  --mia-shadow-offset: 2px 2px 0 var(--mia-offset-color);
 }
 
 /* ---------------------------------------------------------------------------
- * Dark theme — no pure black/white; elevation = surface-raised + 1px border
+ * Dark theme "escritorio de noche" — warm, no pure black/white;
+ * elevation = surface-raised + 1px border
  * ------------------------------------------------------------------------ */
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --mia-bg-page: #12161C;
-  --mia-bg-surface: #1E242C;
-  --mia-bg-surface-raised: #262D37;
-  --mia-bg-subtle: #262D37;
+  --mia-bg-page: #14130F;
+  --mia-bg-surface: #1D1B17;
+  --mia-bg-surface-raised: #25231E;
+  --mia-bg-subtle: #25231E;
 
-  --mia-text-strong: #E8ECF2;
-  --mia-text-default: #E8ECF2;
-  --mia-text-muted: #A9B3C2;
-  --mia-text-on-primary: #FFFFFF;
+  --mia-text-strong: #EDE6D6;
+  --mia-text-default: #DDD6C6;
+  --mia-text-muted: #A39B8A;
+  /* Dark ink on the light-blue primary (white would fail contrast) */
+  --mia-text-on-primary: #14130F;
 
-  --mia-border-hairline: #2B3441;
-  --mia-border-control: #6B7788;
+  --mia-border-hairline: #2E2B25;
+  --mia-border-control: #7A7262;
 
-  --mia-primary: #0066FF;
-  --mia-primary-hover: #3385FF;
-  --mia-primary-text: #5C9BFF;
-  --mia-primary-tint: #14284D;
-  --mia-primary-on-tint: #E8ECF2;
-  --mia-primary-tint-border: #5C9BFF;
+  --mia-ink: #EDE6D6;
+  --mia-rule: #2E2B25;
 
-  --mia-focus: #5C9BFF;
+  --mia-highlight: #D9F24A;
+  --mia-highlight-ink: #14130F;
 
-  --mia-danger: #F97066;
-  --mia-danger-tint: #3A1F1F;
-  --mia-success: #47CD89;
-  --mia-success-tint: #16301F;
-  --mia-warning: #FDB022;
+  --mia-primary: #8EA2FF;
+  --mia-primary-hover: #A9B8FF;
+  --mia-primary-text: #8EA2FF;
+  --mia-primary-tint: #1F2442;
+  --mia-primary-on-tint: #C9D2FF;
+  --mia-primary-tint-border: #5C6FD0;
+
+  --mia-focus: #8EA2FF;
+
+  --mia-danger: #FF8A73;
+  --mia-danger-tint: #3A1E19;
+  --mia-success: #6FCF97;
+  --mia-success-tint: #1A2E22;
+  --mia-warning: #E8B04A;
   --mia-warning-tint: #33280F;
   --mia-simulated: #C4B5FD;
   --mia-simulated-tint: #2A2340;
-  --mia-accent-star: #FFC805;
+  --mia-accent-star: #E8B04A;
 
-  --mia-tile-azul: #1C2A4A;
-  --mia-tile-durazno: #3A2C18;
-  --mia-tile-lima: #24311A;
-  --mia-tile-rosa: #3A1E2E;
-  --mia-tile-violeta: #2A2340;
-  --mia-tile-gris: #262D37;
+  --mia-tile-azul: #1E2540;
+  --mia-tile-durazno: #3A2D18;
+  --mia-tile-lima: #2A3018;
+  --mia-tile-rosa: #3A2420;
+  --mia-tile-violeta: #2B2540;
+  --mia-tile-gris: #25231E;
 
-  /* Dark elevation: shadows replaced by a 1px hairline ring. Pair with
-     `bg-surface-raised` (which equals bg-surface in light). */
+  --mia-paper-dot: rgb(237 230 214 / 3.5%);
+
+  /* Dark elevation: shadows replaced by a 1px hairline ring. */
   --mia-elevation-1: 0 0 0 1px var(--mia-border-hairline);
   --mia-elevation-2: 0 0 0 1px var(--mia-border-hairline);
   --mia-elevation-3: 0 0 0 1px var(--mia-border-hairline);
+  --mia-offset-color: #5A5446;
+  --mia-shadow-offset: 2px 2px 0 var(--mia-offset-color);
 }
 
 /* ---------------------------------------------------------------------------
@@ -129,7 +154,11 @@
  * ------------------------------------------------------------------------ */
 :root {
   /* Typography (§3) — phone sizes first, desktop from 640px */
-  --mia-font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mia-font-sans: "Hanken Grotesk Variable", "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mia-font-display: "Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
+  --mia-font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Fraunces optical size / softness (use via `font-variation-settings`) */
+  --mia-display-variation: "opsz" 96, "SOFT" 50;
   --mia-display-size: 2rem;      /* 32 */
   --mia-display-leading: 2.5rem; /* 40 */
   --mia-timer-size: 3.5rem;      /* 56 */
@@ -138,9 +167,9 @@
   --mia-h1-leading: 2rem;        /* 32 */
 
   /* Radius (§4) */
-  --mia-radius-sm: 8px;
-  --mia-radius-md: 12px;
-  --mia-radius-lg: 20px;
+  --mia-radius-sm: 6px;
+  --mia-radius-md: 10px;
+  --mia-radius-lg: 14px;
   --mia-radius-pill: 9999px;
 
   /* Motion (§7) */
@@ -151,7 +180,9 @@
   --mia-duration-toast-out: 150ms;
   --mia-duration-flip: 300ms;
   --mia-duration-shimmer: 1.2s;
+  --mia-duration-sweep: 450ms;
   --mia-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --mia-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Focus ring (§8.3) */
   --mia-focus-width: 2px;
@@ -175,6 +206,8 @@
 @theme inline {
   /* Font: overrides Tailwind's default sans, so legacy screens adopt it too */
   --font-sans: var(--mia-font-sans);
+  --font-display: var(--mia-font-display);
+  --font-mono: var(--mia-font-mono);
 
   /* Backgrounds: bg-page, bg-surface, bg-surface-raised, bg-subtle */
   --color-page: var(--mia-bg-page);
@@ -200,6 +233,12 @@
   --color-primary-on-tint: var(--mia-primary-on-tint);
   --color-primary-tint-border: var(--mia-primary-tint-border);
   --color-focus: var(--mia-focus);
+
+  /* Editorial: bg-highlight + text-highlight-ink (NEVER text-highlight), border-rule, text/bg-ink */
+  --color-highlight: var(--mia-highlight);
+  --color-highlight-ink: var(--mia-highlight-ink);
+  --color-ink: var(--mia-ink);
+  --color-rule: var(--mia-rule);
 
   /* Status */
   --color-danger: var(--mia-danger);
@@ -232,6 +271,8 @@
   --shadow-elevation-1: var(--mia-elevation-1);
   --shadow-elevation-2: var(--mia-elevation-2);
   --shadow-elevation-3: var(--mia-elevation-3);
+  /* Hard offset (ink / paper-cut): shadow-offset */
+  --shadow-offset: var(--mia-shadow-offset);
 
   /* Sizing (§4): h-control-sm/md/lg, min-h-touch; spacing scale is Tailwind's
      default 4px base, which already matches §4. */
@@ -240,8 +281,11 @@
   --spacing-control-lg: 3rem;
   --spacing-touch: 2.75rem;
 
-  /* Content widths (§5.3): max-w-reading, max-w-content, dialog widths */
+  /* Content widths (§5.3): max-w-narrow 560, max-w-reading 720, max-w-wide 960,
+     max-w-content 1240, dialog widths */
+  --container-narrow: 35rem;
   --container-reading: 45rem;
+  --container-wide: 60rem;
   --container-content: 77.5rem;
   --container-dialog-sm: 25rem;
   --container-dialog-md: 35rem;
@@ -251,18 +295,18 @@
   --text-display: var(--mia-display-size);
   --text-display--line-height: var(--mia-display-leading);
   --text-display--letter-spacing: -0.02em;
-  --text-display--font-weight: 600;
+  --text-display--font-weight: 500;
   --text-timer: var(--mia-timer-size);
   --text-timer--line-height: var(--mia-timer-leading);
   --text-timer--letter-spacing: -0.02em;
-  --text-timer--font-weight: 600;
+  --text-timer--font-weight: 500;
   --text-h1: var(--mia-h1-size);
   --text-h1--line-height: var(--mia-h1-leading);
   --text-h1--letter-spacing: -0.01em;
-  --text-h1--font-weight: 600;
+  --text-h1--font-weight: 500;
   --text-h2: 1.25rem;
   --text-h2--line-height: 1.75rem;
-  --text-h2--font-weight: 600;
+  --text-h2--font-weight: 500;
   --text-h3: 1.0625rem;
   --text-h3--line-height: 1.5rem;
   --text-h3--font-weight: 600;
@@ -288,21 +332,20 @@
 }
 
 /*
- * TEMPORARY (remove in L10): re-point Tailwind's `indigo-*` palette — the
- * legacy primary (~544 uses) — to a blue scale derived from #0066FF so
- * existing screens adopt the new primary without editing components.
- * New code must use the semantic tokens above, never `indigo-*`.
+ * TEMPORARY (remove when no screen uses `indigo-*`): re-point Tailwind's
+ * `indigo-*` palette — the legacy primary — to an ink-blue scale derived from
+ * #2340D8. New code must use the semantic tokens above, never `indigo-*`.
  */
 @theme {
-  --color-indigo-50: #EBF3FF;
-  --color-indigo-100: #D6E6FF;
-  --color-indigo-200: #B3D1FF;
-  --color-indigo-300: #85B3FF;
-  --color-indigo-400: #5C9BFF;
-  --color-indigo-500: #1A75FF;
-  --color-indigo-600: #0066FF;
-  --color-indigo-700: #0050CC;
-  --color-indigo-800: #003D99;
-  --color-indigo-900: #002966;
-  --color-indigo-950: #001A40;
+  --color-indigo-50: #EEF0FD;
+  --color-indigo-100: #E0E4FC;
+  --color-indigo-200: #C4CCF8;
+  --color-indigo-300: #98A6F3;
+  --color-indigo-400: #6C80EE;
+  --color-indigo-500: #3F5AE6;
+  --color-indigo-600: #2340D8;
+  --color-indigo-700: #1A30A8;
+  --color-indigo-800: #142582;
+  --color-indigo-900: #0E1A5C;
+  --color-indigo-950: #090F38;
 }

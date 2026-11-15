@@ -1,6 +1,6 @@
 import {useState} from 'react';
-import {ChevronLeft, ChevronRight, Lightbulb} from 'lucide-react';
 import {Button, InlineAlert} from '../../../ui';
+import {Icon} from '../../../ui/Icon';
 
 interface Flashcard {
   question: string;
@@ -75,13 +75,13 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
       ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button variant="secondary" leadingIcon={<ChevronLeft aria-hidden className="size-4" />} onClick={() => go(-1)}>
+        <Button variant="secondary" leadingIcon={<Icon name="chevron-left" className="size-4" />} onClick={() => go(-1)}>
           Anterior
         </Button>
         <p className="text-small text-muted" aria-live="polite">
           {index + 1} de {cards.length}
         </p>
-        <Button variant="secondary" trailingIcon={<ChevronRight aria-hidden className="size-4" />} onClick={() => go(1)}>
+        <Button variant="secondary" trailingIcon={<Icon name="chevron-right" className="size-4" />} onClick={() => go(1)}>
           Siguiente
         </Button>
       </div>
@@ -90,7 +90,7 @@ export function FlashcardsView({cards}: {cards: Flashcard[]}) {
         <div className="flex justify-center">
           <Button
             variant="ghost"
-            leadingIcon={<Lightbulb aria-hidden className="size-4" />}
+            leadingIcon={<Icon name="idea" className="size-4" />}
             aria-pressed={showHint}
             onClick={() => setShowHint((v) => !v)}
           >

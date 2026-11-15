@@ -26,8 +26,13 @@ export interface ButtonProps extends Omit<ComponentProps<'button'>, 'children'> 
 
 export const buttonVariants: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-on-primary hover:bg-primary-hover',
-  secondary: 'border border-control bg-surface text-strong hover:bg-subtle',
-  ghost: 'bg-transparent text-primary-text hover:bg-subtle',
+  secondary: 'border-[1.5px] border-ink bg-surface text-strong hover:bg-subtle hover:shadow-offset hover:-translate-x-px hover:-translate-y-px',
+  // Highlighter underline sweeps in on hover (decorative stripe below the label)
+  ghost: cx(
+    'bg-transparent text-primary-text bg-no-repeat [background-image:linear-gradient(var(--mia-highlight),var(--mia-highlight))]',
+    '[background-position:center_calc(100%-5px)] [background-size:0%_4px] hover:[background-size:calc(100%-1.5rem)_4px]',
+    'transition-[background-size] duration-[var(--mia-duration-sweep)] ease-[var(--mia-ease-out)]',
+  ),
   danger: 'bg-danger text-page hover:opacity-90',
   'danger-ghost': 'bg-transparent text-danger hover:bg-danger-tint',
 };
@@ -79,7 +84,7 @@ export function Button({
       onClick={handleClick}
       className={cx(
         'inline-flex select-none items-center justify-center whitespace-nowrap font-sans',
-        'transition-[background-color,transform] duration-[120ms] active:scale-[0.98]',
+        'transition-[background-color,transform,box-shadow] duration-[120ms] active:scale-[0.98]',
         pill ? 'rounded-pill' : 'rounded-control',
         HIT_44,
         sizes[size],

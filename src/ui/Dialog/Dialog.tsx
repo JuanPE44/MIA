@@ -7,12 +7,12 @@ import {
   type SyntheticEvent,
 } from 'react';
 import {createPortal} from 'react-dom';
-import {X} from 'lucide-react';
 import {cx} from '../internal/cx';
 import {lockBodyScroll} from '../internal/scrollLock';
 import {useIsPhone} from '../internal/useIsPhone';
 import {IconButton} from '../IconButton';
 import '../ui.css';
+import {Icon} from '../Icon';
 
 export interface DialogProps {
   open: boolean;
@@ -99,8 +99,8 @@ function DialogInner({
         if (dismissible && e.target === ref.current) onClose();
       }}
       className={cx(
-        'mia-dialog flex w-full max-w-none flex-col overflow-hidden border border-hairline bg-surface-raised p-0',
-        'text-strong shadow-elevation-3 backdrop:bg-[rgb(18_22_28/48%)]',
+        'mia-dialog flex w-full max-w-none flex-col overflow-hidden border border-ink bg-surface-raised p-0',
+        'text-strong shadow-offset backdrop:bg-[rgb(20_19_15/55%)]',
         phone
           ? 'mia-anim-sheet mx-0 mb-0 mt-auto max-h-[92vh] rounded-t-card'
           : cx(
@@ -119,7 +119,7 @@ function DialogInner({
         {hideCloseButton ? null : (
           <IconButton
             aria-label="Cerrar"
-            icon={<X aria-hidden className="size-5" />}
+            icon={<Icon name="close" className="size-5" />}
             size="sm"
             className="-mr-2"
             onClick={() => dismissible && onClose()}

@@ -1,9 +1,9 @@
 import {useRef, useState} from 'react';
-import {Monitor, Moon, Sun} from 'lucide-react';
 import {useAppState} from '../../app/AppStateContext';
 import {useTheme, type ThemeMode} from '../../app/providers/ThemeProvider';
 import {Button, SegmentedControl} from '../../ui';
 import type {UserType} from '../../types';
+import {Icon} from '../../ui/Icon';
 
 const NOTEBOOKS_KEY = 'focused_notebooks_frecuente_v2';
 const LOADING_MS = 250;
@@ -18,9 +18,9 @@ function readIsFirstRun(): boolean {
 }
 
 const THEME_OPTIONS = [
-  {value: 'light' as const, label: <span className="sr-only">Claro</span>, icon: <Sun aria-hidden className="size-4" />},
-  {value: 'dark' as const, label: <span className="sr-only">Oscuro</span>, icon: <Moon aria-hidden className="size-4" />},
-  {value: 'system' as const, label: <span className="sr-only">Sistema</span>, icon: <Monitor aria-hidden className="size-4" />},
+  {value: 'light' as const, label: <span className="sr-only">Claro</span>, icon: <Icon name="theme-light" className="size-4" />},
+  {value: 'dark' as const, label: <span className="sr-only">Oscuro</span>, icon: <Icon name="theme-dark" className="size-4" />},
+  {value: 'system' as const, label: <span className="sr-only">Sistema</span>, icon: <Icon name="theme-system" className="size-4" />},
 ];
 
 /**

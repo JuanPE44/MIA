@@ -1,7 +1,7 @@
-import {Eye, MessageSquare, Trash2} from 'lucide-react';
 import type {SourceItem} from '../../types';
 import {Button, InlineAlert, Menu, StatusBadge, Switch, type MenuItem} from '../../ui';
 import {TYPE_TILE, sourceMeta, typeIcon} from './sourceModel';
+import {Icon} from '../../ui/Icon';
 
 export type SourceStatus = 'analyzing' | 'ready' | 'error';
 
@@ -19,9 +19,9 @@ interface SourceRowProps {
 export function SourceRow({source, status, onToggle, onViewAnalysis, onAsk, onDelete, onRetry}: SourceRowProps) {
   const selected = source.selectedForChat !== false;
   const items: MenuItem[] = [
-    {id: 'view', label: 'Ver análisis', icon: <Eye />, onSelect: onViewAnalysis},
-    {id: 'ask', label: 'Preguntar en el chat', icon: <MessageSquare />, onSelect: onAsk},
-    {id: 'delete', label: 'Eliminar', icon: <Trash2 />, onSelect: onDelete, danger: true},
+    {id: 'view', label: 'Ver análisis', icon: <Icon name="view" />, onSelect: onViewAnalysis},
+    {id: 'ask', label: 'Preguntar en el chat', icon: <Icon name="chat" />, onSelect: onAsk},
+    {id: 'delete', label: 'Eliminar', icon: <Icon name="delete" />, onSelect: onDelete, danger: true},
   ];
 
   return (
