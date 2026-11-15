@@ -469,7 +469,7 @@ El lienzo de **Alexander Osterwalder** e **Yves Pigneur** [Fuente 2] condensa el
       {
         id: 'msg-1',
         sender: 'assistant',
-        text: '¡Hola Emanuel! Soy tu asistente de estudio con Inteligencia Artificial para este cuaderno sobre "Lean Startup y Modelo Canvas". Ya he analizado las 3 fuentes que cargaste (Eric Ries, Business Model Canvas y los casos de MVP). ¿Qué te gustaría hacer con este material? Puedes consultarme dudas conceptuales, o ir a la sección Artefactos para crear un nuevo recurso personalizado.',
+        text: '¡Hola Emanuel! Soy tu asistente de estudio con Inteligencia Artificial para este cuaderno sobre "Lean Startup y Modelo Canvas". Ya he analizado las 3 fuentes que cargaste (Eric Ries, Business Model Canvas y los casos de MVP). ¿Qué te gustaría hacer con este material? Puedes consultarme dudas conceptuales, o ir a la pestaña Crear material para crear un nuevo recurso personalizado.',
         timestamp: '11:22 AM',
         sourcesCited: ['Eric Ries - El Método Lean Startup', 'Business Model Canvas', 'Casos Prácticos de MVP']
       },
@@ -496,7 +496,7 @@ El lienzo de **Alexander Osterwalder** e **Yves Pigneur** [Fuente 2] condensa el
           {
             id: 'msg-1',
             sender: 'assistant',
-            text: '¡Hola Juan! Soy tu asistente de estudio con Inteligencia Artificial para este cuaderno sobre "Lean Startup y Modelo Canvas". Ya he analizado las 3 fuentes que cargaste (Eric Ries, Business Model Canvas y los casos de MVP). ¿Qué te gustaría hacer con este material? Puedes consultarme dudas conceptuales, o ir a la sección Artefactos para crear un nuevo recurso personalizado.',
+            text: '¡Hola Juan! Soy tu asistente de estudio con Inteligencia Artificial para este cuaderno sobre "Lean Startup y Modelo Canvas". Ya he analizado las 3 fuentes que cargaste (Eric Ries, Business Model Canvas y los casos de MVP). ¿Qué te gustaría hacer con este material? Puedes consultarme dudas conceptuales, o ir a la pestaña Crear material para crear un nuevo recurso personalizado.',
             timestamp: '11:22 AM',
             sourcesCited: ['Eric Ries - El Método Lean Startup', 'Business Model Canvas', 'Casos Prácticos de MVP']
           },

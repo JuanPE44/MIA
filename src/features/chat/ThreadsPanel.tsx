@@ -8,6 +8,8 @@ interface ThreadsListProps {
   activeThreadId: string;
   onSelect: (threadId: string) => void;
   onNewChat: () => void;
+  /** Shows the "Nuevo chat" button above the list (default true). */
+  showNewChat?: boolean;
   onRename: (threadId: string, title: string) => void;
   /** Called after the user confirmed the deletion. */
   onDelete: (threadId: string) => void;
@@ -33,7 +35,7 @@ export function formatThreadDate(createdAt: string, today: Date = new Date()): s
 }
 
 /** Thread list + the only "Nuevo chat" control (UX-10). Used in the aside and in the Chats dialog. */
-export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRename, onDelete}: ThreadsListProps) {
+export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRename, onDelete, showNewChat = true}: ThreadsListProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const [deleting, setDeleting] = useState<ChatThread | null>(null);
@@ -55,14 +57,16 @@ export function ThreadsList({threads, activeThreadId, onSelect, onNewChat, onRen
 
   return (
     <div className="flex flex-col gap-3">
-      <Button
-        variant="ghost"
-        className="self-start"
-        leadingIcon={<Icon name="add" className="size-5" />}
-        onClick={onNewChat}
-      >
-        Nuevo chat
-      </Button>
+      {showNewChat ? (
+        <Button
+          variant="ghost"
+          className="self-start"
+          leadingIcon={<Icon name="add" className="size-5" />}
+          onClick={onNewChat}
+        >
+          Nuevo chat
+        </Button>
+      ) : null}
 
       <ul className="flex flex-col gap-1" aria-label="Tus chats">
         {threads.map((thread) => {

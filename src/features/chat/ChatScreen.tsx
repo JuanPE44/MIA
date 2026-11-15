@@ -1,11 +1,13 @@
-import {useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Dialog, EmptyState, InteractiveCard, Reveal, RevealItem, useToast} from '../../ui';
+import {Button, EmptyState, InteractiveCard, Reveal, RevealItem, useToast} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {AssistantMessage, ErrorMessage, PendingMessage, UserMessage} from './ChatMessage';
 import {CitationInspector} from './CitationInspector';
 import {Composer} from './Composer';
-import {ThreadsList} from './ThreadsPanel';
+import {TabActions} from '../../app/shell/TabActionsSlot';
+import {useIsPhone} from '../../ui/internal/useIsPhone';
+import {ThreadSwitcher} from './ThreadSwitcher';
 import {Icon} from '../../ui/Icon';
 
 const IMPROVEMENT_PREFIX = 'Solicitud de mejora: ';
@@ -14,21 +16,6 @@ const GENERIC_SUGGESTIONS = [
   'Resume las fuentes en cinco ideas',
   '¿Qué conceptos centrales se explican?',
 ];
-
-const LG_QUERY = '(min-width: 1024px)';
-
-/** True from the `lg` breakpoint: the history opens as a side panel instead of a dialog. */
-function useIsDesktop(): boolean {
-  return useSyncExternalStore(
-    (cb) => {
-      const mql = window.matchMedia(LG_QUERY);
-      mql.addEventListener('change', cb);
-      return () => mql.removeEventListener('change', cb);
-    },
-    () => window.matchMedia(LG_QUERY).matches,
-    () => false,
-  );
-}
 
 const now = () => new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
 
@@ -42,8 +29,7 @@ export function ChatScreen() {
     activeNotebook,
     currentThreads,
     currentActiveThread,
-    currentActiveThreadId,
-    handleStartNewChat,
+        handleStartNewChat,
     handleSelectChatThread,
     handleRenameChatThread,
     handleRemoveChatThread,
@@ -55,12 +41,11 @@ export function ChatScreen() {
     setChatInitialPrompt,
   } = useAppState();
   const toast = useToast();
-  const desktop = useIsDesktop();
+  const phone = useIsPhone();
 
   const [input, setInput] = useState('');
   const [waiting, setWaiting] = useState(false);
   const [chunk, setChunk] = useState<CitationChunk | null>(null);
-  const [threadsOpen, setThreadsOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
@@ -223,20 +208,15 @@ export function ChatScreen() {
     }
   };
 
-  const threadsList = (afterSelect?: () => void) => (
-    <ThreadsList
+  const switcher = (
+    <ThreadSwitcher
       threads={currentThreads}
-      activeThreadId={currentActiveThreadId}
-      onSelect={(id) => {
-        handleSelectChatThread(id);
-        afterSelect?.();
-      }}
-      onNewChat={() => {
-        handleStartNewChat();
-        afterSelect?.();
-      }}
+      activeThread={currentActiveThread}
+      onSelect={handleSelectChatThread}
+      onNewChat={handleStartNewChat}
       onRename={handleRenameChatThread}
       onDelete={deleteThread}
+      fill={phone}
     />
   );
 
@@ -365,43 +345,14 @@ export function ChatScreen() {
   }
 
   return (
-    <section aria-label="Chat" className="flex flex-col gap-3">
-      {/* Toolbar: history toggle + new chat (both quiet) */}
-      <div className="flex items-center gap-1 border-b border-rule pb-2">
-        <Button
-          variant="ghost"
-          leadingIcon={<Icon name="chats" className="size-5" />}
-          aria-expanded={threadsOpen}
-          aria-controls={desktop ? 'chat-history-panel' : undefined}
-          onClick={() => setThreadsOpen((v) => !v)}
-        >
-          Historial
-        </Button>
-        <Button
-          variant="ghost"
-          leadingIcon={<Icon name="add" className="size-5" />}
-          onClick={handleStartNewChat}
-        >
-          Nuevo chat
-        </Button>
-        <p className="ml-2 min-w-0 flex-1 truncate text-small text-muted">{currentActiveThread.title}</p>
-      </div>
-      {!desktop ? (
-        <Dialog open={threadsOpen} onClose={() => setThreadsOpen(false)} title="Historial" size="sm">
-          {threadsList(() => setThreadsOpen(false))}
-        </Dialog>
-      ) : null}
+    <section aria-label="Preguntar" className="flex flex-col gap-3">
+      {/* Thread switcher: in the notebook tabs row (desktop) or a compact row (phone) */}
+      {phone ? <div className="flex border-b border-rule pb-2">{switcher}</div> : <TabActions>{switcher}</TabActions>}
 
-      <div className="flex flex-col lg:flex-row lg:gap-6">
-      {desktop && threadsOpen ? (
-        <aside id="chat-history-panel" aria-label="Chats" className="w-72 shrink-0">
-          <div className="sticky top-4">{threadsList()}</div>
-        </aside>
-      ) : null}
-
+      <div className="flex flex-col">
       {/* Conversation */}
       <div className="flex w-full min-w-0 flex-1 flex-col">
-        <h1 className="sr-only">Chat: {currentActiveThread.title}</h1>
+        <h1 className="sr-only">Preguntar: {currentActiveThread.title}</h1>
         <div className="min-h-[40vh] flex-1">
           {body}
           <div ref={endRef} className="scroll-mb-48" />

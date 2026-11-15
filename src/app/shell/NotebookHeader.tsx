@@ -1,15 +1,16 @@
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router';
-import {Breadcrumb, ConfirmDialog, IconButton, Menu, type MenuItem} from '../../ui';
+import {ConfirmDialog, IconButton, Menu, type MenuItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
 import {MoveNotebookDialog} from '../../features/library/MoveNotebookDialog';
-import {Icon, resolveItemIcon} from '../../ui/Icon';
+import {Icon} from '../../ui/Icon';
 
 /**
- * Notebook context header. Desktop/tablet: breadcrumb, one title row (small
- * icon, h1, mono metadata, menu); "Añadir fuente" lives in the menu and Fuentes. Phone (56 px): back button, truncated title, menu.
+ * Notebook context header. Desktop/tablet: back link to the (folder-filtered)
+ * Library, then title + muted subject + menu; the tabs row follows.
+ * "Añadir fuente" lives in the menu and Fuentes. Phone (56 px): back button, truncated title, menu.
  */
 export function NotebookHeader() {
   const navigate = useNavigate();
@@ -21,9 +22,7 @@ export function NotebookHeader() {
   if (!activeNotebook) return null;
   const nb = activeNotebook;
   const folder = nb.folderId ? folders.find((f) => f.id === nb.folderId) : undefined;
-  const sourcesCount = nb.sources.length;
-  const sourcesLabel = `${sourcesCount} ${sourcesCount === 1 ? 'fuente' : 'fuentes'}`;
-  const toSources = paths.notebookSegment(nb.id, 'FUENTES');
+  const backTo = folder ? `${paths.notebooks()}?carpeta=${encodeURIComponent(folder.id)}` : paths.notebooks();
   const addSource = openAddSource;
 
   const items: MenuItem[] = [
@@ -76,31 +75,18 @@ export function NotebookHeader() {
 
   return (
     <>
-      <div className="flex flex-col gap-2 pb-2">
-        <Breadcrumb
-          items={[
-            {label: 'Biblioteca', to: paths.notebooks()},
-            ...(folder ? [{label: folder.name, to: paths.notebooks()}] : []),
-            {label: nb.title},
-          ]}
-        />
-        {/* Compact masthead: one band, title + inline mono metadata, tabs follow with a single rule */}
-        <div className="flex items-center gap-3">
-          <Icon
-            name={resolveItemIcon(nb.icon, 'notebook')}
-            weight="duotone"
-            aria-hidden
-            className="size-6 shrink-0 text-muted"
-          />
-          <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3">
-            <h1 className="min-w-0 max-w-full truncate font-display text-h1 text-strong">{nb.title}</h1>
-            <p className="shrink-0 font-mono text-caption text-muted">
-              {nb.subject || 'General'}
-              <span aria-hidden> · </span>
-              <Link to={toSources} className="rounded-small underline-offset-4 hover:underline">
-                {sourcesLabel}
-              </Link>
-            </p>
+      <div className="flex flex-col gap-1 pb-2">
+        <Link
+          to={backTo}
+          className="inline-flex items-center gap-1 self-start rounded-small text-small text-muted underline-offset-4 hover:text-strong hover:underline"
+        >
+          <Icon name="chevron-left" aria-hidden className="size-4" />
+          {folder ? folder.name : 'Biblioteca'}
+        </Link>
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="max-w-full truncate font-display text-[28px] leading-tight text-strong">{nb.title}</h1>
+            <p className="text-small text-muted">{nb.subject || 'General'}</p>
           </div>
           <Menu label={`Opciones de ${nb.title}`} items={items} />
         </div>

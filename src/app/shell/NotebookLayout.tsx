@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import {useState, type ReactNode} from 'react';
 import {BottomTabBar, Page, Tabs, type NavTabItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
@@ -6,12 +6,14 @@ import {paths, SEGMENT_SLUGS} from '../routes';
 import type {MainSegment} from '../../types';
 import {AddSourceDialog} from '../../features/sources';
 import {NotebookHeader} from './NotebookHeader';
+import {TabActionsContext} from './TabActionsSlot';
 import {Icon} from '../../ui/Icon';
 
-const SECTIONS: Array<{segment: MainSegment; label: string; icon: ReactNode}> = [
-  {segment: 'CHAT', label: 'Chat', icon: <Icon name="chat" />},
+/** Verb labels; `phoneLabel` is the shorter text for the bottom bar. */
+const SECTIONS: Array<{segment: MainSegment; label: string; phoneLabel?: string; icon: ReactNode}> = [
+  {segment: 'CHAT', label: 'Preguntar', icon: <Icon name="chat" />},
   {segment: 'FUENTES', label: 'Fuentes', icon: <Icon name="document" />},
-  {segment: 'ARTEFACTOS', label: 'Materiales', icon: <Icon name="materials" />},
+  {segment: 'ARTEFACTOS', label: 'Crear material', phoneLabel: 'Crear', icon: <Icon name="materials" />},
   {segment: 'ESTUDIO', label: 'Estudiar', icon: <Icon name="timer" />},
 ];
 
@@ -21,23 +23,24 @@ const SECTIONS: Array<{segment: MainSegment; label: string; icon: ReactNode}> = 
  */
 export function NotebookLayout({children}: {children: ReactNode}) {
   const phone = useIsPhone();
-  const {activeNotebook, activeSegment, currentThreads, isFocusModeActive, isAddSourceOpen, closeAddSource} =
-    useAppState();
+  const {activeNotebook, activeSegment, isFocusModeActive, isAddSourceOpen, closeAddSource} = useAppState();
+  const [actionsNode, setActionsNode] = useState<HTMLElement | null>(null);
 
   if (!activeNotebook) return <>{children}</>;
   if (isFocusModeActive) return <Page>{children}</Page>;
 
-  const counts: Partial<Record<MainSegment, number>> = {
-    CHAT: currentThreads.length > 1 ? currentThreads.length : undefined,
-    FUENTES: activeNotebook.sources.length,
-    ARTEFACTOS: activeNotebook.artifacts.length,
-  };
+  // Desktop tabs are text only; a muted "0" hints that Fuentes is still empty.
   const tabs: NavTabItem[] = SECTIONS.map((s) => ({
     id: SEGMENT_SLUGS[s.segment],
     label: s.label,
     to: paths.notebookSegment(activeNotebook.id, s.segment),
+    count: s.segment === 'FUENTES' && activeNotebook.sources.length === 0 ? 0 : undefined,
+  }));
+  const phoneTabs = SECTIONS.map((s) => ({
+    id: SEGMENT_SLUGS[s.segment],
+    label: s.phoneLabel ?? s.label,
+    to: paths.notebookSegment(activeNotebook.id, s.segment),
     icon: s.icon,
-    count: counts[s.segment],
   }));
   const activeId = SEGMENT_SLUGS[activeSegment];
 
@@ -45,14 +48,24 @@ export function NotebookLayout({children}: {children: ReactNode}) {
     <Page className="flex flex-col gap-4">
       <div>
         <NotebookHeader />
-        {!phone ? <Tabs aria-label="Secciones del cuaderno" items={tabs} activeId={activeId} /> : null}
+        {!phone ? (
+          <div className="flex items-center gap-2 border-b border-rule">
+            <Tabs
+              aria-label="Secciones del cuaderno"
+              items={tabs}
+              activeId={activeId}
+              className="min-w-0 flex-1 border-b-0!"
+            />
+            <div ref={setActionsNode} className="flex shrink-0 items-center gap-1" />
+          </div>
+        ) : null}
       </div>
-      {children}
+      <TabActionsContext.Provider value={phone ? null : actionsNode}>{children}</TabActionsContext.Provider>
       <AddSourceDialog open={isAddSourceOpen} onClose={closeAddSource} />
       {phone ? (
         <BottomTabBar
           aria-label="Secciones del cuaderno"
-          items={tabs.map(({id, label, to, icon}) => ({id, label, to, icon: icon as ReactNode}))}
+          items={phoneTabs}
           activeId={activeId}
         />
       ) : null}

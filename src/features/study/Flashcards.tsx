@@ -50,10 +50,10 @@ export function Flashcards() {
         <EmptyState
           icon={<Icon name="materials" />}
           title="Crea un material de Tarjetas"
-          description="Aún no hay un mazo en este cuaderno. Genéralo desde Materiales a partir de tus fuentes."
+          description="Aún no hay un mazo en este cuaderno. Genéralo desde la pestaña Crear material a partir de tus fuentes."
           action={
             <Button variant="primary" onClick={() => navigate(paths.notebookSegment(activeNotebook.id, 'ARTEFACTOS'))}>
-              Ir a Materiales
+              Ir a Crear material
             </Button>
           }
         />
