@@ -1,6 +1,6 @@
 import {useId, useState} from 'react';
 import type {Notebook, SourceAnalysis} from '../../types';
-import {Button, Card, InlineAlert} from '../../ui';
+import {Button, Card, InlineAlert, Skeleton} from '../../ui';
 import {Icon} from '../../ui/Icon';
 
 const storageKey = (notebookId: string) => `mia_sources_summary_open_${notebookId}`;
@@ -38,6 +38,23 @@ function List({items, ordered}: {items: string[]; ordered?: boolean}) {
         <li key={i}>{i}</li>
       ))}
     </Tag>
+  );
+}
+
+/** Placeholder with the same two-column rhythm as `Summary`, shown while the analysis runs. */
+function SummarySkeleton() {
+  return (
+    <div role="status" aria-busy="true" className="grid gap-4 sm:grid-cols-2">
+      <span className="sr-only">Analizando tus fuentes…</span>
+      {Array.from({length: 4}, (_, i) => (
+        <div key={i} className="space-y-2">
+          <Skeleton className="h-2.5 w-24" />
+          <Skeleton className="w-full" />
+          <Skeleton className="w-4/5" />
+          {i % 2 === 0 ? <Skeleton className="w-3/5" /> : null}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -130,7 +147,9 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
               Revisa tu conexión e inténtalo de nuevo.
             </InlineAlert>
           ) : null}
-          {analysis ? (
+          {analyzing ? (
+            <SummarySkeleton />
+          ) : analysis ? (
             <>
               <Summary analysis={analysis} />
               <p className="font-mono text-caption text-muted">Analizado: {analysis.analyzedAt}</p>

@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {lazy, Suspense, useMemo} from 'react';
 import {useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
@@ -6,9 +6,24 @@ import {Button, Card, EmptyState, Select, useToast} from '../../ui';
 import {GOAL_OPTIONS, useDailyGoal} from './dailyGoal';
 import {buildWeek, hasActivity, toDailyLogs} from './progressModel';
 import {StatTile} from './StatTile';
-import {WeeklyChart} from './WeeklyChart';
+
+// Recharts is heavy: load the chart on demand and hold its place with a skeleton.
+const WeeklyChart = lazy(() => import('./WeeklyChart').then((m) => ({default: m.WeeklyChart})));
+
+function ChartSkeleton() {
+  return (
+    <div role="status" aria-busy="true" className="h-64 w-full sm:h-72">
+      <span className="sr-only">Cargando gráfico…</span>
+      <div aria-hidden className="flex h-full items-end gap-3 border-b border-rule px-2 pb-2">
+        {[45, 70, 35, 85, 55, 30, 65].map((h, i) => (
+          <Skeleton key={i} shape="block" className="flex-1 rounded-b-none" style={{height: `${h}%`}} />
+        ))}
+      </div>
+    </div>
+  );
+}
 import {Icon} from '../../ui/Icon';
-import {Highlight, Page, PageHeader, Reveal, RevealItem} from '../../ui';
+import {Highlight, Page, PageHeader, Reveal, RevealItem, Skeleton} from '../../ui';
 import {LockedFeature, usePlan} from '../plans';
 
 const number = new Intl.NumberFormat('es');
@@ -182,7 +197,9 @@ function ProgressContent() {
           <h2 id="progress-week" className="flex items-center gap-2 font-display text-h2 text-strong">
             <Icon name="book" weight="duotone" className="size-5 text-primary-text" /> Esta semana
           </h2>
-          <WeeklyChart week={week} goal={goal} />
+          <Suspense fallback={<ChartSkeleton />}>
+            <WeeklyChart week={week} goal={goal} />
+          </Suspense>
         </Card>
       </section>
       </RevealItem>

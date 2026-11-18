@@ -8,6 +8,7 @@ import {
   RevealItem,
   SegmentedControl,
  
+  Skeleton,
   Spinner,
   StatusBadge,
   TextField,
@@ -157,10 +158,21 @@ function WebSearchPanelContent({initialQuery}: WebSearchPanelProps) {
                   </div>
 
                   {turn.status === 'loading' ? (
-                    <p className="flex items-center gap-2 text-body text-muted" role="status">
-                      <Spinner size={20} />
-                      Buscando en la web…
-                    </p>
+                    <div role="status" aria-busy="true" className="flex flex-col gap-3">
+                      <p className="flex items-center gap-2 text-body text-muted">
+                        <Spinner size={20} />
+                        Buscando en la web…
+                      </p>
+                      <div aria-hidden className="space-y-2">
+                        <Skeleton className="w-full" />
+                        <Skeleton className="w-11/12" />
+                        <Skeleton className="w-3/5" />
+                      </div>
+                      <div aria-hidden className="flex gap-2">
+                        <Skeleton className="h-6 w-28" />
+                        <Skeleton className="h-6 w-24" />
+                      </div>
+                    </div>
                   ) : null}
 
                   {turn.status === 'error' ? (

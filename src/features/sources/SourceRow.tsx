@@ -1,5 +1,5 @@
 import type {SourceItem} from '../../types';
-import {Button, InlineAlert, Menu, RevealItem, StatusBadge, Switch, type MenuItem} from '../../ui';
+import {Button, InlineAlert, Menu, RevealItem, Skeleton, StatusBadge, Switch, type MenuItem} from '../../ui';
 import {SOURCE_TYPE_LABEL, TYPE_TILE, sourceMeta, typeIcon} from './sourceModel';
 import {Icon} from '../../ui/Icon';
 
@@ -72,6 +72,7 @@ export function SourceRow({source, status, onToggle, onViewAnalysis, onAsk, onDe
         </label>
         <Menu label={`Opciones de ${source.title}`} items={items} />
       </div>
+      {status === 'analyzing' ? <Skeleton className="mb-2 h-1.5 w-full" /> : null}
       {status === 'error' ? (
         <InlineAlert
           variant="danger"

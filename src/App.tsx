@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Navigate } from 'react-router';
 import { AuthScreen, AuthCallback } from './features/auth';
 import { PlansScreen } from './features/plans';
-import { Spinner } from './ui';
+import { PageTransition, Spinner } from './ui';
 import { ProgressScreen } from './features/progress';
 import { HelpScreen } from './features/help';
 import { AccountScreen } from './features/account';
@@ -11,6 +11,7 @@ import { ChatScreen } from './features/chat';
 import { SourcesScreen } from './features/sources';
 import { StudyScreen, StudySessionProvider } from './features/study';
 import { WebSearchDialog } from './features/web-search';
+import { OnboardingDialog } from './features/onboarding';
 import { useAppState } from './app/AppStateContext';
 import { NotFound, paths } from './app/routes';
 import { TopBar, SideRail, NotebookLayout } from './app/shell';
@@ -94,6 +95,13 @@ export default function App() {
     return <Navigate to={paths.notebookSegment(route.notebookId, 'CHAT')} replace />;
   }
 
+  // Top-level screen identity for the route transition (tabs inside a notebook animate in NotebookLayout).
+  const screenKey = isNotFound
+    ? 'not-found'
+    : route.kind === 'workspace' && activeNotebook
+      ? `notebook:${activeNotebook.id}`
+      : route.kind;
+
   const viewingMaterial =
     route.kind === 'workspace' && Boolean(route.artifactId) && !isNotFound && !isFocusModeActive;
 
@@ -112,6 +120,7 @@ export default function App() {
 
       {/* Main Container */}
       <main className="w-full flex-1 px-4 sm:px-6 lg:px-12 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
+        <PageTransition transitionKey={screenKey} lift={false}>
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
         {isNotFound && <NotFound />}
 
@@ -150,8 +159,12 @@ export default function App() {
           </NotebookLayout>
           </StudySessionProvider>
         )}
+        </PageTransition>
       </main>
       </div>
+
+      {/* First-login welcome (new non-seed accounts only) */}
+      {!isFocusModeActive && <OnboardingDialog />}
 
       {/* Agente de Búsqueda Google en Vivo (Grounding en Tiempo Real con Gemini 3.8 Flash invocado desde el Chat) (hidden in Focus mode) */}
       {!isFocusModeActive && (

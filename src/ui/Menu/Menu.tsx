@@ -299,7 +299,7 @@ function MenuPanel({id, label, items, header, anchor, triggerRef, focusLast, onC
   return createPortal(
     phone ? (
       <>
-        <div aria-hidden className="mia-anim-fade fixed inset-0 z-40 bg-[rgb(18_22_28/48%)]" />
+        <div aria-hidden className="mia-anim-fade fixed inset-0 z-40 bg-scrim" />
         {panel}
       </>
     ) : (

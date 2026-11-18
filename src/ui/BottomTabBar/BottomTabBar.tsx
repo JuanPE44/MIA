@@ -79,6 +79,7 @@ export function BottomTabBar({items, activeId, 'aria-label': ariaLabel}: BottomT
                 aria-current={active ? 'page' : undefined}
                 className={cx(
                   'relative flex h-16 flex-col items-center justify-center gap-1 text-caption font-semibold',
+                  'focus-visible:outline-offset-[-2px]',
                   active ? 'text-strong' : 'text-muted',
                 )}
               >

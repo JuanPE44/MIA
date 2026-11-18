@@ -48,7 +48,7 @@
 
   /* Focus ring: 2px focus color + 2px outer offset on every focusable element */
   :focus-visible {
-    outline: var(--mia-focus-width) solid var(--mia-focus);
+    outline: var(--mia-focus-ring);
     outline-offset: var(--mia-focus-offset);
   }
 }

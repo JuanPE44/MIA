@@ -95,6 +95,13 @@
   --mia-elevation-3: 0 16px 48px rgb(var(--mia-shadow-color) / 16%);
   --mia-offset-color: var(--mia-ink);
   --mia-shadow-offset: 2px 2px 0 var(--mia-offset-color);
+
+  /* Scrim behind dialogs and menu sheets (single source for both) */
+  --mia-scrim: rgb(20 19 15 / 50%);
+
+  /* Skeleton shimmer: base block + moving sheen */
+  --mia-skeleton-base: var(--mia-bg-subtle);
+  --mia-skeleton-sheen: rgb(255 253 248 / 70%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -168,6 +175,10 @@
   --mia-elevation-3: 0 0 0 1px var(--mia-border-hairline);
   --mia-offset-color: #5A5446;
   --mia-shadow-offset: 2px 2px 0 var(--mia-offset-color);
+
+  --mia-scrim: rgb(0 0 0 / 62%);
+  --mia-skeleton-base: var(--mia-bg-subtle);
+  --mia-skeleton-sheen: rgb(237 230 214 / 9%);
 }
 
 /* ---------------------------------------------------------------------------
@@ -208,6 +219,8 @@
   /* Focus ring (§8.3) */
   --mia-focus-width: 2px;
   --mia-focus-offset: 2px;
+  /* Shorthand used by `outline` everywhere a custom focus style is needed */
+  --mia-focus-ring: var(--mia-focus-width) solid var(--mia-focus);
 }
 
 @media (min-width: 40rem) {
@@ -350,6 +363,9 @@
 
   /* Motion: ease-standard, duration via arbitrary values or the raw vars */
   --ease-standard: var(--mia-ease-standard);
+
+  /* Scrim: bg-scrim */
+  --color-scrim: var(--mia-scrim);
 }
 
 /*

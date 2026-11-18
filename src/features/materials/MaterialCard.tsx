@@ -1,6 +1,7 @@
-import {useRef, type MouseEvent} from 'react';
+import {useEffect, useRef, useState, type MouseEvent} from 'react';
+import {AnimatePresence, motion, useReducedMotion} from 'motion/react';
 import type {StudyArtifact} from '../../types';
-import {Button, Card, InteractiveCard, Menu, Spinner, type MenuItem} from '../../ui';
+import {Button, Card, InteractiveCard, Menu, Skeleton, type MenuItem} from '../../ui';
 import {paths} from '../../app/routes';
 import {materialTypeOf, plural} from './materialModel';
 import type {MaterialJob} from './MaterialsJobs';
@@ -69,26 +70,65 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
   );
 }
 
-/** Skeleton card shown while a material is generating in the background. */
+const STAGE_INTERVAL_MS = 2600;
+
+/** Staged copy shown while a material generates; the last stage holds until it finishes. */
+function stagesFor(noun: string): string[] {
+  return ['Leyendo tus fuentes…', 'Extrayendo conceptos clave…', `Armando: ${noun}…`, 'Dando los últimos retoques…'];
+}
+
+/** Card shown while a material is generating in the background: staged text + slim progress bar. */
 export function GeneratingCard({job}: {job: MaterialJob}) {
   const info = materialTypeOf(job.type);
+  const reduced = useReducedMotion();
+  const stages = stagesFor(info.noun);
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setStage((s) => Math.min(s + 1, stages.length - 1)), STAGE_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [stages.length]);
+
+  // Each stage advances the bar; it never reaches 100% until the card is replaced by the result.
+  const pct = Math.round(((stage + 1) / (stages.length + 0.5)) * 100);
+
   return (
     <Card aria-busy="true" className="h-full">
       <div className="flex items-center gap-3">
-        <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-control text-strong" style={{backgroundImage: info.gradient}}>
+        <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-control border border-rule text-strong" style={{backgroundImage: info.gradient}}>
           <Icon name={info.icon} weight="duotone" className="size-5" />
         </span>
         <div className="min-w-0">
           <p className="font-mono text-caption uppercase tracking-widest text-muted">{info.label}</p>
-          <p role="status" className="flex items-center gap-2 text-h3 text-strong">
-            <Spinner size={16} />
-            Generando…
+          <p role="status" aria-live="polite" className="relative h-6 text-h3 text-strong">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={stage}
+                className="block truncate"
+                initial={reduced ? false : {opacity: 0, y: 6}}
+                animate={{opacity: 1, y: 0}}
+                exit={reduced ? {opacity: 0, transition: {duration: 0}} : {opacity: 0, y: -6}}
+                transition={{duration: 0.18}}
+              >
+                {stages[stage]}
+              </motion.span>
+            </AnimatePresence>
           </p>
         </div>
       </div>
+      <div
+        role="progressbar"
+        aria-label={`Progreso de ${info.noun}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+        className="mt-4 h-1.5 w-full overflow-hidden rounded-pill border border-rule bg-subtle"
+      >
+        <div className="h-full rounded-pill bg-primary transition-[width] duration-700 ease-out" style={{width: `${pct}%`}} />
+      </div>
       <div aria-hidden className="mt-4 space-y-2">
-        <div className="h-3 w-4/5 animate-pulse rounded-pill bg-subtle" />
-        <div className="h-3 w-3/5 animate-pulse rounded-pill bg-subtle" />
+        <Skeleton className="w-4/5" />
+        <Skeleton className="w-3/5" />
       </div>
       <p className="mt-3 text-small text-muted">Puedes seguir usando la app; te avisamos cuando esté listo.</p>
     </Card>

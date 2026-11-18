@@ -4,6 +4,7 @@ import {isSupabaseConfigured, supabase} from '../../services/supabaseClient';
 import {AppMark, Button, Highlight, InlineAlert, Reveal, RevealItem, SegmentedControl, TextField} from '../../ui';
 import {Icon} from '../../ui/Icon';
 import {paths} from '../../app/routes';
+import {AuthShowcase} from './AuthShowcase';
 
 type Mode = 'signin' | 'signup' | 'reset';
 
@@ -120,17 +121,21 @@ export function AuthScreen() {
     mode === 'signup' ? 'Crea tu cuenta' : mode === 'reset' ? 'Recupera tu contraseña' : 'Ingresa a tu cuenta';
 
   return (
-    <div className="relative min-h-dvh overflow-x-hidden bg-page px-4 py-4 text-strong sm:px-6">
-      <div className="absolute right-4 top-4 z-10 sm:right-6">
-        <SegmentedControl<ThemeMode>
-          aria-label="Tema"
-          value={themeMode}
-          onValueChange={setThemeMode}
-          options={THEME_OPTIONS}
-        />
-      </div>
+    <div className="min-h-dvh overflow-x-hidden bg-page text-strong lg:grid lg:grid-cols-2">
+      <AuthShowcase />
 
-      <main className="mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-[440px] flex-col justify-center gap-6 py-16">
+      <div className="flex min-h-dvh min-w-0 flex-col px-4 py-4 sm:px-6">
+        {/* In flow (not absolutely positioned) so it can never overlap the heading on small screens */}
+        <div className="flex justify-end">
+          <SegmentedControl<ThemeMode>
+            aria-label="Tema"
+            value={themeMode}
+            onValueChange={setThemeMode}
+            options={THEME_OPTIONS}
+          />
+        </div>
+
+      <main className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center gap-6 py-8">
         <Reveal className="flex flex-col gap-6" stagger={0.1}>
           <RevealItem>
             <div className="flex items-center justify-center gap-3">
@@ -251,6 +256,7 @@ export function AuthScreen() {
           </RevealItem>
         </Reveal>
       </main>
+      </div>
     </div>
   );
 }

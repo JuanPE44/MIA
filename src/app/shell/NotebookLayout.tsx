@@ -1,5 +1,5 @@
 import {useState, type ReactNode} from 'react';
-import {BottomTabBar, Page, Tabs, type NavTabItem} from '../../ui';
+import {BottomTabBar, Page, PageTransition, Tabs, type NavTabItem} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths, SEGMENT_SLUGS} from '../routes';
@@ -60,7 +60,9 @@ export function NotebookLayout({children}: {children: ReactNode}) {
           </div>
         ) : null}
       </div>
-      <TabActionsContext.Provider value={phone ? null : actionsNode}>{children}</TabActionsContext.Provider>
+      <TabActionsContext.Provider value={phone ? null : actionsNode}>
+        <PageTransition transitionKey={activeId}>{children}</PageTransition>
+      </TabActionsContext.Provider>
       <AddSourceDialog open={isAddSourceOpen} onClose={closeAddSource} />
       {phone ? (
         <BottomTabBar

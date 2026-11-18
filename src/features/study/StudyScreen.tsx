@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
+import {useDailyGoal} from '../progress/dailyGoal';
 import {paths, type StudyTab} from '../../app/routes';
 import {InlineAlert, Tabs, type NavTabItem} from '../../ui';
 import {ActiveRecall} from './ActiveRecall';
@@ -15,12 +16,12 @@ const TAB_LABELS: Array<{id: StudyTab; label: string}> = [
   {id: 'repaso', label: 'Repaso activo'},
   {id: 'tarjetas', label: 'Tarjetas'},
 ];
-const DAILY_GOAL_MINUTES = 60;
 
 /** Estudiar section: Sesión · Repaso activo · Tarjetas. */
 export function StudyScreen() {
   const {route, activeNotebook, stats, isFocusModeActive} = useAppState();
   const {session, summary} = useStudySession();
+  const [dailyGoal] = useDailyGoal();
   if (!activeNotebook) return null;
 
   const tab: StudyTab = route.kind === 'workspace' && route.studyTab ? route.studyTab : 'sesion';
@@ -38,7 +39,7 @@ export function StudyScreen() {
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
           <Tabs items={items} activeId={tab} aria-label="Modos de estudio" className="min-w-0 flex-1" />
           <Link to="/progreso" className="min-h-touch inline-flex items-center font-mono text-label text-primary-text hover:underline">
-            Hoy {stats.focusMinutesToday}/{DAILY_GOAL_MINUTES} min → Progreso
+            Hoy {stats.focusMinutesToday}/{dailyGoal} min → Progreso
           </Link>
         </div>
       )}

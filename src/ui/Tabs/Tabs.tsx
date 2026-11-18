@@ -77,6 +77,8 @@ export function Tabs({items, activeId, 'aria-label': ariaLabel, className}: Tabs
               aria-current={active ? 'page' : undefined}
               className={cx(
                 'relative inline-flex h-12 shrink-0 items-center gap-2 px-4 text-label transition-colors duration-[120ms]',
+                // Inset ring: the scroll container would clip an outer outline
+                'focus-visible:outline-offset-[-2px]',
                 active ? 'font-semibold text-strong' : 'font-medium text-muted hover:text-strong',
               )}
             >

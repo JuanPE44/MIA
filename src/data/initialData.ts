@@ -565,3 +565,27 @@ export const INITIAL_USER_STATS: UserStudyStats = {
     { day: 'Dom', fullDay: 'Domingo (Hoy)', date: 'Hoy', minutes: 55, targetMinutes: 45, sessions: 2 }
   ]
 };
+
+/**
+ * Builds a fresh "sample notebook" from the demo Lean Startup notebook: same
+ * sources, analysis and summary, but new ids, loose (no folder), a clean chat
+ * and today's dates. Used by onboarding and the empty Library state.
+ */
+export function createSampleNotebook(): Notebook {
+  const base = JSON.parse(JSON.stringify(INITIAL_NOTEBOOKS[0])) as Notebook;
+  const stamp = Date.now();
+  const today = new Date().toLocaleDateString('es-ES');
+  const thread = { id: `thread-sample-${stamp}`, title: 'Chat 1', createdAt: 'Hoy', messages: [] };
+  return {
+    ...base,
+    id: `nb-sample-${stamp}`,
+    folderId: null,
+    createdAt: today,
+    updatedAt: today,
+    sources: base.sources.map((source, i) => ({ ...source, id: `src-sample-${stamp}-${i}` })),
+    artifacts: base.artifacts.slice(0, 1).map((artifact) => ({ ...artifact, id: `art-sample-${stamp}` })),
+    chatMessages: [],
+    chatThreads: [thread],
+    activeChatThreadId: thread.id
+  };
+}

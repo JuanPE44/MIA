@@ -18,8 +18,10 @@ import {
   INITIAL_FOLDERS,
   INITIAL_NOTEBOOKS,
   INITIAL_USER_STATS,
-  INITIAL_STUDENT_PROFILE
+  INITIAL_STUDENT_PROFILE,
+  createSampleNotebook
 } from '../data/initialData';
+import { setDailyGoal } from '../features/progress/dailyGoal';
 import { soundManager } from '../services/audioSynthesizer';
 import { AppRoute, parseRoute, paths } from './routes';
 import { useToast } from '../ui/Toast';
@@ -36,7 +38,8 @@ const storageKeys = (uid: string) => ({
   folders: `focused_folders_${uid}_v3`,
   notebooks: `focused_notebooks_${uid}_v3`,
   stats: `focused_user_stats_${uid}_v3`,
-  profile: `mia_student_profile_${uid}_v3`
+  profile: `mia_student_profile_${uid}_v3`,
+  onboarded: `mia_onboarded_${uid}_v3`
 });
 
 const emptyStats = (): UserStudyStats => ({
@@ -252,6 +255,9 @@ function useAppStateValue() {
   // User study statistics
   const [stats, setStats] = useState<UserStudyStats>(emptyStats);
 
+  // First-login welcome dialog (see features/onboarding)
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+
   // Hydrate this user's data (or seed/empty data on first login) when the session user changes.
   useEffect(() => {
     if (!userId) {
@@ -260,6 +266,7 @@ function useAppStateValue() {
       setActiveNotebookId(null);
       setStats(emptyStats());
       setStudentProfile(emptyStudentProfile(''));
+      setIsOnboardingOpen(false);
       setDataOwner(null);
       return;
     }
@@ -282,6 +289,15 @@ function useAppStateValue() {
           ? INITIAL_STUDENT_PROFILE
           : emptyStudentProfile(session?.user.user_metadata?.full_name || userEmail?.split('@')[0] || ''))
     );
+    // First-login welcome: only for brand-new non-seed accounts that have not finished or skipped it.
+    let onboarded = false;
+    try {
+      onboarded = localStorage.getItem(keys.onboarded) === '1';
+    } catch {
+      // storage unavailable: do not nag
+      onboarded = true;
+    }
+    setIsOnboardingOpen(!isSeedUser && !onboarded && nextNotebooks.length === 0);
     setDataOwner(userId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -465,6 +481,46 @@ function useAppStateValue() {
     setNotebooks((prev) => [fullNotebook, ...prev]);
     setActiveNotebookId(fullNotebook.id);
     navigate(paths.notebookSegment(fullNotebook.id, 'CHAT'));
+  };
+
+  /** Adds the sample notebook (Lean Startup, with sources) and opens it. */
+  const handleCreateSampleNotebook = () => {
+    const sample = createSampleNotebook();
+    setNotebooks((prev) => [sample, ...prev]);
+    setActiveNotebookId(sample.id);
+    navigate(paths.notebookSegment(sample.id, 'CHAT'));
+    return sample;
+  };
+
+  const markOnboarded = () => {
+    setIsOnboardingOpen(false);
+    if (!userId) return;
+    try {
+      localStorage.setItem(storageKeys(userId).onboarded, '1');
+    } catch {
+      // ignore
+    }
+  };
+
+  /** "Saltar": closes the welcome for good without creating anything. */
+  const handleSkipOnboarding = () => markOnboarded();
+
+  /** Saves name, subject and daily goal, then creates the sample notebook. */
+  const handleCompleteOnboarding = (answers: { name: string; mainSubject: string; dailyGoalMinutes: number }) => {
+    const name = answers.name.trim();
+    handleUpdateProfile({
+      ...studentProfile,
+      name: name || studentProfile.name,
+      avatarSeed: name || studentProfile.avatarSeed,
+      mainSubject: answers.mainSubject.trim() || undefined
+    });
+    setDailyGoal(answers.dailyGoalMinutes);
+    setStats((prev) => ({
+      ...prev,
+      weeklyLogs: prev.weeklyLogs?.map((log) => ({ ...log, targetMinutes: answers.dailyGoalMinutes }))
+    }));
+    markOnboarded();
+    handleCreateSampleNotebook();
   };
 
   const handleDeleteNotebook = (notebookId: string) => {
@@ -904,6 +960,10 @@ function useAppStateValue() {
     handleUpdateFolder,
     handleDeleteFolder,
     handleCreateNotebook,
+    handleCreateSampleNotebook,
+    isOnboardingOpen,
+    handleSkipOnboarding,
+    handleCompleteOnboarding,
     handleDeleteNotebook,
     handleRestoreNotebook,
     handleMoveNotebook,

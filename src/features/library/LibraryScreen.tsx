@@ -21,6 +21,7 @@ export function LibraryScreen() {
     notebooks,
     handleOpenNotebook,
     handleCreateNotebook,
+    handleCreateSampleNotebook,
     handleDeleteNotebook,
     handleRestoreNotebook,
     handleMoveNotebook,
@@ -148,6 +149,11 @@ export function LibraryScreen() {
         action={
           <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(selectedFolder?.id ?? '')}>
             Crear tu primer cuaderno
+          </Button>
+        }
+        secondaryAction={
+          <Button variant="ghost" leadingIcon={<Icon name="sparkles" />} onClick={handleCreateSampleNotebook}>
+            Probar cuaderno de ejemplo
           </Button>
         }
       />

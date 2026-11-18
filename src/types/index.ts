@@ -149,6 +149,8 @@ export interface StudentProfile {
   university: string;
   academicTerm: string;
   avatarSeed: string;
+  /** Main subject entered during onboarding (optional; absent on older profiles). */
+  mainSubject?: string;
 }
 
 export interface DailyStudyLog {
