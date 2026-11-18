@@ -2,12 +2,14 @@ import {Highlight, Reveal, RevealItem} from '../../../ui';
 
 interface InfographicData {
   highlightStat?: {number: string; label: string};
+  stats?: Array<{number: string; label: string}>;
   pillars?: Array<{title: string; desc: string; color?: string}>;
 }
 
 /** Infographic: a highlighted statistic and numbered pillars. */
 export function InfographicView({data}: {data: InfographicData}) {
   const pillars = Array.isArray(data.pillars) ? data.pillars : [];
+  const stats = Array.isArray(data.stats) ? data.stats : [];
   return (
     <div className="w-full max-w-reading space-y-5">
       {data.highlightStat ? (
@@ -17,6 +19,17 @@ export function InfographicView({data}: {data: InfographicData}) {
           </p>
           <p className="mx-auto mt-3 max-w-narrow text-label text-default">{data.highlightStat.label}</p>
         </div>
+      ) : null}
+
+      {stats.length > 0 ? (
+        <ul className="grid grid-cols-3 gap-3">
+          {stats.map((stat, i) => (
+            <li key={i} className="rounded-card border border-rule bg-subtle p-4 text-center">
+              <p className="font-display text-h2 text-strong">{stat.number}</p>
+              <p className="mt-1 text-caption text-muted">{stat.label}</p>
+            </li>
+          ))}
+        </ul>
       ) : null}
 
       {pillars.length > 0 ? (

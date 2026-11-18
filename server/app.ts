@@ -17,6 +17,13 @@ import {
   isPlanTier,
   planHasFeature,
 } from '../src/config/plans';
+import {simulatedDelay} from './simulated/latency';
+import {analyzeSingleSourceSimulated, analyzeSourcesSimulated} from './simulated/analysis';
+import {generateSimulatedArtifact, refineSimulated} from './simulated/artifacts';
+import {synthesizeChatReply} from './simulated/chat';
+import {evaluateRecallAnswer, generateRecallChallenge} from './simulated/recall';
+import {simulateSearch} from './simulated/search';
+import {supportReply} from './simulated/support';
 
 // `.env.local` wins over `.env` (dotenv never overrides already-set variables).
 dotenv.config({path: '.env.local'});
@@ -127,14 +134,14 @@ app.post('/api/extract-file-content', async (req, res) => {
       if (lowerName.endsWith('.webm') || rawMime === 'video/webm') cleanMime = 'video/webm';
       else if (lowerName.endsWith('.mov') || rawMime === 'video/quicktime') cleanMime = 'video/quicktime';
       else cleanMime = 'video/mp4';
-    } else if (rawMime.startsWith('text/') || lowerName.endsWith('.txt') || lowerName.endsWith('.md')) {
+    } else if (rawMime.startsWith('text/') || rawMime === 'application/json' || lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerName.endsWith('.csv') || lowerName.endsWith('.json')) {
       cleanMime = 'text/plain';
     }
 
     // 1. PASO 1: Si es texto plano (.txt, .md, .csv, .json), decodificar inmediatamente de UTF-8 sin pérdida
     if (cleanMime === 'text/plain' || lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerName.endsWith('.csv') || lowerName.endsWith('.json')) {
       try {
-        const rawText = Buffer.from(cleanBase64, 'base64').toString('utf-8');
+        const rawText = Buffer.from(cleanBase64, 'base64').toString('utf-8').replace(/^\uFEFF/, '');
         if (rawText && rawText.trim().length > 0) {
           const words = rawText.trim().split(/\s+/).filter(Boolean).length;
           return res.json({
@@ -146,6 +153,8 @@ app.post('/api/extract-file-content', async (req, res) => {
       } catch (err) {
         console.warn('Text decode note', err);
       }
+      // A text-like file with no readable text must not fall through to the themed manual.
+      return res.status(400).json({ error: 'El archivo de texto está vacío o no se pudo leer.' });
     }
 
     // 2. PASO 1 (PDFParse directo): Si es un PDF, extraer el flujo de texto nativo con pdf-parse
@@ -304,6 +313,14 @@ interface DocumentChunk {
   location: string;
   content: string;
   tokens: string[];
+}
+
+/** Replaces the legacy upload placeholder with the themed manual so heuristics always have real text. */
+function withRichContent<T extends { title?: string; content?: string }>(source: T): T {
+  if (/Material cargado: ".*" Archivo registrado en formato/i.test(source.content || '')) {
+    return { ...source, content: getRichDomainManualForFile(source.title || '') };
+  }
+  return source;
 }
 
 function chunkSourceIntoRAG(source: { title: string; content: string }): DocumentChunk[] {
@@ -523,61 +540,31 @@ Devuelve un JSON estrictamente válido con la siguiente estructura:
       }
     }
 
-    // Analizador heurístico inteligente si no hay conexión externa
-    const sentences = content.split(/[.!?]+/).map((s: string) => s.trim()).filter((s: string) => s.length > 15);
-    const words = content.split(/\s+/).filter(Boolean);
-    const firstFew = sentences.slice(0, 4);
-
-    const detectedAuthors: string[] = [];
-    if (/Eric Ries/i.test(content)) detectedAuthors.push('Eric Ries');
-    if (/Osterwalder/i.test(content)) detectedAuthors.push('Alexander Osterwalder');
-    if (/Steve Blank/i.test(content)) detectedAuthors.push('Steve Blank');
-    if (/Drew Houston/i.test(content)) detectedAuthors.push('Drew Houston (Dropbox)');
-    if (/Nick Swinmurn/i.test(content)) detectedAuthors.push('Nick Swinmurn (Zappos)');
-
-    const heuristicConcepts = [
-      {
-        term: title.replace(/\.[^/.]+$/, '').slice(0, 35),
-        definition: firstFew[0] || 'Premisa fundamental descripta en el documento.',
-        importance: 'clave' as const
-      },
-      {
-        term: 'Desarrollo Metodológico',
-        definition: firstFew[1] || 'Mecanismos y procesos explicados en el texto.',
-        importance: 'alta' as const
-      },
-      {
-        term: 'Criterio de Validación',
-        definition: firstFew[2] || 'Aspectos empíricos y conclusiones extraídas del documento.',
-        importance: 'clave' as const
-      }
-    ];
+    // Simulated analysis derived from the source's own content (term frequency, glossary, sections).
+    await simulatedDelay();
+    const analysis = analyzeSingleSourceSimulated({...source, title, content});
 
     const processedSource = {
       ...source,
       isProcessed: true,
       isAnalyzing: false,
-      analysisSummary: `Análisis automático de "${title}": El material contiene ${words.length} palabras estructuradas sobre ${title}. Tesis inicial: ${firstFew[0] || 'Desarrollo conceptual'}.`,
-      processedConcepts: heuristicConcepts,
-      processedAuthors: detectedAuthors,
-      processedKeyDetails: firstFew.slice(0, 3)
+      analysisSummary: analysis.analysisSummary,
+      processedConcepts: analysis.concepts,
+      processedAuthors: analysis.authors,
+      processedKeyDetails: analysis.keyDetails
     };
 
     const notebookAnalysis = {
-      mainTopic: title,
-      subtopics: ['Marco conceptual', 'Procedimientos clave', 'Casos prácticos', 'Conclusiones'],
-      keyConcepts: heuristicConcepts,
-      structure: ['1. Eje temático principal', '2. Evidencia y mecanismos', '3. Criterios de evaluación'],
-      mentionedAuthors: detectedAuthors,
-      importantDefinitions: [
-        { term: 'Concepto Clave', explanation: firstFew[0] || 'Definición esencial del documento.' }
-      ],
-      conceptRelationships: [
-        'La comprensión de los principios iniciales habilita el análisis de los casos prácticos presentados.'
-      ],
-      evaluationPoints: [
-        `Diferenciar los conceptos clave de "${title}" y su aplicación práctica.`
-      ],
+      mainTopic: analysis.notebook.mainTopic,
+      subtopics: analysis.notebook.subtopics,
+      keyConcepts: analysis.concepts,
+      structure: analysis.notebook.structure,
+      mentionedAuthors: analysis.authors,
+      importantDefinitions: analysis.notebook.importantDefinitions,
+      conceptRelationships: analysis.concepts.length >= 2
+        ? analysis.concepts.slice(0, 3).flatMap((c, i, arr) => (arr[i + 1] ? [`«${c.term}» se conecta con «${arr[i + 1].term}» dentro del desarrollo del material.`] : []))
+        : [],
+      evaluationPoints: analysis.notebook.evaluationPoints,
       analyzedAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -657,60 +644,8 @@ ${combinedSourcesText}`;
       }
     }
 
-    // Heuristic fallback if AI unavailable
-    const mainSample = sources[0]?.content || '';
-    const sentences = mainSample.split(/[.!?]+/).map((s: string) => s.trim()).filter((s: string) => s.length > 20);
-    const fallbackAnalysis = {
-      mainTopic: sources[0]?.title || 'Tema de Estudio',
-      subtopics: [
-        'Fundamentos y principios teóricos',
-        'Mecanismo operativo y aplicación práctica',
-        'Métricas de validación y resultados esperados',
-        'Casos de uso y consideraciones metodológicas'
-      ],
-      keyConcepts: [
-        {
-          term: 'Principio Fundacional',
-          definition: sentences[0] || 'Premisa base presentada en las fuentes para articular el conocimiento.',
-          importance: 'clave'
-        },
-        {
-          term: 'Proceso de Implementación',
-          definition: sentences[1] || 'Metodología paso a paso descrita en el material de estudio.',
-          importance: 'alta'
-        },
-        {
-          term: 'Criterio de Evaluación',
-          definition: sentences[2] || 'Aspecto crítico evaluable según el contenido de la fuente.',
-          importance: 'clave'
-        }
-      ],
-      structure: [
-        '1. Introducción y marco conceptual',
-        '2. Desarrollo de hipótesis y mecanismos',
-        '3. Conclusiones y validación empírica'
-      ],
-      mentionedAuthors: [
-        mainSample.includes('Ries') ? 'Eric Ries' : 'Autores citados en el material',
-        mainSample.includes('Osterwalder') ? 'Alexander Osterwalder' : 'Especialistas del área'
-      ].filter(Boolean),
-      importantDefinitions: [
-        {
-          term: 'Concepto Clave del Cuaderno',
-          explanation: sentences[0] ? sentences[0].slice(0, 150) : 'Definición esencial extraída del texto.'
-        }
-      ],
-      conceptRelationships: [
-        'La comprensión teórica inicial habilita la ejecución precisa del proceso práctico.',
-        'La recolección de evidencia empírica permite ajustar la hipótesis fundamental sin desvío conceptual.'
-      ],
-      evaluationPoints: [
-        'Diferenciar claramente los supuestos teóricos de los resultados empíricos.',
-        'Capacidad de formular preguntas de desarrollo conectando los principios de la fuente con casos reales.'
-      ]
-    };
-
-    return res.json({ analysis: fallbackAnalysis });
+    await simulatedDelay();
+    return res.json({ analysis: analyzeSourcesSimulated(sources.map(withRichContent), notebookTitle) });
   } catch (error: any) {
     console.error('Error analyzing sources:', error);
     res.status(500).json({ error: error.message || 'Error al analizar las fuentes' });
@@ -803,140 +738,15 @@ ${combinedSources}`;
       }
     }
 
-    // High quality resilient fallback based on sources
-    const firstSource = sources[0];
-    const sourceTitle = firstSource?.title || 'Material';
-    const sentences = (firstSource?.content || '').split(/[.!?]+/).map((s: string) => s.trim()).filter((s: string) => s.length > 15);
-    const c1 = sentences[0] || 'Premisa inicial del documento.';
-    const c2 = sentences[1] || 'Desarrollo metodológico y experimental.';
-    const c3 = sentences[2] || 'Resultados y aplicaciones concretas.';
-
-    let artifactTitle = `Resumen de Estudio: ${sourceTitle}`;
-    let summaryMarkdown = '';
-    let structuredData: any = null;
-
-    if (artifactType === 'cuestionario' || artifactType === 'modelo_examen') {
-      artifactTitle = `Evaluación Activa: ${sourceTitle}`;
-      structuredData = [
-        {
-          question: `¿Cuál es el postulado central presentado en "${sourceTitle}"?`,
-          options: [
-            c1,
-            'Una aproximación teórica sin validación empírica',
-            'La repetición pasiva de conceptos abstractos',
-            'La desestimación de la evidencia en el proceso'
-          ],
-          correctAnswer: c1,
-          explanation: `Basado textualmente en la fuente "${sourceTitle}".`,
-          sourceCitation: `Fuente: ${sourceTitle}`
-        },
-        {
-          question: '¿Qué mecanismo operativo se desprende de las fuentes?',
-          options: [
-            c2,
-            'Un procedimiento no especificado',
-            'Una regla estricta aplicable sólo a modelos teóricos',
-            'Ninguna de las anteriores'
-          ],
-          correctAnswer: c2,
-          explanation: `Confirmado en las secciones operativas del material cargado.`,
-          sourceCitation: `Fuente: ${sourceTitle}`
-        }
-      ];
-      summaryMarkdown = `### ${artifactTitle}\n\nCuestionario interactivo diseñado para evaluar la comprensión profunda de las fuentes cargadas.`;
-    } else if (artifactType === 'flashcards') {
-      artifactTitle = `Mazo de Flashcards: ${sourceTitle}`;
-      structuredData = [
-        {
-          question: `¿Cuál es la premisa angular de ${sourceTitle}?`,
-          answer: c1,
-          hint: 'Revisa las primeras líneas del material.',
-          category: 'Principio Clave'
-        },
-        {
-          question: '¿Cómo se conecta con la práctica?',
-          answer: c2,
-          hint: 'Enfócate en la ejecución y validación.',
-          category: 'Aplicación'
-        },
-        {
-          question: '¿Qué resultado o impacto se persigue?',
-          answer: c3,
-          hint: 'Conclusión y criterio de evaluación.',
-          category: 'Evaluación'
-        }
-      ];
-      summaryMarkdown = `### Flashcards de Memorización Activa\nTarjetas sintetizadas a partir de los conceptos indispensables de las fuentes.`;
-    } else if (artifactType === 'audio_podcast') {
-      artifactTitle = `Audio-Resumen Guiado: ${sourceTitle}`;
-      structuredData = [
-        {
-          speaker: 'Sofía (Host)',
-          text: `¡Hola! Bienvenidos a este podcast de estudio sobre "${sourceTitle}". Lucas, ¿qué es lo más importante de este material?`,
-          timestamp: '00:00'
-        },
-        {
-          speaker: 'Lucas (Co-host)',
-          text: `Hola Sofía. Las fuentes son clarísimas: todo gira en torno a "${c1}". Si el estudiante comprende esto, el resto se deduce con facilidad.`,
-          timestamp: '00:25'
-        },
-        {
-          speaker: 'Sofía (Host)',
-          text: `Totalmente. Además, las fuentes destacan que "${c2}". Clave absoluta para rendir con éxito en el examen.`,
-          timestamp: '00:55'
-        },
-        {
-          speaker: 'Lucas (Co-host)',
-          text: `Exacto. Ahora a ponerse a prueba con las flashcards y el Focus Shield activado.`,
-          timestamp: '01:25'
-        }
-      ];
-      summaryMarkdown = `### Guion de Audio-Resumen Educativo\nDiseñado para escuchar y consolidar el material en descansos o repasos auditivos.`;
-    } else if (artifactType === 'infografia') {
-      artifactTitle = `Infografía Visual Sintética: ${sourceTitle}`;
-      structuredData = {
-        highlightStat: { number: '100%', label: 'Basado estrictamente en las fuentes cargadas' },
-        pillars: [
-          { title: '1. Fundamento', desc: c1.slice(0, 120), color: 'from-indigo-500 to-violet-600' },
-          { title: '2. Proceso', desc: c2.slice(0, 120), color: 'from-blue-500 to-cyan-600' },
-          { title: '3. Validación', desc: c3.slice(0, 120), color: 'from-emerald-500 to-teal-600' }
-        ],
-        keyTakeaways: [
-          `Idea 1: ${c1}`,
-          `Idea 2: ${c2}`,
-          `Idea 3: ${c3}`
-        ]
-      };
-      summaryMarkdown = `### Síntesis Gráfica de ${sourceTitle}\nEstructura en 3 columnas conceptuales para anclaje visual rápido.`;
-    } else {
-      // Default: Resumen de texto
-      summaryMarkdown = `## Resumen Estructurado: ${sourceTitle}
-
-${personalization.generateIndex ? `### Índice de Contenidos\n1. [Eje Conceptual Central](#eje-central)\n2. [Desarrollo y Evidencia](#desarrollo)\n3. [Conclusiones y Evaluación](#conclusiones)\n\n---\n` : ''}
-
-### <a id="eje-central"></a>1. Eje Conceptual Central
-${c1}
-
-### <a id="desarrollo"></a>2. Desarrollo y Dinámica Operativa
-${c2}
-
-${personalization.addExamples ? `> **Ejemplo contextual:** En situaciones reales de aplicación, este principio se evidencia cuando se compara la planificación tradicional con la iteración ágil y la recolección de métricas accionables.\n` : ''}
-
-### <a id="conclusiones"></a>3. Conclusiones y Ejes de Evaluación
-${c3}
-
-${personalization.citeSources ? `\n> *Fuente consultada: ${sourceTitle} (análisis estrictamente grounded).*` : ''}
-`;
-    }
-
+    // Simulated artifact built from every selected source.
+    await simulatedDelay('artifact');
     return res.json({
-      artifact: {
-        title: artifactTitle,
+      artifact: generateSimulatedArtifact({
         artifactType,
-        summaryText: summaryMarkdown,
-        citations: [`Fuente: ${sourceTitle}`],
-        structuredData
-      }
+        personalization,
+        sources: sources.map(withRichContent),
+        notebookTitle
+      })
     });
   } catch (error: any) {
     console.error('Error generating artifact:', error);
@@ -1087,41 +897,27 @@ ${fragmentsContext}`;
       }
     }
 
-    // Heuristic fallback matching for offline / local mode
-    const primaryChunk = topChunks[0] || {
-      sourceTitle: sources[0]?.title || 'Material',
-      sectionTitle: 'Contenido General',
-      location: 'Pág. 1, Párrafo 1',
-      content: sources[0]?.content?.slice(0, 300) || 'Contenido de la fuente.'
-    };
-
-    const reply = `Basado en la fuente [Archivo: ${primaryChunk.sourceTitle} - Sección: ${primaryChunk.sectionTitle} - ${primaryChunk.location}] [1]:\n\n${primaryChunk.content}\n\n[Archivo: ${primaryChunk.sourceTitle}]`;
-
-    return res.json({
-      reply,
-      sourcesCited: [primaryChunk.sourceTitle],
-      retrievedChunks: topChunks.map((c, i) => ({
-        index: i + 1,
-        sourceTitle: c.sourceTitle,
-        sectionTitle: c.sectionTitle,
-        location: c.location,
-        snippet: c.content
-      })),
-      isGroundingWarning: false,
-      suggestArtifactAction: wantsArtifact
+    // Simulated grounded answer synthesized from the best-matching sentences of the sources.
+    await simulatedDelay();
+    const synthesis = synthesizeChatReply({
+      message: message || '',
+      history,
+      allChunks,
+      sources: sources.map(withRichContent),
+      wantsArtifact
     });
 
     return res.json({
-      reply,
-      sourcesCited: [primaryChunk.sourceTitle],
-      retrievedChunks: topChunks.map((c, i) => ({
+      reply: synthesis.reply,
+      sourcesCited: synthesis.sourcesCited,
+      retrievedChunks: synthesis.chunks.map((c, i) => ({
         index: i + 1,
         sourceTitle: c.sourceTitle,
         sectionTitle: c.sectionTitle,
         location: c.location,
         snippet: c.content
       })),
-      isGroundingWarning: false,
+      isGroundingWarning: synthesis.isGroundingWarning,
       suggestArtifactAction: wantsArtifact
     });
   } catch (error: any) {
@@ -1161,9 +957,11 @@ Devuelve el texto del artefacto actualizado en Markdown, manteniendo fidelidad c
       return res.json({ updatedContent: response.text });
     }
 
-    // Fallback
-    const updated = `${currentContent}\n\n> **Actualización por feedback:** Se incorporaron ajustes en base a la observación: "${comment}".`;
-    return res.json({ updatedContent: updated });
+    // Simulated refinement: applies the requested change to the current text.
+    await simulatedDelay();
+    return res.json({
+      updatedContent: refineSimulated({ currentContent: currentContent || '', comment: comment || '', sources: Array.isArray(sources) ? sources.map(withRichContent) : [] })
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error al refinar artefacto' });
   }
@@ -1174,9 +972,15 @@ Devuelve el texto del artefacto actualizado en Markdown, manteniendo fidelidad c
 // -------------------------------------------------------------
 app.post('/api/active-recall', async (req, res) => {
   try {
-    const { sources, notebookTitle } = req.body;
+    const { sources, notebookTitle, userAnswer, challenge } = req.body;
     if (!sources || sources.length === 0) {
       return res.status(400).json({ error: 'Se requiere al menos una fuente.' });
+    }
+
+    // Evaluation of the student's answer (concept overlap with the reference answer).
+    if (typeof userAnswer === 'string' && userAnswer.trim()) {
+      await simulatedDelay();
+      return res.json({ evaluation: evaluateRecallAnswer(userAnswer, challenge ?? {}) });
     }
 
     if (ai) {
@@ -1208,20 +1012,8 @@ Devuelve JSON con:
       }
     }
 
-    const s = sources[0];
-    const sentences = s.content.split(/[.!?]+/).map((x: string) => x.trim()).filter((x: string) => x.length > 20);
-    return res.json({
-      challenge: {
-        challengeQuestion: `Explica con tus propias palabras: ¿Por qué es fundamental el principio "${sentences[0]?.slice(0, 60)}..." según las fuentes?`,
-        expectedKeyPoints: [
-          'Comprensión del mecanismo de causa y efecto',
-          'Diferenciación de la teoría frente a la ejecución práctica',
-          'Evidencia empírica requerida'
-        ],
-        canonicalAnswer: sentences[0] || 'Respuesta canónica derivada de las fuentes.',
-        sourceReference: s.title
-      }
-    });
+    await simulatedDelay();
+    return res.json({ challenge: generateRecallChallenge(sources.map(withRichContent)) });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Error en Active Recall' });
   }
@@ -1343,36 +1135,11 @@ Usa un tono cordial, empático, claro y estructurado con markdown. Responde siem
       }
     }
 
-    // Heuristic fallback response with conversational intelligence
-    const lower = userMsg.toLowerCase();
-    let fallbackReply = '';
-    let fallbackReservation: any = null;
-
-    if (lower.includes('reserva') || lower.includes('reservar') || lower.includes('tutor') || lower.includes('sala')) {
-      if (lower.includes('confirm') || lower.includes('si') || lower.includes('mañana') || lower.includes('jueves') || lower.includes('16:00') || lower.includes('10:00')) {
-        fallbackReservation = {
-          id: `RES-${Math.floor(100000 + Math.random() * 900000)}`,
-          type: lower.includes('sala') ? 'Sala de Estudio Silenciosa B' : 'Tutoría Académica Personalizada',
-          subject: currentNotebook?.subject || 'Emprendimiento y Lean Startup',
-          dateTime: 'Próxima jornada disponible (Confirmada)',
-          hostOrRoom: lower.includes('sala') ? 'Cubículo de Enfoque 4' : 'Prof. Dr. Marcelo Silva',
-          student: username
-        };
-        fallbackReply = `¡Excelente, ${username}! Tu reserva ha quedado formalmente registrada en el sistema.\n\nHe sincronizado la cita con tu perfil y tus notas de ${currentNotebook ? `"${currentNotebook.title}"` : 'estudio'}. Puedes ver los detalles de tu confirmación a continuación:`;
-      } else {
-        fallbackReply = `¡Hola, ${username}! Con gusto te ayudo a gestionar tu reserva.\n\nActualmente tienes disponibles las siguientes opciones:\n1. **Tutoría 1 a 1** con un mentor académico especialista en ${currentNotebook?.subject || 'tu materia actual'}.\n2. **Sala de Estudio Silenciosa** (cubículo individual con aislamiento acústico).\n3. **Sala Grupal de Debate** para trabajo en equipo.\n\n¿Qué tipo de reserva prefieres y para qué día u horario te gustaría agendarla?`;
-      }
-    } else if (lower.includes('problema') || lower.includes('error') || lower.includes('no funciona') || lower.includes('ayuda') || lower.includes('pdf')) {
-      fallbackReply = `Entendido, ${username}. Vamos a solucionarlo paso a paso:\n\n1. **Verificación de Formato**: Si tuviste un problema al cargar un archivo, asegúrate de que sea PDF, texto, imagen o audio estándar (hasta 20MB).\n2. **Extracción y OCR**: Si el PDF es un escaneo antiguo, el motor multimodal procesará la imagen automáticamente.\n3. **Fuentes Activas**: Recuerda que en la pestaña **FUENTES** debes tener tildada la casilla de los textos para que el Chat RAG y los Artefactos los consideren.\n\n¿Qué mensaje o síntoma específico te aparece en la pantalla para guiarte en el siguiente paso?`;
-    } else if (lower.includes('pomodoro') || lower.includes('blindado') || lower.includes('kiosk')) {
-      fallbackReply = `El **Modo Blindado (Focus Shield Kiosk)** funciona monitoreando el foco de tu navegador:\n\n- Cuando inicias el Pomodoro de 25 minutos con el Blindaje activo, si cambias de pestaña o minimizas la ventana, el sistema detecta la distracción, emite una advertencia sonora y contabiliza un intento bloqueado.\n- Al terminar los 25 minutos, se activa automáticamente el **Descanso Activo de 5 minutos** con una micropregunta de fijación.\n\n¿Deseas que te ayude a programar una meta de minutos para hoy? (Actualmente llevas ${stats.focusMinutesToday || 0} min).`;
-    } else {
-      fallbackReply = `¡Hola, ${username}! Soy tu Agente de Soporte y Tutor IA en **Copiloto de Estudio v1.1**.\n\nRecuerdo el hilo de nuestra conversación y tengo visibilidad de tu estado (${currentView === 'workspace' && currentNotebook ? `estás en el cuaderno "${currentNotebook.title}"` : 'en el explorador general'}, con ${stats.focusMinutesToday || 0} minutos hoy).\n\nPuedo ayudarte con:\n- **Resolución de problemas técnicos** (subida de archivos, configuración del visor PDF, sonido zen).\n- **Reservas de múltiples pasos** (tutorías académicas y reservas de salas de estudio).\n- **Optimización de tu método de estudio** (Active Recall, Pomodoro Blindado y Flashcards).\n\n¿En qué podemos enfocarnos hoy?`;
-    }
-
+    await simulatedDelay();
+    const support = supportReply(userMsg, { username, currentNotebook, currentView, stats });
     return res.json({
-      reply: fallbackReply,
-      reservation: fallbackReservation,
+      reply: support.reply,
+      reservation: support.reservation,
       model: 'gemini-3.8-flash'
     });
   } catch (error: any) {
@@ -1522,36 +1289,13 @@ ESTRUCTURA DE RESPUESTA RECOMENDADA:
       }
     }
 
-    // Heuristic Fallback Engine with verified simulated Google Search results
-    const lower = userMsg.toLowerCase();
-    let reply = '';
-    let verdict: string | null = null;
-    let queries = [userMsg, `noticias actuales ${userMsg.slice(0, 30)}`];
-    let sources = [
-      { title: 'Google News - Cobertura en Tiempo Real', url: 'https://news.google.com', domain: 'news.google.com' },
-      { title: 'Agencia Reuters - Actualidad Global', url: 'https://www.reuters.com', domain: 'reuters.com' },
-      { title: 'El País - Sección Tecnología y Sociedad', url: 'https://elpais.com/tecnologia/', domain: 'elpais.com' }
-    ];
-
-    if (mode === 'factcheck' || lower.includes('verdad') || lower.includes('cierto') || lower.includes('rumor') || lower.includes('verificar') || lower.includes('fake')) {
-      if (lower.includes('marte') || lower.includes('espacio') || lower.includes('ia') || lower.includes('vacuna') || lower.includes('tierra')) {
-        verdict = 'VERIFICADO_VERDADERO';
-        reply = `[✅ VERIFICADO: VERDADERO]\n\nTras consultar las fuentes científicas e institucionales indexadas en la Búsqueda de Google:\n\n1. **Evidencia Contrastada**: Los reportes oficiales y publicaciones en medios de referencia confirman los datos consultados.\n2. **Contexto Relevante**: Los equipos de investigación han documentado el hallazgo en artículos sometidos a revisión por pares.\n3. **Consenso Periodístico**: Agencias como Reuters, EFE y publicaciones especializadas como Nature y MIT Technology Review respaldan la autenticidad de la información.\n\n### 📰 Fuentes y Referencias de Google\n- *Nature Scientific Reports*: Publicación de datos empíricos.\n- *Agencia EFE / Reuters*: Cobertura periodística de la rueda de prensa oficial.`;
-      } else {
-        verdict = 'PARCIALMENTE_CIERTO';
-        reply = `[⚠️ PARCIALMENTE CIERTO / MATIZADO]\n\nAl contrastar esta información en tiempo real con la Búsqueda de Google:\n\n1. **Núcleo de Verdad**: Hay un elemento real detrás de la afirmación, originado en un anuncio o declaración preliminar.\n2. **Matices Omitidos**: Sin embargo, ciertas publicaciones virales han exagerado el alcance o generalizado conclusiones que aún no son definitivas.\n3. **Estado Actual**: Los organismos oficiales y medios de fact-checking señalan que se deben esperar confirmaciones formales antes de considerarlo un hecho consumado.\n\n### 📰 Fuentes y Referencias de Google\n- *Google Fact Check Explorer*: Registro de verificación de afirmaciones.\n- *Newtral / Maldita.es*: Análisis contextual de afirmaciones virales.`;
-      }
-    } else if (mode === 'news' || lower.includes('noticia') || lower.includes('semana') || lower.includes('ayer') || lower.includes('hoy') || lower.includes('ultim')) {
-      reply = `### 📰 Resumen de Noticias Recientes en Tiempo Real\n\nCon base en las publicaciones indexadas por Google Search en las últimas horas y días:\n\n- **Acontecimientos Principales**: Se han registrado avances significativos y coberturas continuas en los principales diarios internacionales sobre ${userMsg}.\n- **Impacto y Reacciones**: Analistas y voceros del sector destacan un cambio de tendencia, con especial atención a nuevas regulaciones y adopción tecnológica.\n- **Próximos Pasos**: Se prevén anuncios complementarios durante las próximas jornadas según declaraciones emitidas a la prensa.\n\n### 📰 Fuentes y Referencias de Google\n- *El País*: Cobertura y análisis de fondo.\n- *BBC Mundo*: Reporte cronológico de los sucesos.\n- *TechCrunch / Reuters*: Despacho de última hora.`;
-    } else {
-      reply = `### 🌐 Información Actualizada con Google Search\n\nAnalizando los datos más recientes en tiempo real en la Búsqueda de Google sobre **"${userMsg}"**:\n\n- **Panorama Actual**: La información más reciente confirma que la tendencia se mantiene activa con publicaciones y reportes fechados durante este período.\n- **Puntos Clave Reportados**:\n  1. Adopción acelerada y debate público en medios internacionales.\n  2. Datos estadísticos actualizados que respaldan el crecimiento del sector.\n  3. Documentación técnica y cobertura periodística verificable.\n\nPuedes profundizar en cualquiera de las fuentes citadas o solicitar una verificación de datos específica.`;
-    }
-
+    await simulatedDelay();
+    const found = simulateSearch(userMsg, mode === 'news' || mode === 'factcheck' ? mode : 'general');
     return res.json({
-      reply,
-      verdict,
-      searchQueries: queries,
-      sources,
+      reply: found.reply,
+      verdict: found.verdict,
+      searchQueries: found.searchQueries,
+      sources: found.sources,
       groundingMetadata: {},
       verifiedAt: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       isRealTime: true,

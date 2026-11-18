@@ -47,6 +47,8 @@ export function ChatScreen() {
   const [input, setInput] = useState('');
   const [waiting, setWaiting] = useState(false);
   const [chunk, setChunk] = useState<CitationChunk | null>(null);
+  // Id of the answer that just arrived: only that one is revealed word by word.
+  const [freshId, setFreshId] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
@@ -77,6 +79,7 @@ export function ChatScreen() {
   // bottom tab bar, so the user would lose section navigation on arrival.
   useEffect(() => {
     setInput('');
+    setFreshId(null);
     if (window.matchMedia('(min-width: 640px)').matches) {
       inputRef.current?.focus({preventScroll: true});
     }
@@ -91,6 +94,10 @@ export function ChatScreen() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     endRef.current?.scrollIntoView({block: 'end', behavior: reduce ? 'auto' : 'smooth'});
   }, [messages.length, waiting, failed]);
+
+  const scrollToEnd = useCallback(() => {
+    endRef.current?.scrollIntoView({block: 'end', behavior: 'auto'});
+  }, []);
 
   const suggestions = useMemo(() => {
     const fromAnalysis = (activeNotebook?.analysis?.keyConcepts ?? [])
@@ -135,6 +142,7 @@ export function ChatScreen() {
         const current = latest.current;
         if (current.notebookId === targetNotebook && current.threadId === targetThread) {
           current.handleUpdateThreadMessages(targetThread, [...history, answer]);
+          setFreshId(answer.id);
         }
       } catch (err) {
         // The unanswered question stays in the thread: the error variant + Reintentar is derived from it.
@@ -328,6 +336,8 @@ export function ChatScreen() {
               message={m}
               lastQuestion={lastQuestion}
               busy={waiting}
+              streaming={m.id === freshId}
+              onStreamDone={scrollToEnd}
               onOpenChunk={setChunk}
               onFeedback={(rating) => setFeedback(m.id, rating)}
               onSubmitComment={(comment) => submitComment(m.id, comment)}

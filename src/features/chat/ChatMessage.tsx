@@ -1,4 +1,4 @@
-import {useState, type ReactNode} from 'react';
+import {useEffect, useMemo, useState, type ReactNode} from 'react';
 import {AppMark, Button, CitationChip, IconButton, InlineAlert, Spinner, Textarea} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {Markdown} from './markdown';
@@ -22,6 +22,51 @@ export function stripSourceMarkers(text: string): string {
     .replace(/[ \t]*\[Fuentes?:[^\]\n]*\]/gi, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+
+const REVEAL_MAX_MS = 1500;
+const REVEAL_MIN_MS = 600;
+
+/** Closes dangling markup of a partially revealed text so the Markdown renderer does not flash raw markers. */
+function closeOpenMarkup(text: string): string {
+  let out = text.replace(/\[\d*$/, '');
+  if ((out.match(/\*\*/g) ?? []).length % 2 === 1) out += '**';
+  return out;
+}
+
+/**
+ * Reveals `text` word by word (~1.5 s at most) for a freshly received answer.
+ * With `enabled` false (history) or `prefers-reduced-motion`, the whole text is returned at once.
+ */
+function useWordReveal(text: string, enabled: boolean, onDone?: () => void): {shown: string; done: boolean} {
+  const tokens = useMemo(() => text.match(/\S+\s*/g) ?? [], [text]);
+  const total = tokens.length;
+  const [count, setCount] = useState<number>(() => {
+    if (!enabled) return Infinity;
+    const reduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return reduce ? Infinity : 0;
+  });
+
+  useEffect(() => {
+    if (!enabled || count === Infinity) return;
+    const duration = Math.min(REVEAL_MAX_MS, Math.max(REVEAL_MIN_MS, total * 35));
+    const start = performance.now();
+    let frame = 0;
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - start) / duration);
+      setCount(Math.ceil(total * progress));
+      if (progress < 1) frame = requestAnimationFrame(step);
+      else onDone?.();
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+    // Runs once per message: `count` only gates the Infinity (already revealed) case.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, total]);
+
+  const done = count >= total;
+  return {shown: done ? text : tokens.slice(0, count).join(''), done};
 }
 
 /** User question: right-aligned bubble. */
@@ -80,6 +125,9 @@ interface AssistantMessageProps {
   onCreateArtifact: () => void;
   onSearchWeb: (query?: string) => void;
   busy: boolean;
+  /** Reveal the text word by word (only for the answer that just arrived). */
+  streaming?: boolean;
+  onStreamDone?: () => void;
 }
 
 export function AssistantMessage({
@@ -91,12 +139,15 @@ export function AssistantMessage({
   onCreateArtifact,
   onSearchWeb,
   busy,
+  streaming = false,
+  onStreamDone,
 }: AssistantMessageProps) {
   const [commenting, setCommenting] = useState(false);
   const [comment, setComment] = useState('');
   const chunks = message.retrievedChunks ?? [];
   const isUnknown = message.text.includes(UNKNOWN_ANSWER);
   const text = stripSourceMarkers(message.text);
+  const {shown, done} = useWordReveal(text, streaming, onStreamDone);
   const showFeedback = !message.isGroundingWarning;
   const citedOnly = chunks.length === 0 ? (message.sourcesCited ?? []) : [];
 
@@ -120,7 +171,14 @@ export function AssistantMessage({
     <div className="min-w-0">
       <div className="min-w-0">
         <MiaLabel />
-        {message.isGroundingWarning || isUnknown ? (
+        {!done ? (
+          <>
+            <div aria-hidden>
+              <Markdown text={closeOpenMarkup(shown)} className={readingClass} renderCitation={renderCitation} />
+            </div>
+            <p className="sr-only">{text}</p>
+          </>
+        ) : message.isGroundingWarning || isUnknown ? (
           <InlineAlert variant="warning">
             <Markdown text={text} className={readingClass} renderCitation={renderCitation} />
           </InlineAlert>
@@ -128,6 +186,7 @@ export function AssistantMessage({
           <Markdown text={text} className={readingClass} renderCitation={renderCitation} />
         )}
 
+        <div className={done ? undefined : 'invisible'} aria-hidden={done ? undefined : true}>
         {chunks.length > 0 || citedOnly.length > 0 ? (
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
             <p className="text-small text-muted">
@@ -252,10 +311,11 @@ export function AssistantMessage({
             </div>
           </form>
         ) : null}
+        </div>
       </div>
     </div>
     {chunks.length > 0 ? (
-      <aside aria-label="Notas al margen" className="mt-3 hidden space-y-3 lg:block">
+      <aside aria-label="Notas al margen" className={`mt-3 hidden space-y-3 lg:block ${done ? '' : 'invisible'}`}>
         {chunks.map((chunk) => (
           <button
             key={chunk.index}

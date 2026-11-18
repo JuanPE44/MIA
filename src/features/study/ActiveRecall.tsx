@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import {Button, Card, EmptyState, InlineAlert, Textarea} from '../../ui';
-import {requestChallenge, type RecallChallenge} from './recallApi';
+import {evaluateAnswer, requestChallenge, type RecallChallenge, type RecallEvaluation} from './recallApi';
 import {Icon} from '../../ui/Icon';
 
 type Phase = 'idle' | 'loading' | 'question' | 'compared' | 'error';
@@ -15,6 +15,8 @@ export function ActiveRecall() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [challenge, setChallenge] = useState<RecallChallenge | null>(null);
   const [answer, setAnswer] = useState('');
+  const [evaluation, setEvaluation] = useState<RecallEvaluation | null>(null);
+  const [comparing, setComparing] = useState(false);
   const questionRef = useRef<HTMLHeadingElement>(null);
 
   if (!activeNotebook) return null;
@@ -36,9 +38,19 @@ export function ActiveRecall() {
     );
   }
 
+  const compare = async () => {
+    if (!challenge) return;
+    setComparing(true);
+    const result = await evaluateAnswer(activeNotebook, challenge, answer);
+    setEvaluation(result);
+    setComparing(false);
+    setPhase('compared');
+  };
+
   const generate = async () => {
     setPhase('loading');
     setAnswer('');
+    setEvaluation(null);
     try {
       const next = await requestChallenge(activeNotebook);
       setChallenge(next);
@@ -107,12 +119,22 @@ export function ActiveRecall() {
               variant="primary"
               disabled={!answer.trim()}
               disabledReason="Escribe tu respuesta primero"
-              onClick={() => setPhase('compared')}
+              loading={comparing}
+              onClick={compare}
             >
               Comparar con la respuesta
             </Button>
           ) : (
             <div className="space-y-5">
+              {evaluation ? (
+                <InlineAlert
+                  variant={evaluation.level === 'alto' ? 'success' : evaluation.level === 'medio' ? 'warning' : 'danger'}
+                  live
+                  title={`Coincidencia con las ideas clave: ${evaluation.score}%`}
+                >
+                  {evaluation.feedback}
+                </InlineAlert>
+              ) : null}
               <div className="grid gap-4 sm:grid-cols-2">
                 <section aria-labelledby="recall-yours" className="space-y-2 rounded-card border border-rule bg-subtle p-4">
                   <h4 id="recall-yours" className="font-mono text-caption uppercase tracking-widest text-muted">

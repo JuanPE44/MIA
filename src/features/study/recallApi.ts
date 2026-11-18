@@ -25,3 +25,37 @@ export async function requestChallenge(notebook: Pick<Notebook, 'sources' | 'tit
     sourceReference: typeof c.sourceReference === 'string' ? c.sourceReference : '',
   };
 }
+
+export interface RecallEvaluation {
+  score: number;
+  level: 'alto' | 'medio' | 'bajo';
+  hitTerms: string[];
+  missedTerms: string[];
+  feedback: string;
+}
+
+/** Scores the student's answer against the reference. Returns null when the service cannot evaluate it. */
+export async function evaluateAnswer(
+  notebook: Pick<Notebook, 'sources' | 'title'>,
+  challenge: RecallChallenge,
+  userAnswer: string,
+): Promise<RecallEvaluation | null> {
+  try {
+    const res = await apiFetch('/api/active-recall', {
+      method: 'POST',
+      body: JSON.stringify({sources: notebook.sources, notebookTitle: notebook.title, userAnswer, challenge}),
+    });
+    if (!res.ok) return null;
+    const e = (await res.json())?.evaluation;
+    if (!e || typeof e.score !== 'number' || typeof e.feedback !== 'string') return null;
+    return {
+      score: e.score,
+      level: e.level === 'alto' || e.level === 'medio' ? e.level : 'bajo',
+      hitTerms: Array.isArray(e.hitTerms) ? e.hitTerms.map(String) : [],
+      missedTerms: Array.isArray(e.missedTerms) ? e.missedTerms.map(String) : [],
+      feedback: e.feedback,
+    };
+  } catch {
+    return null;
+  }
+}
