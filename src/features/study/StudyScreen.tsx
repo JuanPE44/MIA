@@ -36,9 +36,9 @@ export function StudyScreen() {
       <h1 className="sr-only">Estudiar</h1>
 
       {isFocusModeActive ? null : (
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <div className="flex flex-wrap items-stretch justify-between gap-y-1">
           <Tabs items={items} activeId={tab} aria-label="Modos de estudio" className="min-w-0 flex-1" />
-          <Link to="/progreso" className="min-h-touch inline-flex items-center font-mono text-label text-primary-text hover:underline">
+          <Link to="/progreso" className="min-h-touch hidden items-center border-b border-rule pl-4 font-mono sm:inline-flex text-label text-primary-text hover:underline">
             Hoy {stats.focusMinutesToday}/{dailyGoal} min → Progreso
           </Link>
         </div>

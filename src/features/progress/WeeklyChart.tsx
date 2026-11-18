@@ -44,10 +44,10 @@ export function WeeklyChart({week, goal}: WeeklyChartProps) {
     <div>
       <div aria-hidden className="h-64 w-full sm:h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={week} margin={{top: 12, right: 8, left: -16, bottom: 0}} accessibilityLayer={false}>
+          <BarChart data={week} margin={{top: 12, right: 8, left: 0, bottom: 0}} accessibilityLayer={false}>
             <CartesianGrid stroke="var(--mia-rule)" strokeDasharray="2 4" vertical={false} />
             <XAxis dataKey="day" tickLine={false} axisLine={{stroke: 'var(--mia-rule)'}} tick={TICK} />
-            <YAxis unit=" m" tickLine={false} axisLine={false} domain={[0, top]} width={48} tick={TICK} />
+            <YAxis allowDecimals={false} tickLine={false} axisLine={false} domain={[0, top]} width={32} tick={TICK} />
             <Tooltip cursor={{fill: 'var(--mia-bg-subtle)'}} content={<ChartTooltip goal={goal} />} />
             <ReferenceLine y={goal} stroke="var(--mia-ink)" strokeDasharray="4 4" strokeOpacity={0.6} />
             <Bar dataKey="minutes" radius={[4, 4, 0, 0]} isAnimationActive={false}>
@@ -66,7 +66,7 @@ export function WeeklyChart({week, goal}: WeeklyChartProps) {
 
       <ul aria-hidden className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-caption text-muted">
         <li className="flex items-center gap-2">
-          <span className="size-3 rounded-small bg-primary" /> Minutos de estudio
+          <span className="size-3 rounded-small bg-primary" /> Minutos de estudio (eje en min)
         </li>
         <li className="flex items-center gap-2">
           <span className="size-3 rounded-small border border-ink bg-highlight" /> Mejor día

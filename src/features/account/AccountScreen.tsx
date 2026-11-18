@@ -17,7 +17,7 @@ export function AccountScreen({tab}: {tab: AccountTab}) {
     <Page className="space-y-6">
       <PageHeader title={<Highlight trigger="mount">Cuenta</Highlight>} />
       <Tabs items={ITEMS} activeId={tab} aria-label="Secciones de la cuenta" />
-      <div className="max-w-reading">{tab === 'perfil' ? (
+      <div className="max-w-3xl">{tab === 'perfil' ? (
           <div className="space-y-6">
             <ProfilePanel />
             <PlanPanel />

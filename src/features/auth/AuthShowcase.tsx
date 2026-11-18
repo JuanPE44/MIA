@@ -13,14 +13,16 @@ const BENEFITS: Array<{icon: IconName; title: string; text: string}> = [
 function Vignette() {
   const reduced = useReducedMotion();
   return (
-    <div aria-hidden className="relative mt-2 h-60 w-full max-w-md select-none">
-      <div className="absolute inset-x-0 top-0 rounded-card border border-ink bg-surface p-5 shadow-offset">
+    <div aria-hidden className="mt-2 flex w-full max-w-md select-none flex-col gap-4">
+      <div className="rounded-card border border-ink bg-surface p-5 shadow-offset">
         <p className="font-mono text-caption uppercase tracking-widest text-muted">Ries · Lean Startup</p>
         <p className="mt-3 font-display text-h3 leading-8 text-strong">
           Un MVP es la versión que te permite <Highlight trigger="mount" delay={0.9}>aprender más</Highlight> con{' '}
           <span className="relative inline-block">
             menos esfuerzo
-            <InkUnderline className="absolute -bottom-1.5 left-0 text-primary-text" delay={1.7} />
+            <span className="absolute -bottom-1.5 left-0 block w-full">
+              <InkUnderline className="text-primary-text" delay={1.7} />
+            </span>
           </span>
           .
         </p>
@@ -34,12 +36,11 @@ function Vignette() {
         </motion.span>
       </div>
 
-      <div className="absolute bottom-0 right-0 h-28 w-44 [perspective:800px] sm:right-2">
+      <div className="h-24 w-full max-w-xs self-end [perspective:800px]">
         <motion.div
           className="relative size-full [transform-style:preserve-3d]"
-          animate={reduced ? undefined : {rotateY: [0, 0, 180, 180, 0], rotate: [-3, -3, -3, -3, -3]}}
+          animate={reduced ? undefined : {rotateY: [0, 0, 180, 180, 0]}}
           transition={{duration: 8, times: [0, 0.35, 0.45, 0.85, 0.95], repeat: Infinity, ease: 'easeInOut', delay: 3}}
-          style={{rotate: -3}}
         >
           <div className="absolute inset-0 flex flex-col justify-between rounded-card border border-ink bg-primary-tint p-3 shadow-offset [backface-visibility:hidden]">
             <span className="font-mono text-caption uppercase tracking-widest text-primary-on-tint">Tarjeta</span>

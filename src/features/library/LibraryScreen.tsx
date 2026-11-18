@@ -240,7 +240,6 @@ export function LibraryScreen() {
             <div key={folder.id} className="flex flex-col gap-4">
               <FolderHeader
                 folder={folder}
-                size="compact"
                 notebookCount={items.length}
                 onOpen={() => updateParams({carpeta: folder.id})}
                 onNewNotebook={() => openNewNotebook(folder.id)}
@@ -250,12 +249,12 @@ export function LibraryScreen() {
               {items.length > 0 ? (
                 <NotebookGrid>{items.map((nb) => renderCard(nb, true))}</NotebookGrid>
               ) : (
-                <p className="flex flex-wrap items-center gap-x-2 text-small text-muted">
-                  Carpeta vacía ·
-                  <Button variant="ghost" onClick={() => openNewNotebook(folder.id)}>
+                <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-rule px-4 py-6 text-center">
+                  <p className="text-small text-muted">Esta carpeta está vacía.</p>
+                  <Button variant="secondary" leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(folder.id)}>
                     Crear el primer cuaderno
                   </Button>
-                </p>
+                </div>
               )}
             </div>
           ),
@@ -306,7 +305,7 @@ export function LibraryScreen() {
               <TextField
                 type="search"
                 label="Buscar cuadernos"
-                placeholder="Buscar por nombre, materia o carpeta"
+                placeholder="Buscar cuadernos"
                 leadingIcon={<Icon name="search" />}
                 value={query}
                 onChange={(e) => updateParams({q: e.target.value})}

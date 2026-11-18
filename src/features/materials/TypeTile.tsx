@@ -17,11 +17,11 @@ function TileBand({info}: {info: MaterialTypeInfo}) {
   return (
     <div
       aria-hidden
-      className="flex h-24 items-center justify-center rounded-t-[calc(var(--radius-card)-1px)] border-b border-rule"
+      className="flex h-16 items-center justify-center rounded-t-[calc(var(--radius-card)-1px)] border-b border-rule"
       style={{backgroundImage: info.gradient}}
     >
-      <span className="flex size-14 items-center justify-center rounded-control border border-ink/15 bg-surface text-strong shadow-[2px_2px_0_color-mix(in_oklab,var(--color-ink)_15%,transparent)]">
-        <Icon name={info.icon} weight="duotone" className="size-8" />
+      <span className="flex size-11 items-center justify-center rounded-control border border-ink/15 bg-surface text-strong shadow-[2px_2px_0_color-mix(in_oklab,var(--color-ink)_15%,transparent)]">
+        <Icon name={info.icon} weight="duotone" className="size-6" />
       </span>
     </div>
   );
@@ -48,7 +48,7 @@ export function TypeTile({info, disabled, describedBy, locked, onSelect}: TypeTi
     return (
       <Card flush aria-disabled="true" aria-describedby={describedBy} className="flex h-full cursor-not-allowed flex-col opacity-40">
         <TileBand info={info} />
-        <div className="p-4 sm:p-5">
+        <div className="p-3 sm:p-4">
           <h3 className="text-h3 text-strong">{title}</h3>
           <div className="mt-1">
             <TileDetails info={info} locked={locked} />

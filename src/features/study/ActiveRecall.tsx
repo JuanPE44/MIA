@@ -23,7 +23,7 @@ export function ActiveRecall() {
 
   if (activeNotebook.sources.length === 0) {
     return (
-      <Card className="w-full max-w-reading p-6">
+      <Card className="mx-auto w-full max-w-reading p-6">
         <EmptyState
           icon={<Icon name="brain" />}
           title="Necesitas al menos una fuente"
@@ -63,7 +63,7 @@ export function ActiveRecall() {
   };
 
   return (
-    <Card className="w-full max-w-reading space-y-6 p-6">
+    <Card className="mx-auto w-full max-w-reading space-y-6 p-6">
       <div className="space-y-1">
         <h2 className="text-h1 text-strong">Repaso activo</h2>
         <p className="text-small text-muted">

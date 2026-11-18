@@ -1,6 +1,6 @@
 import type {SourceItem} from '../../types';
 import {Button, InlineAlert, Menu, RevealItem, Skeleton, StatusBadge, Switch, type MenuItem} from '../../ui';
-import {SOURCE_TYPE_LABEL, TYPE_TILE, sourceMeta, typeIcon} from './sourceModel';
+import {TYPE_TILE, sourceMeta, typeIcon} from './sourceModel';
 import {Icon} from '../../ui/Icon';
 
 export type SourceStatus = 'analyzing' | 'ready' | 'error';
@@ -27,14 +27,8 @@ export function SourceRow({source, status, onToggle, onViewAnalysis, onAsk, onDe
   return (
     <RevealItem
       as="li"
-      className="relative rounded-card border border-rule bg-surface px-3 pb-2 pt-5 transition-[box-shadow,border-color,translate] duration-[120ms] hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset sm:px-4"
+      className="relative rounded-card border border-rule bg-surface px-3 py-2 transition-[box-shadow,border-color,translate] duration-[120ms] hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset sm:px-4"
     >
-      <span
-        aria-hidden
-        className="absolute left-3 top-1 font-mono text-caption uppercase tracking-widest text-muted sm:left-4"
-      >
-        {SOURCE_TYPE_LABEL[source.type]}
-      </span>
       <div className="flex min-h-16 items-center gap-3">
         <span
           aria-hidden

@@ -73,7 +73,7 @@ export function NotebookHeader() {
             icon={<Icon name="back" className="size-5" />}
             onClick={() => navigate(paths.notebooks())}
           />
-          <h1 className="min-w-0 flex-1 truncate text-h2 font-bold text-strong">{nb.title}</h1>
+          <h1 title={nb.title} className="min-w-0 flex-1 truncate text-h2 font-bold text-strong">{nb.title}</h1>
           <Menu label={`Opciones de ${nb.title}`} items={items} />
         </div>
         {dialog}
@@ -93,7 +93,7 @@ export function NotebookHeader() {
         </Link>
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="max-w-full truncate font-display text-[34px] font-bold leading-tight tracking-tight text-strong">{nb.title}</h1>
+            <h1 title={nb.title} className="max-w-full truncate font-display text-[34px] font-bold leading-tight tracking-tight text-strong">{nb.title}</h1>
             <p className="text-small text-muted">{nb.subject || 'General'}</p>
           </div>
           <Menu label={`Opciones de ${nb.title}`} items={items} />

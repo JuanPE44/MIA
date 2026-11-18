@@ -2,6 +2,7 @@ import {useId, useState} from 'react';
 import type {Notebook, SourceAnalysis} from '../../types';
 import {Button, Card, InlineAlert, Skeleton} from '../../ui';
 import {Icon} from '../../ui/Icon';
+import {formatShortDate} from '../../utils/date';
 
 const storageKey = (notebookId: string) => `mia_sources_summary_open_${notebookId}`;
 
@@ -87,10 +88,10 @@ function Summary({analysis}: {analysis: SourceAnalysis}) {
   );
 }
 
-/** Collapsible "Resumen del cuaderno" panel. Open by default with <= 3 sources; the choice is remembered. */
+/** Collapsible "Resumen del cuaderno" panel. Collapsed by default; the choice is remembered. */
 export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: NotebookSummaryPanelProps) {
   const bodyId = useId();
-  const [open, setOpen] = useState(() => readStored(notebook.id) ?? notebook.sources.length <= 3);
+  const [open, setOpen] = useState(() => readStored(notebook.id) ?? false);
   const analysis = notebook.analysis;
 
   const toggle = () => {
@@ -123,7 +124,7 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
         </Button>
         <Button
           size="sm"
-          variant="secondary"
+          variant={open || !analysis ? 'secondary' : 'ghost'}
           leadingIcon={<Icon name="refresh" className="size-4" />}
           loading={analyzing}
           onClick={onAnalyze}
@@ -152,7 +153,7 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
           ) : analysis ? (
             <>
               <Summary analysis={analysis} />
-              <p className="font-mono text-caption text-muted">Analizado: {analysis.analyzedAt}</p>
+              <p className="font-mono text-caption text-muted">Analizado: {formatShortDate(analysis.analyzedAt)}</p>
             </>
           ) : (
             <p className="text-body text-muted">

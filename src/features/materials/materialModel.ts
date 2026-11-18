@@ -25,6 +25,9 @@ export const MATERIAL_TYPES: MaterialTypeInfo[] = [
   {id: 'presentacion', label: 'Presentación', noun: 'presentación', description: 'Diapositivas con los conceptos', icon: 'presentation', gradient: 'var(--mia-grad-cyan)'},
 ];
 
+
+export {formatShortDate as formatMaterialDate} from '../../utils/date';
+
 export const materialTypeOf = (type: ArtifactType): MaterialTypeInfo =>
   MATERIAL_TYPES.find((t) => t.id === type) ?? MATERIAL_TYPES[0];
 

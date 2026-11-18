@@ -35,8 +35,8 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
         {dot ? <span aria-hidden className={cx('size-2.5 rounded-full border border-ink/40', dot)} /> : null}
         <span className="sr-only">{label}, </span>
         <span aria-hidden>{label}</span>
-        <span aria-hidden className={cx('font-mono text-small', isSelected ? 'text-highlight-ink' : 'text-muted')}>
-          {explicit ? countLabels.notebooks(count) : count}
+        <span aria-hidden className={cx('font-mono text-small', 'text-muted')}>
+          {count}
         </span>
         <span className="sr-only">{countLabels.notebooks(count)}</span>
       </button>
@@ -44,7 +44,7 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
   };
 
   const row: ReactNode[] = [
-    chip(null, 'Todas', totalCount, undefined, true),
+    chip(null, 'Todas', totalCount),
     ...folders.map((f) => chip(f.id, f.name, counts[f.id] ?? 0, tileClassFor(f.id))),
     chip(LOOSE_FILTER, 'Sin carpeta', looseCount),
   ];
@@ -52,7 +52,7 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
   return (
     <div className="flex flex-col gap-2">
       <p className="font-mono text-caption uppercase tracking-widest text-muted">Carpetas</p>
-      <div role="group" aria-label="Filtrar por carpeta" className="-my-2 flex gap-2 overflow-x-auto py-2 sm:flex-wrap">
+      <div role="group" aria-label="Filtrar por carpeta" className="-mx-4 flex gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0 [&::-webkit-scrollbar]:hidden">
         {row}
       </div>
     </div>

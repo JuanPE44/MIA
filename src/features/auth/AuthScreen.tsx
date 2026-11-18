@@ -21,6 +21,8 @@ const MODE_OPTIONS = [
 
 const MIN_PASSWORD = 6;
 
+const MOBILE_POINTS = ['Organiza tus fuentes', 'Chatea con citas', 'Estudia en serio'];
+
 const callbackUrl = () => `${window.location.origin}${paths.authCallback()}`;
 
 /** Maps Supabase auth errors to neutral Spanish copy. */
@@ -138,13 +140,24 @@ export function AuthScreen() {
       <main className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center gap-6 py-8">
         <Reveal className="flex flex-col gap-6" stagger={0.1}>
           <RevealItem>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex flex-col items-center justify-center gap-3 text-center">
               <AppMark size={40} />
-              <h1 className="font-display text-h1 text-strong">
-                Bienvenida a <Highlight trigger="mount" delay={0.5}>MIA</Highlight>
+              <h1 className="text-balance font-display text-h1 text-strong">
+                Te damos la bienvenida a <Highlight trigger="mount" delay={0.5}>MIA</Highlight>
               </h1>
             </div>
             <p className="mt-3 text-center text-body text-muted">Tu copiloto de estudio.</p>
+            <ul className="mt-4 flex flex-wrap justify-center gap-2 lg:hidden">
+              {MOBILE_POINTS.map((p) => (
+                <li
+                  key={p}
+                  className="inline-flex items-center gap-1.5 rounded-pill border border-rule bg-surface px-3 py-1 text-small text-default"
+                >
+                  <Icon name="check" className="size-3.5 text-primary-text" />
+                  {p}
+                </li>
+              ))}
+            </ul>
           </RevealItem>
 
           <RevealItem>

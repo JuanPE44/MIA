@@ -47,7 +47,7 @@ export function Composer({
         e.preventDefault();
         if (canSend) onSend();
       }}
-      className="rounded-card border border-rule bg-surface p-2 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
+      className="rounded-card border border-rule bg-surface p-2 transition-colors focus-within:border-strong focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-focus/20"
     >
       <div className="flex items-end gap-2">
         <div className="min-w-0 flex-1 [&_label]:sr-only [&_textarea]:border-0 [&_textarea]:bg-transparent [&_textarea]:outline-none">
@@ -72,13 +72,18 @@ export function Composer({
           disabled={!canSend}
         />
       </div>
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
-        <p id={blocked ? 'chat-composer-reason' : 'chat-composer-hint'} className="text-caption text-muted">
+      <div className="mt-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 max-sm:justify-end">
+        <p id={blocked ? 'chat-composer-reason' : 'chat-composer-hint'} className={`text-caption text-muted ${blocked ? '' : 'hidden sm:block pointer-coarse:hidden'}`}>
           {blocked ? disabledReason : 'Enter envía · Mayús+Enter agrega una línea'}
         </p>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={onOpenSources} className="font-mono text-muted!">
-            Fuentes activas: {activeSources} de {totalSources}
+        <div className="flex min-w-0 items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={onOpenSources} aria-label={`Fuentes activas: ${activeSources} de ${totalSources}. Gestionar fuentes`} className="font-mono text-muted!">
+            <span>
+              <span className="max-sm:hidden">Fuentes activas: </span>
+              {activeSources}
+              <span className="sm:hidden"> fuentes</span>
+              <span className="max-sm:hidden"> de {totalSources}</span>
+            </span>
           </Button>
           <Button
             variant="ghost"
@@ -87,7 +92,7 @@ export function Composer({
             onClick={onSearchWeb}
             className="text-muted!"
           >
-            Buscar en la web
+            <span className="max-sm:sr-only">Buscar en la web</span>
           </Button>
         </div>
       </div>

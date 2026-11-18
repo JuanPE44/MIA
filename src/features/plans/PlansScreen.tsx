@@ -4,7 +4,7 @@ import {PLAN_LABELS, PLAN_PRICES, PLAN_TIERS, type BillingPeriod, type PlanTier}
 import {Button, Card, Highlight, Page, PageHeader, SegmentedControl, StatusBadge, useToast} from '../../ui';
 import {Icon} from '../../ui/Icon';
 import {CheckoutDialog} from './CheckoutDialog';
-import {formatUsd, planHighlights, priceLabel} from './planCopy';
+import {formatUsd, planHighlights} from './planCopy';
 
 const PERIOD_OPTIONS = [
   {value: 'monthly' as const, label: 'Mensual'},
@@ -49,14 +49,18 @@ export function PlansScreen() {
         Cambia de plan cuando quieras. Por ahora el pago es simulado: no se cobra nada.
       </p>
 
-      <SegmentedControl<BillingPeriod>
-        aria-label="Facturación del plan Pro"
-        value={period}
-        onValueChange={setPeriod}
-        options={PERIOD_OPTIONS}
-      />
+      <div className="flex flex-wrap items-center gap-3">
+        <SegmentedControl<BillingPeriod>
+          aria-label="Facturación del plan Pro"
+          value={period}
+          onValueChange={setPeriod}
+          options={PERIOD_OPTIONS}
+          className="self-start"
+        />
+        <span className="text-small text-muted">Aplica al plan Pro</span>
+      </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid items-stretch gap-4 lg:grid-cols-3">
         {PLAN_TIERS.map((tier) => {
           const current = tier === plan;
           const perMonth = tier === 'pro' && period === 'annual' ? PLAN_PRICES.pro.annual / 12 : null;
@@ -64,10 +68,21 @@ export function PlansScreen() {
             <Card key={tier} selected={current} className="flex flex-col gap-4" aria-label={`Plan ${PLAN_LABELS[tier]}`}>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="font-display text-h2 text-strong">{PLAN_LABELS[tier]}</h2>
-                {current ? <StatusBadge variant="success">Plan actual</StatusBadge> : null}
+                {current ? (
+                  <StatusBadge variant="success">Plan actual</StatusBadge>
+                ) : tier === 'pro' ? (
+                  <StatusBadge variant="info">Más completo</StatusBadge>
+                ) : null}
               </div>
               <div>
-                <p className="font-mono text-display font-semibold text-strong">{priceLabel(tier, period)}</p>
+                <p className="flex flex-wrap items-baseline gap-x-2 whitespace-nowrap">
+                  <span className="font-mono text-display font-semibold text-strong tabular-nums">
+                    {tier === 'free' ? '0 US$' : formatUsd(PLAN_PRICES[tier][tier === 'pro' ? period : 'monthly'])}
+                  </span>
+                  <span className="font-mono text-small text-muted">
+                    {tier === 'free' ? 'para siempre' : tier === 'pro' && period === 'annual' ? '/ año' : '/ mes'}
+                  </span>
+                </p>
                 {perMonth ? <p className="text-small text-muted">Equivale a {formatUsd(perMonth)} al mes</p> : null}
               </div>
               <p className="text-body text-muted">{TAGLINES[tier]}</p>
@@ -80,13 +95,13 @@ export function PlansScreen() {
                 ))}
               </ul>
               <Button
-                variant={current ? 'secondary' : 'primary'}
+                variant={current || tier === 'free' ? 'secondary' : 'primary'}
                 fullWidth
                 disabled={current}
                 loading={switching === tier}
                 onClick={() => void choose(tier)}
               >
-                {current ? 'Tu plan actual' : 'Obtener plan'}
+                {current ? 'Tu plan actual' : tier === 'free' ? 'Cambiar a Gratis' : `Elegir ${PLAN_LABELS[tier]}`}
               </Button>
             </Card>
           );

@@ -3,7 +3,7 @@ import {AnimatePresence, motion, useReducedMotion} from 'motion/react';
 import type {StudyArtifact} from '../../types';
 import {Button, Card, InteractiveCard, Menu, Skeleton, type MenuItem} from '../../ui';
 import {paths} from '../../app/routes';
-import {materialTypeOf, plural} from './materialModel';
+import {formatMaterialDate, materialTypeOf, plural} from './materialModel';
 import type {MaterialJob} from './MaterialsJobs';
 import {Icon} from '../../ui/Icon';
 
@@ -36,14 +36,14 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
   ];
 
   return (
-    <div ref={wrapperRef} className="group/stack relative isolate h-full pb-2 pr-2">
+    <div ref={wrapperRef} className="group/stack relative isolate h-full pb-2 pr-3">
       <span
         aria-hidden
-        className="absolute inset-0 -z-10 translate-x-2 translate-y-2 rotate-1 rounded-card border border-rule bg-subtle transition-transform duration-[120ms] group-hover/stack:translate-x-2.5 group-hover/stack:rotate-2 motion-reduce:transition-none"
+        className="absolute inset-y-0 left-0 right-2 -z-10 translate-x-2 translate-y-2 rotate-1 rounded-card border border-rule bg-subtle transition-transform duration-[120ms] group-hover/stack:rotate-2 motion-reduce:transition-none"
       />
       <span
         aria-hidden
-        className="absolute inset-0 -z-10 translate-x-1 translate-y-1 -rotate-1 rounded-card border border-rule bg-surface transition-transform duration-[120ms] group-hover/stack:translate-y-1.5 group-hover/stack:-rotate-2 motion-reduce:transition-none"
+        className="absolute inset-y-0 left-0 right-2 -z-10 translate-x-1 translate-y-1 -rotate-1 rounded-card border border-rule bg-surface transition-transform duration-[120ms] group-hover/stack:-rotate-2 motion-reduce:transition-none"
       />
       <InteractiveCard
         className="h-full"
@@ -63,7 +63,7 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
         actions={<Menu label={`Más opciones de ${artifact.title}`} items={items} contextTargetRef={wrapperRef} />}
       >
         <p className="font-mono text-caption text-muted">
-          {artifact.createdAt} · {plural(sources, 'fuente', 'fuentes')}
+          {formatMaterialDate(artifact.createdAt)} · {plural(sources, 'fuente', 'fuentes')}
         </p>
       </InteractiveCard>
     </div>

@@ -23,9 +23,9 @@ export function InkUnderline({className, delay = 0.2}: InkMarkProps) {
         strokeWidth="2.4"
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
-        initial={reduced ? false : {pathLength: 0}}
-        animate={{pathLength: 1}}
-        transition={{duration: 0.7, delay, ease: EASE}}
+        initial={reduced ? false : {pathLength: 0, opacity: 0}}
+        animate={{pathLength: 1, opacity: 1}}
+        transition={{duration: 0.7, delay, ease: EASE, opacity: {duration: 0.01, delay}}}
       />
     </svg>
   );

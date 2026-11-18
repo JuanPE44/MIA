@@ -51,6 +51,7 @@ export function ThreadSwitcher({threads, activeThread, onSelect, onNewChat, onRe
     <div ref={rootRef} className={`relative flex items-center gap-1 ${fill ? 'w-full' : ''}`}>
       <Button
         variant="ghost"
+        title={activeThread.title}
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
         aria-label={`Cambiar de chat. Chat actual: ${activeThread.title}`}

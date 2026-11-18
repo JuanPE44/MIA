@@ -89,6 +89,8 @@ export function ChatScreen() {
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
+      // Opening an existing conversation: jump to the latest message.
+      if (messages.length > 0) requestAnimationFrame(() => endRef.current?.scrollIntoView({block: 'end', behavior: 'auto'}));
       return;
     }
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -361,15 +363,15 @@ export function ChatScreen() {
 
       <div className="flex flex-col">
       {/* Conversation */}
-      <div className="flex w-full min-w-0 flex-1 flex-col">
+      <div className="mx-auto flex w-full max-w-[47.5rem] min-w-0 flex-1 flex-col">
         <h1 className="sr-only">Preguntar: {currentActiveThread.title}</h1>
         <div className="min-h-[40vh] flex-1">
           {body}
           <div ref={endRef} className="scroll-mb-48" />
         </div>
 
-        <div className="sticky bottom-0 z-10 bg-page pb-[var(--mia-bottom-bar,0px)] pt-2">
-          <div className="max-w-reading pb-2">
+        <div className="sticky bottom-0 z-10 bg-page pb-[var(--mia-bottom-bar,0px)] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-page before:to-transparent">
+          <div className="pb-2">
             <Composer
               value={input}
               onChange={setInput}

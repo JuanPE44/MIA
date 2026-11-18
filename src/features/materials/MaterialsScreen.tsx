@@ -84,7 +84,7 @@ export function MaterialsScreen() {
             </InlineAlert>
           </div>
         ) : null}
-        <Reveal className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Reveal className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&>*]:h-full">
           {MATERIAL_TYPES.map((info) => (
             <RevealItem key={info.id}>
               <TypeTile

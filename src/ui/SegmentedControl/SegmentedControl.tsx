@@ -66,7 +66,7 @@ export function SegmentedControl<T extends string>(props: SegmentedControlProps<
       aria-labelledby={'aria-labelledby' in props ? props['aria-labelledby'] : undefined}
       onKeyDown={onKeyDown}
       className={cx(
-        'inline-flex gap-1 rounded-pill bg-subtle p-1',
+        'inline-flex max-w-full gap-1 self-start overflow-x-auto rounded-pill bg-subtle p-1',
         fullWidth && 'flex w-full [&>button]:flex-1',
         className,
       )}
@@ -87,7 +87,7 @@ export function SegmentedControl<T extends string>(props: SegmentedControlProps<
             tabIndex={o.value === tabStop ? 0 : -1}
             onClick={() => onValueChange(o.value)}
             className={cx(
-              'inline-flex h-control-sm items-center justify-center gap-2 rounded-pill px-3 text-label',
+              'inline-flex h-control-sm shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-pill px-2.5 text-label sm:px-3',
               'transition-colors duration-[120ms]',
               HIT_44,
               selected ? 'bg-surface text-strong shadow-elevation-1' : 'text-muted hover:text-strong',

@@ -1,4 +1,6 @@
 import {useId, useState} from 'react';
+import {useAppState} from '../../app/AppStateContext';
+import {useDailyGoal} from '../progress/dailyGoal';
 import {Button, Card, InlineAlert, SegmentedControl, Switch} from '../../ui';
 import {useStudySession, type StudySettings} from './StudySessionProvider';
 import {Icon} from '../../ui/Icon';
@@ -9,13 +11,17 @@ const LONG_BREAK_OPTIONS = [15, 20, 25, 30].map((m) => ({value: String(m), label
 /** S7a: one-step session setup. */
 export function SessionSetup() {
   const {settings, setSettings, start} = useStudySession();
+  const {stats} = useAppState();
+  const [dailyGoal] = useDailyGoal();
+  const pct = Math.min(100, Math.round((stats.focusMinutesToday / Math.max(1, dailyGoal)) * 100));
   const [explainOpen, setExplainOpen] = useState(false);
   const studyId = useId();
   const longId = useId();
   const explainId = useId();
 
   return (
-    <Card className="w-full max-w-narrow space-y-6 p-6">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]">
+    <Card className="w-full space-y-6 p-6">
       <h2 className="text-h1 text-strong">Sesión de estudio</h2>
 
       <div className="space-y-2">
@@ -60,6 +66,7 @@ export function SessionSetup() {
         <Button
           variant="ghost"
           size="sm"
+          className="-ml-2 self-start"
           aria-expanded={explainOpen}
           aria-controls={explainId}
           onClick={() => setExplainOpen((o) => !o)}
@@ -81,5 +88,33 @@ export function SessionSetup() {
         Empezar sesión
       </Button>
     </Card>
+
+    <aside aria-label="Resumen de la sesión" className="space-y-4">
+      <Card className="space-y-3 p-5">
+        <h3 className="font-mono text-caption uppercase tracking-widest text-muted">Tu día</h3>
+        <p className="text-h2 text-strong">
+          {stats.focusMinutesToday} <span className="text-body text-muted">/ {dailyGoal} min de enfoque</span>
+        </p>
+        <div
+          role="progressbar"
+          aria-label="Meta diaria de enfoque"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={pct}
+          className="h-2 w-full overflow-hidden rounded-pill border border-rule bg-subtle"
+        >
+          <div className="h-full bg-primary" style={{width: `${pct}%`}} />
+        </div>
+      </Card>
+      <Card className="space-y-3 p-5">
+        <h3 className="font-mono text-caption uppercase tracking-widest text-muted">Qué pasa en la sesión</h3>
+        <ol className="list-decimal space-y-2 pl-5 text-small text-default">
+          <li>Estudias {settings.studyMinutes} min sin distracciones.</li>
+          <li>Descanso corto de 5 min; tras 4 ciclos, descanso largo de {settings.longBreakMinutes} min.</li>
+          <li>Al terminar ves un resumen y sumas minutos a tu meta diaria.</li>
+        </ol>
+      </Card>
+    </aside>
+    </div>
   );
 }

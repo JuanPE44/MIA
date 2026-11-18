@@ -49,26 +49,20 @@ export function NotebookCard({notebook, folder, showFolder = true, onOpen, onMov
           href={paths.notebookSegment(notebook.id, 'CHAT')}
           onClick={handleClick}
           title={
-            <span className="flex flex-col gap-3">
+            <span className="flex items-start gap-3 pr-8">
               <span
                 aria-hidden
-                className={`relative flex h-24 items-end overflow-hidden rounded-control border border-rule p-3 ${tileClassFor(notebook.id)}`}
+                className={`flex size-10 shrink-0 items-center justify-center rounded-control border border-rule ${tileClassFor(notebook.id)}`}
               >
-                <span
-                  className="pointer-events-none absolute inset-0 text-ink opacity-[0.08]"
-                  style={{backgroundImage: 'radial-gradient(currentColor 1px, transparent 1.5px)', backgroundSize: '14px 14px'}}
-                />
-                <span className="relative flex size-12 items-center justify-center rounded-control border border-rule bg-surface shadow-elevation-1">
-                  <Icon name={resolveItemIcon(notebook.icon, 'notebook')} weight="duotone" className="size-7 text-ink" />
-                </span>
+                <Icon name={resolveItemIcon(notebook.icon, 'notebook')} weight="duotone" className="size-5 text-ink" />
               </span>
-              <span className="min-w-0 line-clamp-2 break-words font-display" title={notebook.title}>
+              <span className="min-w-0 line-clamp-2 break-words pt-0.5 font-display" title={notebook.title}>
                 {notebook.title}
               </span>
             </span>
           }
           actions={
-            <span className="mr-2 mt-2 inline-flex sm:mr-3 sm:mt-3">
+            <span className="mr-1 mt-1 inline-flex sm:mr-2 sm:mt-2">
               <Menu
                 label={`Más opciones de ${notebook.title}`}
                 items={items}

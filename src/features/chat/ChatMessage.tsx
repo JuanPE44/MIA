@@ -73,7 +73,7 @@ function useWordReveal(text: string, enabled: boolean, onDone?: () => void): {sh
 export function UserMessage({message}: {message: ChatMessageData}) {
   return (
     <div className="flex justify-end">
-      <p className="max-w-narrow whitespace-pre-wrap break-words rounded-card bg-subtle px-4 py-2 text-body text-default">
+      <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-card bg-subtle px-4 py-2 text-body text-default">
         {message.text}
       </p>
     </div>
@@ -159,7 +159,7 @@ export function AssistantMessage({
         n={index}
         onClick={() => onOpenChunk(chunk)}
         aria-label={`Ver fuente ${index}: ${chunk.sourceTitle}`}
-        className="mx-0.5 pointer-coarse:min-h-6"
+        className="mx-0.5 cursor-pointer hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus pointer-coarse:min-h-6"
       />
     );
   };
@@ -167,7 +167,7 @@ export function AssistantMessage({
   const readingClass = 'font-sans text-[1.0625rem] leading-[1.75rem] text-default';
 
   return (
-    <div className="group/msg lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-8">
+    <div className="group/msg relative">
     <div className="min-w-0">
       <div className="min-w-0">
         <MiaLabel />
@@ -200,7 +200,7 @@ export function AssistantMessage({
                     title={chunk.sourceTitle}
                     onClick={() => onOpenChunk(chunk)}
                     aria-label={`Ver fuente ${chunk.index}: ${chunk.sourceTitle}, ${chunk.location}`}
-                    className="pointer-coarse:min-h-6 pointer-coarse:min-w-6"
+                    className="cursor-pointer transition-transform hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus pointer-coarse:min-h-6 pointer-coarse:min-w-6"
                   />
                 </li>
               ))}
@@ -315,7 +315,7 @@ export function AssistantMessage({
       </div>
     </div>
     {chunks.length > 0 ? (
-      <aside aria-label="Notas al margen" className={`mt-3 hidden space-y-3 lg:block ${done ? '' : 'invisible'}`}>
+      <aside aria-label="Notas al margen" className={`absolute left-full top-0 ml-8 hidden w-60 space-y-3 xl:block ${done ? '' : 'invisible'}`}>
         {chunks.map((chunk) => (
           <button
             key={chunk.index}

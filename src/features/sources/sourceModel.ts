@@ -10,6 +10,8 @@ export const LARGE_FILE_BYTES = 2 * 1024 * 1024;
 export const MAX_FILE_BYTES = 3 * 1024 * 1024;
 
 export const FILE_ACCEPT = 'application/pdf,image/*,audio/*,video/*,text/*,.md,.csv,.json,.txt';
+import {formatShortDate} from '../../utils/date';
+
 export const ACCEPTED_LABEL = 'PDF, imágenes, audio, video o texto (.txt, .md, .csv, .json)';
 export const MAX_SIZE_LABEL = 'Máximo 3 MB';
 
@@ -66,7 +68,7 @@ export function sourceMeta(source: SourceItem): string {
   const parts = [SOURCE_TYPE_LABEL[source.type]];
   if (source.fileSize) parts.push(source.fileSize);
   else if (source.wordCount) parts.push(`${source.wordCount} palabras`);
-  if (source.uploadDate) parts.push(source.uploadDate);
+  if (source.uploadDate) parts.push(formatShortDate(source.uploadDate));
   return parts.join(' · ');
 }
 
