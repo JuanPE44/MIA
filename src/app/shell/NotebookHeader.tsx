@@ -5,6 +5,7 @@ import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {useAppState} from '../AppStateContext';
 import {paths} from '../routes';
 import {MoveNotebookDialog} from '../../features/library/MoveNotebookDialog';
+import {RenameNotebookDialog} from '../../features/library/RenameNotebookDialog';
 import {Icon} from '../../ui/Icon';
 
 /**
@@ -15,9 +16,10 @@ import {Icon} from '../../ui/Icon';
 export function NotebookHeader() {
   const navigate = useNavigate();
   const phone = useIsPhone();
-  const {activeNotebook, folders, handleDeleteNotebook, handleMoveNotebook, openAddSource} = useAppState();
+  const {activeNotebook, folders, handleDeleteNotebook, handleMoveNotebook, handleRenameNotebook, openAddSource} = useAppState();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [moving, setMoving] = useState(false);
+  const [renaming, setRenaming] = useState(false);
 
   if (!activeNotebook) return null;
   const nb = activeNotebook;
@@ -27,14 +29,20 @@ export function NotebookHeader() {
 
   const items: MenuItem[] = [
     {id: 'add-source', label: 'Añadir fuente', icon: <Icon name="add" />, onSelect: addSource},
-    // TODO: rename needs a notebook-rename action and dialog; neither exists yet.
-    {id: 'rename', label: 'Renombrar (próximamente)', onSelect: () => {}, disabled: true},
+    {id: 'rename', label: 'Renombrar', onSelect: () => setRenaming(true)},
     {id: 'move', label: 'Mover a…', onSelect: () => setMoving(true)},
     {id: 'delete', label: 'Eliminar', onSelect: () => setConfirmingDelete(true), danger: true},
   ];
 
   const dialog = (
     <>
+    {renaming ? (
+      <RenameNotebookDialog
+        notebook={nb}
+        onClose={() => setRenaming(false)}
+        onRename={(title) => handleRenameNotebook(nb.id, title)}
+      />
+    ) : null}
     {moving ? (
       <MoveNotebookDialog
         notebook={nb}

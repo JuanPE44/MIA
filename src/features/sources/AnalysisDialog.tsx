@@ -1,5 +1,5 @@
 import type {SourceItem} from '../../types';
-import {Button, Dialog, InlineAlert, SimulatedBadge} from '../../ui';
+import {Button, Dialog, InlineAlert} from '../../ui';
 import {sourceMeta} from './sourceModel';
 import {Icon} from '../../ui/Icon';
 
@@ -58,7 +58,6 @@ export function AnalysisDialog({source, onClose, onAsk}: AnalysisDialogProps) {
             <section className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <h3 className="text-h3 text-strong">Análisis</h3>
-                <SimulatedBadge />
               </div>
               {source.analysisSummary ? <p className="text-body text-default">{source.analysisSummary}</p> : null}
               {source.processedAuthors && source.processedAuthors.length > 0 ? (

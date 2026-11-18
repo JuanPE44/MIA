@@ -1,7 +1,7 @@
 import {apiFetch} from '../../services/api';
 import {useEffect, useRef, useState, type KeyboardEvent} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Card, Chip, Highlight, IconButton, Page, PageHeader, Reveal, RevealItem, SimulatedBadge, Textarea} from '../../ui';
+import {Button, Card, Chip, Highlight, IconButton, Page, PageHeader, Reveal, RevealItem, Textarea} from '../../ui';
 import {ErrorMessage, PendingMessage, UserMessage} from '../chat/ChatMessage';
 import {Markdown} from '../chat/markdown';
 import {
@@ -30,7 +30,6 @@ function AssistantReply({message}: {message: HelpMessage}) {
       <div className="min-w-0 flex-1 space-y-3">
         <Markdown text={message.text} className="text-body text-default" />
         {message.request ? <RequestCard request={message.request} /> : null}
-        <SimulatedBadge />
       </div>
     </div>
   );

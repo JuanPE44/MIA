@@ -125,9 +125,16 @@ export function parseRoute(pathname: string): AppRoute {
 /** Minimal 404 (plain markup on purpose; restyled with the new shell). */
 export function NotFound() {
   return (
-    <div>
-      <h1>Esta página no existe</h1>
-      <Link to={paths.notebooks()} className="underline">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-4 py-16 text-center">
+      <p className="font-mono text-caption text-muted">Error 404</p>
+      <h1 className="font-display text-h1 text-strong">Esta página no existe</h1>
+      <p className="text-body text-default">
+        El enlace que abriste no existe o el contenido ya no está disponible.
+      </p>
+      <Link
+        to={paths.notebooks()}
+        className="inline-flex items-center rounded-small bg-primary px-4 py-2 text-body font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      >
         Ir a Mis cuadernos
       </Link>
     </div>

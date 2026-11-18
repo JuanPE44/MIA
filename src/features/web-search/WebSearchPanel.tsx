@@ -7,7 +7,7 @@ import {
   Reveal,
   RevealItem,
   SegmentedControl,
-  SimulatedBadge,
+ 
   Spinner,
   StatusBadge,
   TextField,
@@ -154,7 +154,6 @@ function WebSearchPanelContent({initialQuery}: WebSearchPanelProps) {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="min-w-0 flex-1 font-display text-h3 text-strong">{turn.query}</p>
                     {verdict ? <StatusBadge variant={verdict.variant}>{verdict.label}</StatusBadge> : null}
-                    {turn.status === 'done' ? <SimulatedBadge /> : null}
                   </div>
 
                   {turn.status === 'loading' ? (

@@ -5,6 +5,7 @@ import {
   consumeQuota,
   featureLockedResponse,
   getSupabaseAdmin,
+  isProductionRuntime,
   quotaExceededResponse,
   requireAuth,
   requireFeature,
@@ -24,15 +25,17 @@ dotenv.config();
 /** Express app with every API route. No listen, no Vite: see server.ts (local) and api/index.ts (Vercel). */
 export const app = express();
 
-app.use(express.json({ limit: '20mb' }));
+app.use(express.json({ limit: '4.5mb' }));
 
 // Every API route requires a valid session (or the dev fallback without Supabase).
 app.use('/api', requireAuth);
 
 // Shared server-side Gemini client
+// Real AI only when explicitly enabled (AI_SIMULATED=false) and a key is present.
 const apiKey = process.env.GEMINI_API_KEY;
+const useRealAi = process.env.AI_SIMULATED === 'false' && Boolean(apiKey);
 let ai: GoogleGenAI | null = null;
-if (apiKey) {
+if (useRealAi) {
   ai = new GoogleGenAI({
     apiKey,
     httpOptions: {
@@ -42,6 +45,7 @@ if (apiKey) {
     }
   });
 }
+console.log(`[ai] mode: ${useRealAi ? 'real (Gemini)' : 'simulated (no Gemini calls)'}`);
 
 // -------------------------------------------------------------
 // POST /api/plan (SIMULATED CHECKOUT: no real payment is processed)
@@ -52,9 +56,15 @@ app.post('/api/plan', async (req, res) => {
     return res.status(400).json({error: 'Plan no válido.'});
   }
   const supabase = getSupabaseAdmin();
-  if (!supabase || !req.user || req.user.id === 'dev-anonymous') {
+  if (!supabase) {
+    if (isProductionRuntime()) {
+      return res.status(503).json({error: 'AUTH_NOT_CONFIGURED'});
+    }
     // Dev fallback without Supabase: nothing to persist.
     return res.json({plan});
+  }
+  if (!req.user || req.user.id === 'dev-anonymous') {
+    return res.status(401).json({error: 'Inicia sesión para continuar.', code: 'UNAUTHENTICATED'});
   }
   const {error} = await supabase.from('profiles').update({plan}).eq('id', req.user.id);
   if (error) {

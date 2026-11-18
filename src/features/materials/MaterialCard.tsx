@@ -1,6 +1,6 @@
 import {useRef, type MouseEvent} from 'react';
 import type {StudyArtifact} from '../../types';
-import {Button, Card, InteractiveCard, Menu, SimulatedBadge, Spinner, type MenuItem} from '../../ui';
+import {Button, Card, InteractiveCard, Menu, Spinner, type MenuItem} from '../../ui';
 import {paths} from '../../app/routes';
 import {materialTypeOf, plural} from './materialModel';
 import type {MaterialJob} from './MaterialsJobs';
@@ -64,7 +64,6 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
         <p className="font-mono text-caption text-muted">
           {artifact.createdAt} · {plural(sources, 'fuente', 'fuentes')}
         </p>
-        <SimulatedBadge className="mt-2" />
       </InteractiveCard>
     </div>
   );

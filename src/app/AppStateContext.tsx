@@ -499,6 +499,12 @@ function useAppStateValue() {
     );
   };
 
+  const handleRenameNotebook = (notebookId: string, title: string) => {
+    const clean = title.trim();
+    if (!clean) return;
+    setNotebooks((prev) => prev.map((nb) => (nb.id === notebookId ? { ...nb, title: clean } : nb)));
+  };
+
   // Content mutation inside active notebook
   const handleUpdateActiveNotebook = (updated: Notebook) => {
     setNotebooks((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
@@ -744,31 +750,6 @@ function useAppStateValue() {
     if (location.pathname !== target) navigate(target);
   };
 
-  const handleDeleteChatThread = (threadId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!activeNotebook) return;
-    const threads = getNotebookThreads(activeNotebook);
-    if (threads.length <= 1) {
-      alert('Cada cuaderno debe tener al menos un chat activo.');
-      return;
-    }
-
-    if (confirm('¿Deseas eliminar este hilo de chat? (Las fuentes y artefactos permanecerán intactos).')) {
-      const remainingThreads = threads.filter(t => t.id !== threadId);
-      const nextActiveId = remainingThreads[0]?.id;
-      const updatedNotebook: Notebook = {
-        ...activeNotebook,
-        chatThreads: remainingThreads,
-        activeChatThreadId: nextActiveId
-      };
-      handleUpdateActiveNotebook(updatedNotebook);
-      // Leave `/chat/<deletedId>` so it does not turn into Not found.
-      if (routeThreadId === threadId && nextActiveId) {
-        navigate(paths.chatThread(activeNotebook.id, nextActiveId), { replace: true });
-      }
-    }
-  };
-
   /**
    * Chat screen deletion (the confirmation lives in the UI, no native dialogs).
    * Deleting the last thread replaces it with a new empty "Chat 1" (UX-30).
@@ -926,6 +907,7 @@ function useAppStateValue() {
     handleDeleteNotebook,
     handleRestoreNotebook,
     handleMoveNotebook,
+    handleRenameNotebook,
     // Notebook content
     handleUpdateActiveNotebook,
     handleAddSource,
@@ -952,7 +934,6 @@ function useAppStateValue() {
     currentActiveThread,
     handleStartNewChat,
     handleSelectChatThread,
-    handleDeleteChatThread,
     handleRemoveChatThread,
     handleRenameChatThread,
     handleUpdateThreadMessages,

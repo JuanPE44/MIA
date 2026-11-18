@@ -1,6 +1,5 @@
 import {useState, type ReactNode} from 'react';
-import {AppMark, Button, CitationChip, IconButton, InlineAlert, SimulatedBadge, Spinner, Textarea} from '../../ui';
-import {AI_SIMULATED} from '../../ui';
+import {AppMark, Button, CitationChip, IconButton, InlineAlert, Spinner, Textarea} from '../../ui';
 import type {ChatMessage as ChatMessageData, CitationChunk} from '../../types';
 import {Markdown} from './markdown';
 import {Icon} from '../../ui/Icon';
@@ -174,7 +173,6 @@ export function AssistantMessage({
             commenting || message.feedback ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          {AI_SIMULATED ? <SimulatedBadge /> : null}
           {showFeedback ? (
             <>
               <IconButton

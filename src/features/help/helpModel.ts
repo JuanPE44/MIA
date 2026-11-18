@@ -38,10 +38,6 @@ export const FAQ: Array<{q: string; a: string}> = [
     a: 'Solo en este navegador. Si borras los datos del sitio o cambias de navegador, no se recuperan.',
   },
   {
-    q: '¿Qué significa "Simulado"?',
-    a: 'Que la respuesta es de ejemplo: la IA todavía no está conectada.',
-  },
-  {
     q: '¿Qué hace el modo blindado?',
     a: 'Durante una sesión de estudio te avisa y cuenta cada vez que sales de la pestaña. Puedes salir cuando quieras.',
   },

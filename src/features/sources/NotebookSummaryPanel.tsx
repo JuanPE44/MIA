@@ -1,6 +1,6 @@
 import {useId, useState} from 'react';
 import type {Notebook, SourceAnalysis} from '../../types';
-import {Button, Card, InlineAlert, SimulatedBadge} from '../../ui';
+import {Button, Card, InlineAlert} from '../../ui';
 import {Icon} from '../../ui/Icon';
 
 const storageKey = (notebookId: string) => `mia_sources_summary_open_${notebookId}`;
@@ -104,7 +104,6 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
         >
           Resumen del cuaderno
         </Button>
-        {analysis ? <SimulatedBadge /> : null}
         <Button
           size="sm"
           variant="secondary"

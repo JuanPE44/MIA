@@ -56,7 +56,6 @@ export default function App() {
     currentActiveThread,
     handleStartNewChat,
     handleSelectChatThread,
-    handleDeleteChatThread,
     handleRenameChatThread,
     handleUpdateThreadMessages,
   } = useAppState();

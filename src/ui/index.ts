@@ -32,3 +32,4 @@ export * from './RadioGroup';
 export * from './SelectableCard';
 export * from './Page';
 export * from './AppMark';
+export * from './ErrorBoundary';

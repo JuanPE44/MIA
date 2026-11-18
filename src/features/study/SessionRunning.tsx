@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
-import {Button, Card, ConfirmDialog, Dialog, InlineAlert, SimulatedBadge, Spinner, StatusBadge} from '../../ui';
+import {Button, Card, ConfirmDialog, Dialog, InlineAlert, Spinner, StatusBadge} from '../../ui';
 import {buildStages, currentStage, type SessionState, type Stage} from './sessionMachine';
 import {requestChallenge, type RecallChallenge} from './recallApi';
 import {useStudySession, type LeaveReason} from './StudySessionProvider';
@@ -244,7 +244,6 @@ function MicroQuestion() {
     <Card className="space-y-3 bg-surface p-5">
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-display text-h2 text-strong">Micro-pregunta de descanso</h3>
-        <SimulatedBadge />
       </div>
       {!hasSources ? (
         <p className="text-small text-muted">Agrega una fuente al cuaderno para tener micro-preguntas en los descansos.</p>

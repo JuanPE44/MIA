@@ -3,7 +3,7 @@ import {useLocation, useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
 import type {StudyArtifact} from '../../types';
-import {Button, Dialog, IconButton, Menu, SegmentedControl, SimulatedBadge, Textarea, useToast} from '../../ui';
+import {Button, Dialog, IconButton, Menu, SegmentedControl, Textarea, useToast} from '../../ui';
 import {useIsPhone} from '../../ui/internal/useIsPhone';
 import {hasInteractiveMode} from './materialModel';
 import {refineMaterial} from './materialsApi';
@@ -165,7 +165,6 @@ export function MaterialViewer() {
       <header className="flex min-h-14 flex-wrap items-center gap-2 border-b border-rule bg-surface px-2 sm:px-4">
         <IconButton aria-label="Volver a materiales" icon={<Icon name="chevron-left" className="size-5" />} onClick={closeViewer} />
         <h1 className="min-w-0 flex-1 truncate font-display text-h2 text-strong">{artifact.title}</h1>
-        <SimulatedBadge />
         {interactive ? (
           <SegmentedControl
             aria-label="Modo de lectura"

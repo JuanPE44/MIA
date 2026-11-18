@@ -40,6 +40,9 @@ export function getSupabaseAdmin(): SupabaseClient | null {
   return admin;
 }
 
+/** True on production / Vercel, where the anonymous dev fallback must never be used. */
+export const isProductionRuntime = () => process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+
 let warnedNoSupabase = false;
 
 const DEV_USER: AuthUser = {id: 'dev-anonymous', email: null, plan: 'pro'};
@@ -52,6 +55,9 @@ const DEV_USER: AuthUser = {id: 'dev-anonymous', email: null, plan: 'pro'};
 export const requireAuth: RequestHandler = async (req, res, next) => {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
+    if (isProductionRuntime()) {
+      return res.status(503).json({error: 'AUTH_NOT_CONFIGURED'});
+    }
     if (!warnedNoSupabase) {
       warnedNoSupabase = true;
       console.warn(

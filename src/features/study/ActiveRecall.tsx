@@ -2,7 +2,7 @@ import {useRef, useState} from 'react';
 import {useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import {paths} from '../../app/routes';
-import {Button, Card, EmptyState, InlineAlert, SimulatedBadge, Textarea} from '../../ui';
+import {Button, Card, EmptyState, InlineAlert, Textarea} from '../../ui';
 import {requestChallenge, type RecallChallenge} from './recallApi';
 import {Icon} from '../../ui/Icon';
 
@@ -89,7 +89,6 @@ export function ActiveRecall() {
       {challenge && (phase === 'question' || phase === 'compared') ? (
         <div className="space-y-5">
           <div className="space-y-2">
-            <SimulatedBadge />
             <h3 ref={questionRef} tabIndex={-1} className="font-display text-h1 text-strong outline-none">
               {challenge.challengeQuestion}
             </h3>
