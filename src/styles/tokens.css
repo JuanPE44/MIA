@@ -33,12 +33,12 @@
   --mia-text-on-primary: #FFFFFF;
 
   /* Borders (§2.1 border.*) */
-  --mia-border-hairline: #E4DCCB;
+  --mia-border-hairline: #D9CFBA;
   --mia-border-control: #9A917F;
 
   /* Ink + rule (editorial layer) */
   --mia-ink: #1B1A17;
-  --mia-rule: #E4DCCB;
+  --mia-rule: #D9CFBA;
 
   /* Highlighter: ONLY a background behind dark text, never a text color */
   --mia-highlight: #E8FF5A;
@@ -74,8 +74,19 @@
   --mia-tile-violeta: #E5DDF1;
   --mia-tile-gris: #EAE3D5;
 
+  /* Material type gradients ("Crear material" tiles) — 8 hues ~45deg apart */
+  --mia-grad-amber: linear-gradient(135deg, #FFE6A3, #FFC27A);
+  --mia-grad-lime: linear-gradient(135deg, #E6F79A, #B5E58F);
+  --mia-grad-blue: linear-gradient(135deg, #C4D5FF, #9FB8FA);
+  --mia-grad-violet: linear-gradient(135deg, #DDCBFF, #BBA4F5);
+  --mia-grad-coral: linear-gradient(135deg, #FFC9BD, #FF9C94);
+  --mia-grad-magenta: linear-gradient(135deg, #FFCBEA, #F29FD2);
+  --mia-grad-teal: linear-gradient(135deg, #B5F0DE, #86D9C2);
+  --mia-grad-cyan: linear-gradient(135deg, #BDF0FF, #8FD6F0);
+
   /* Paper texture (page background only) */
-  --mia-paper-dot: rgb(27 26 23 / 4%);
+  --mia-paper-dot: rgb(27 26 23 / 7%);
+  --mia-paper-line: rgb(60 90 170 / 14%);
 
   /* Elevation (§4) — soft shadows + hard offset */
   --mia-shadow-color: 27 26 23;
@@ -104,11 +115,11 @@
   /* Dark ink on the light-blue primary (white would fail contrast) */
   --mia-text-on-primary: #14130F;
 
-  --mia-border-hairline: #2E2B25;
+  --mia-border-hairline: #3A362E;
   --mia-border-control: #7A7262;
 
   --mia-ink: #EDE6D6;
-  --mia-rule: #2E2B25;
+  --mia-rule: #3A362E;
 
   --mia-highlight: #D9F24A;
   --mia-highlight-ink: #14130F;
@@ -139,7 +150,17 @@
   --mia-tile-violeta: #2B2540;
   --mia-tile-gris: #25231E;
 
-  --mia-paper-dot: rgb(237 230 214 / 3.5%);
+  --mia-grad-amber: linear-gradient(135deg, #5E4510, #5A3010);
+  --mia-grad-lime: linear-gradient(135deg, #3E4C10, #25461A);
+  --mia-grad-blue: linear-gradient(135deg, #1E3166, #182652);
+  --mia-grad-violet: linear-gradient(135deg, #3A2868, #2A1F58);
+  --mia-grad-coral: linear-gradient(135deg, #5E2820, #4E1A1C);
+  --mia-grad-magenta: linear-gradient(135deg, #5C1F4A, #48163E);
+  --mia-grad-teal: linear-gradient(135deg, #114A40, #0D3A33);
+  --mia-grad-cyan: linear-gradient(135deg, #10445E, #0E334A);
+
+  --mia-paper-dot: rgb(237 230 214 / 6%);
+  --mia-paper-line: rgb(140 170 240 / 14%);
 
   /* Dark elevation: shadows replaced by a 1px hairline ring. */
   --mia-elevation-1: 0 0 0 1px var(--mia-border-hairline);
@@ -154,8 +175,8 @@
  * ------------------------------------------------------------------------ */
 :root {
   /* Typography (§3) — phone sizes first, desktop from 640px */
-  --mia-font-sans: "Hanken Grotesk Variable", "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mia-font-display: "Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
+  --mia-font-sans: "Ranade", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mia-font-display: "Ranade", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mia-font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   /* Fraunces optical size / softness (use via `font-variation-settings`) */
   --mia-display-variation: "opsz" 96, "SOFT" 50;
@@ -295,7 +316,7 @@
   --text-display: var(--mia-display-size);
   --text-display--line-height: var(--mia-display-leading);
   --text-display--letter-spacing: -0.02em;
-  --text-display--font-weight: 500;
+  --text-display--font-weight: 700;
   --text-timer: var(--mia-timer-size);
   --text-timer--line-height: var(--mia-timer-leading);
   --text-timer--letter-spacing: -0.02em;
@@ -303,10 +324,10 @@
   --text-h1: var(--mia-h1-size);
   --text-h1--line-height: var(--mia-h1-leading);
   --text-h1--letter-spacing: -0.01em;
-  --text-h1--font-weight: 500;
+  --text-h1--font-weight: 700;
   --text-h2: 1.25rem;
   --text-h2--line-height: 1.75rem;
-  --text-h2--font-weight: 500;
+  --text-h2--font-weight: 700;
   --text-h3: 1.0625rem;
   --text-h3--line-height: 1.5rem;
   --text-h3--font-weight: 600;

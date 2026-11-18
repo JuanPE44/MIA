@@ -3,6 +3,7 @@ import {useSearchParams} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
 import type {Notebook} from '../../types';
 import {Button, ConfirmDialog, EmptyState, Highlight, Menu, Page, PageHeader, TextField, useToast} from '../../ui';
+import {ChangeCoverDialog} from './ChangeCoverDialog';
 import {FolderFilter} from './FolderFilter';
 import {FolderHeader} from './FolderHeader';
 import {MoveNotebookDialog} from './MoveNotebookDialog';
@@ -24,7 +25,9 @@ export function LibraryScreen() {
     handleRestoreNotebook,
     handleMoveNotebook,
     handleCreateFolder,
+    handleUpdateFolder,
     handleDeleteFolder,
+    isNotebookLimitReached,
   } = useAppState();
   const toast = useToast();
   const [params, setParams] = useSearchParams();
@@ -35,6 +38,8 @@ export function LibraryScreen() {
   const [moving, setMoving] = useState<Notebook | null>(null);
   const [deleting, setDeleting] = useState<Notebook | null>(null);
   const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
+  const [coverFolderId, setCoverFolderId] = useState<string | null>(null);
+  const [newNotebookFolderId, setNewNotebookFolderId] = useState('');
 
   const query = params.get('q') ?? '';
   const folderParam = params.get('carpeta');
@@ -70,7 +75,6 @@ export function LibraryScreen() {
     return nb.folderId === selected;
   });
 
-  const totalSources = notebooks.reduce((acc, nb) => acc + nb.sources.length, 0);
   const accountEmpty = notebooks.length === 0 && folders.length === 0;
 
   // --- actions -----------------------------------------------------------
@@ -90,6 +94,10 @@ export function LibraryScreen() {
 
   const moveNotebook = (nb: Notebook, folderId: string | null) => {
     const previous = nb.folderId ?? null;
+    if (previous !== folderId && isNotebookLimitReached(folderId)) {
+      handleMoveNotebook(nb.id, folderId); // shows the plan-limit toast and does not move
+      return;
+    }
     handleMoveNotebook(nb.id, folderId);
     const target = folders.find((f) => f.id === folderId)?.name ?? 'Sin carpeta';
     toast.show({
@@ -107,6 +115,11 @@ export function LibraryScreen() {
     if (selected === id) updateParams({carpeta: null});
     headingRef.current?.focus();
     toast.show({message: 'Carpeta eliminada', variant: 'success'});
+  };
+
+  const openNewNotebook = (folderId = '') => {
+    setNewNotebookFolderId(folderId);
+    setNewNotebookOpen(true);
   };
 
   const folderToDelete = folders.find((f) => f.id === deletingFolderId);
@@ -133,7 +146,7 @@ export function LibraryScreen() {
         title="Crea tu primer cuaderno"
         description="Un cuaderno reúne tus fuentes, un chat con IA y material de estudio sobre una materia."
         action={
-          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(selectedFolder?.id ?? '')}>
             Crear tu primer cuaderno
           </Button>
         }
@@ -159,20 +172,20 @@ export function LibraryScreen() {
         title="Esta carpeta está vacía"
         description="Crea un cuaderno aquí o muévelo desde otra carpeta."
         action={
-          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(selectedFolder?.id ?? '')}>
             Crear cuaderno aquí
           </Button>
         }
       />
     );
-  } else if (visible.length === 0) {
+  } else if (visible.length === 0 && (selected === LOOSE_FILTER || folders.length === 0)) {
     body = (
       <EmptyState
         icon={<Icon name="book" />}
         title={selected === LOOSE_FILTER ? 'No hay cuadernos sin carpeta' : 'Todavía no hay cuadernos'}
         description="Crea un cuaderno para empezar a estudiar."
         action={
-          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+          <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(selectedFolder?.id ?? '')}>
             Nuevo cuaderno
           </Button>
         }
@@ -184,33 +197,76 @@ export function LibraryScreen() {
         <FolderHeader
           folder={selectedFolder}
           notebookCount={visible.length}
-          onNewNotebook={() => setNewNotebookOpen(true)}
+          onNewNotebook={() => openNewNotebook(selectedFolder.id)}
           onDelete={() => setDeletingFolderId(selectedFolder.id)}
+          onChangeCover={() => setCoverFolderId(selectedFolder.id)}
         />
         <NotebookGrid>{visible.map((nb) => renderCard(nb, true))}</NotebookGrid>
       </>
     );
   } else {
-    // Todos (grouped by folder, loose last) or Sin carpeta (single group).
-    const groups = [
-      ...(selected === LOOSE_FILTER ? [] : folders.map((f) => ({id: f.id, title: f.name, items: visible.filter((nb) => nb.folderId === f.id)}))),
-      {id: LOOSE_FILTER, title: 'Sin carpeta', items: visible.filter((nb) => isLoose(nb, folders))},
-    ].filter((g) => g.items.length > 0);
+    // Todos (banner per folder, loose last) or Sin carpeta (single group).
+    const searching = Boolean(query.trim());
+    const folderGroups =
+      selected === LOOSE_FILTER
+        ? []
+        : folders
+            .map((f) => ({folder: f, items: visible.filter((nb) => nb.folderId === f.id)}))
+            // Empty folders stay visible in "Todas", except while searching.
+            .filter((g) => g.items.length > 0 || !searching);
+    const looseItems = visible.filter((nb) => isLoose(nb, folders));
     body = (
       <>
-        {groups.map((g) => (
-          <section key={g.id} aria-labelledby={`group-${g.id}`} className="flex flex-col gap-4">
+        {folderGroups.map(({folder, items}) =>
+          searching ? (
+            <section key={folder.id} aria-labelledby={`group-${folder.id}`} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1 border-b border-rule pb-2">
+                <span className="font-mono text-caption uppercase tracking-widest text-muted">Carpeta</span>
+                <h2 id={`group-${folder.id}`} className="flex items-center gap-2 font-display text-h2 text-strong">
+                  <Icon name="folder-open" weight="duotone" className="size-6 shrink-0 text-ink" />
+                  <span className="min-w-0 truncate">{folder.name}</span>
+                  <span className="font-mono text-small font-normal text-muted">{countLabels.notebooks(items.length)}</span>
+                </h2>
+              </div>
+              <NotebookGrid>{items.map((nb) => renderCard(nb, true))}</NotebookGrid>
+            </section>
+          ) : (
+            <div key={folder.id} className="flex flex-col gap-4">
+              <FolderHeader
+                folder={folder}
+                size="compact"
+                notebookCount={items.length}
+                onOpen={() => updateParams({carpeta: folder.id})}
+                onNewNotebook={() => openNewNotebook(folder.id)}
+                onDelete={() => setDeletingFolderId(folder.id)}
+                onChangeCover={() => setCoverFolderId(folder.id)}
+              />
+              {items.length > 0 ? (
+                <NotebookGrid>{items.map((nb) => renderCard(nb, true))}</NotebookGrid>
+              ) : (
+                <p className="flex flex-wrap items-center gap-x-2 text-small text-muted">
+                  Carpeta vacía ·
+                  <Button variant="ghost" onClick={() => openNewNotebook(folder.id)}>
+                    Crear el primer cuaderno
+                  </Button>
+                </p>
+              )}
+            </div>
+          ),
+        )}
+        {looseItems.length > 0 ? (
+          <section aria-labelledby={`group-${LOOSE_FILTER}`} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1 border-b border-rule pb-2">
               <span className="font-mono text-caption uppercase tracking-widest text-muted">Carpeta</span>
-              <h2 id={`group-${g.id}`} className="flex items-center gap-2 font-display text-h2 text-strong">
+              <h2 id={`group-${LOOSE_FILTER}`} className="flex items-center gap-2 font-display text-h2 text-strong">
                 <Icon name="folder-open" weight="duotone" className="size-6 shrink-0 text-ink" />
-                <span className="min-w-0 truncate">{g.title}</span>
-                <span className="font-mono text-small font-normal text-muted">{countLabels.notebooks(g.items.length)}</span>
+                <span className="min-w-0 truncate">Sin carpeta</span>
+                <span className="font-mono text-small font-normal text-muted">{countLabels.notebooks(looseItems.length)}</span>
               </h2>
             </div>
-            <NotebookGrid>{g.items.map((nb) => renderCard(nb, g.id !== LOOSE_FILTER))}</NotebookGrid>
+            <NotebookGrid>{looseItems.map((nb) => renderCard(nb, false))}</NotebookGrid>
           </section>
-        ))}
+        ) : null}
       </>
     );
   }
@@ -224,10 +280,9 @@ export function LibraryScreen() {
             Mis <Highlight trigger="mount">cuadernos</Highlight>
           </>
         }
-        meta={`${countLabels.folders(folders.length)} · ${countLabels.notebooks(notebooks.length)} · ${countLabels.sources(totalSources)}`}
         actions={
           <div className="flex items-center gap-2 sm:hidden">
-            <Button variant="primary" fullWidth leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+            <Button variant="primary" fullWidth leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(selectedFolder?.id ?? '')}>
               Nuevo cuaderno
             </Button>
             <Menu
@@ -256,7 +311,7 @@ export function LibraryScreen() {
               <Button variant="ghost" leadingIcon={<Icon name="folder-add" />} onClick={() => setNewFolderOpen(true)}>
                 Nueva carpeta
               </Button>
-              <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => setNewNotebookOpen(true)}>
+              <Button variant="primary" leadingIcon={<Icon name="add" />} onClick={() => openNewNotebook(selectedFolder?.id ?? '')}>
                 Nuevo cuaderno
               </Button>
             </div>
@@ -280,7 +335,7 @@ export function LibraryScreen() {
       {newNotebookOpen ? (
         <NewNotebookDialog
           folders={folders}
-          initialFolderId={selectedFolder?.id ?? ''}
+          initialFolderId={newNotebookFolderId}
           onClose={() => setNewNotebookOpen(false)}
           onCreate={handleCreateNotebook}
         />
@@ -291,6 +346,17 @@ export function LibraryScreen() {
           onCreate={(name, icon, cover) => {
             handleCreateFolder(name, 'indigo', icon, cover);
             toast.show({message: 'Carpeta creada', variant: 'success'});
+          }}
+        />
+      ) : null}
+      {coverFolderId && folders.some((f) => f.id === coverFolderId) ? (
+        <ChangeCoverDialog
+          folderName={folders.find((f) => f.id === coverFolderId)!.name}
+          initialCover={folders.find((f) => f.id === coverFolderId)!.coverImage}
+          onClose={() => setCoverFolderId(null)}
+          onSave={(cover) => {
+            handleUpdateFolder(coverFolderId, {coverImage: cover});
+            toast.show({message: 'Portada actualizada', variant: 'success'});
           }}
         />
       ) : null}

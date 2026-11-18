@@ -142,8 +142,6 @@ export interface Folder {
   coverImage?: string;
 }
 
-export type UserType = 'frecuente' | 'nuevo';
-
 export interface StudentProfile {
   id: string;
   name: string;

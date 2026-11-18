@@ -16,7 +16,7 @@ interface AccountMenuProps {
 export function AccountMenu({variant = 'avatar'}: AccountMenuProps) {
   const navigate = useNavigate();
   const phone = useIsPhone();
-  const {currentUser, studentProfile, handleLogout} = useAppState();
+  const {currentUser, studentProfile, avatarUrl, handleLogout} = useAppState();
   const {mode, setMode} = useTheme();
   const name = studentProfile?.name?.trim() || currentUser || 'Estudiante';
 
@@ -30,6 +30,7 @@ export function AccountMenu({variant = 'avatar'}: AccountMenuProps) {
 
   const items: MenuItem[] = [
     {id: 'profile', label: 'Perfil', icon: <Icon name="user" />, onSelect: () => navigate(SHELL_PATHS.profile)},
+    {id: 'plan', label: 'Plan', icon: <Icon name="award" />, onSelect: () => navigate(SHELL_PATHS.plans)},
     {id: 'prefs', label: 'Preferencias', icon: <Icon name="settings" />, onSelect: () => navigate(SHELL_PATHS.preferences)},
     ...(phone
       ? [
@@ -60,7 +61,7 @@ export function AccountMenu({variant = 'avatar'}: AccountMenuProps) {
             aria-label={`Cuenta de ${name}`}
             className="flex w-full items-center gap-3 rounded-control border border-transparent px-2 py-2 text-left transition-colors duration-[120ms] hover:border-rule hover:bg-subtle"
           >
-            <Avatar name={name} size={32} />
+            <Avatar name={name} src={avatarUrl ?? undefined} size="sm" />
             <span className="min-w-0 flex-1 truncate text-label font-medium text-strong">{name}</span>
             <Icon name="chevron-right" className="size-4 text-muted" />
           </button>
@@ -74,7 +75,7 @@ export function AccountMenu({variant = 'avatar'}: AccountMenuProps) {
               "pointer-coarse:after:absolute pointer-coarse:after:-inset-1.5 pointer-coarse:after:content-['']",
             )}
           >
-            <Avatar name={name} size={32} />
+            <Avatar name={name} src={avatarUrl ?? undefined} size="sm" />
           </button>
         )
       }

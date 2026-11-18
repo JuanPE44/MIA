@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import type {ReactNode} from 'react';
 import {createElement} from 'react';
 import type {SourceItem, SourceType} from '../../types';
@@ -5,12 +6,12 @@ import {Icon} from '../../ui/Icon';
 
 /** Files above this size trigger the browser-storage warning. */
 export const LARGE_FILE_BYTES = 2 * 1024 * 1024;
-/** Hard limit: the API accepts 20 MB JSON bodies and base64 adds ~33%. */
-export const MAX_FILE_BYTES = 10 * 1024 * 1024;
+/** Hard limit per file, checked before base64 encoding: Vercel functions reject bodies over 4.5 MB and base64 adds ~33%. */
+export const MAX_FILE_BYTES = 3 * 1024 * 1024;
 
 export const FILE_ACCEPT = 'application/pdf,image/*,audio/*,video/*,text/*,.md,.csv,.json,.txt';
 export const ACCEPTED_LABEL = 'PDF, imágenes, audio, video o texto (.txt, .md, .csv, .json)';
-export const MAX_SIZE_LABEL = 'Máximo 10 MB';
+export const MAX_SIZE_LABEL = 'Máximo 3 MB';
 
 export const SOURCE_TYPE_LABEL: Record<SourceType, string> = {
   pdf: 'PDF',
@@ -131,9 +132,8 @@ export async function extractFile(file: File): Promise<ExtractedFile> {
       clientText = await readAs(file, 'text').catch(() => '');
     }
 
-    const res = await fetch('/api/extract-file-content', {
+    const res = await apiFetch('/api/extract-file-content', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({fileName: name, mimeType, fileBase64: dataUrl, clientText: clientText || undefined}),
     });
     if (res.ok) {

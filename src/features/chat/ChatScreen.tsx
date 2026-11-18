@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
 import {Button, EmptyState, InteractiveCard, Reveal, RevealItem, useToast} from '../../ui';
@@ -106,9 +107,8 @@ export function ChatScreen() {
       const targetThread = currentActiveThread.id;
       setWaiting(true);
       try {
-        const res = await fetch('/api/chat', {
+        const res = await apiFetch('/api/chat', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
             message: apiMessage,
             history,

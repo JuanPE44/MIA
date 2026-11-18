@@ -1,5 +1,7 @@
 import {useRef, useState, type FormEvent} from 'react';
+import {useNavigate} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
+import {paths} from '../../app/routes';
 import type {SourceItem, SourceType} from '../../types';
 import {
   Button,
@@ -48,7 +50,8 @@ export function AddSourceDialog({open, onClose}: {open: boolean; onClose: () => 
 }
 
 function AddSourceDialogInner({onClose}: {onClose: () => void}) {
-  const {handleAddSource} = useAppState();
+  const {handleAddSource, sourceLimitReached} = useAppState();
+  const navigate = useNavigate();
   const toast = useToast();
   const [tab, setTab] = useState<Tab>('file');
   const [title, setTitle] = useState('');
@@ -72,7 +75,7 @@ function AddSourceDialogInner({onClose}: {onClose: () => void}) {
     if (file.size > MAX_FILE_BYTES) {
       setErrors((e) => ({
         ...e,
-        file: `«${file.name}» pesa ${formatBytes(file.size)}. ${MAX_SIZE_LABEL} por archivo.`,
+        file: `«${file.name}» pesa ${formatBytes(file.size)} y supera el máximo de 3 MB por archivo. Elige un archivo más liviano o pega el texto en la pestaña Texto.`,
       }));
       return;
     }
@@ -110,6 +113,7 @@ function AddSourceDialogInner({onClose}: {onClose: () => void}) {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (sourceLimitReached) return;
     if (tab === 'file') {
       if (!picked) return setErrors({file: 'Elige un archivo para añadir.'});
       if (!picked.extracted) return;
@@ -167,8 +171,14 @@ function AddSourceDialogInner({onClose}: {onClose: () => void}) {
               type="submit"
               form={FORM_ID}
               variant="primary"
-              disabled={extracting}
-              disabledReason={extracting ? 'Espera a que termine de leerse el archivo' : undefined}
+              disabled={extracting || sourceLimitReached}
+              disabledReason={
+                sourceLimitReached
+                  ? 'Llegaste al límite de fuentes de tu plan'
+                  : extracting
+                    ? 'Espera a que termine de leerse el archivo'
+                    : undefined
+              }
             >
               Añadir
             </Button>
@@ -177,6 +187,15 @@ function AddSourceDialogInner({onClose}: {onClose: () => void}) {
       }
     >
       <div className="flex flex-col gap-5">
+        {sourceLimitReached ? (
+          <InlineAlert variant="warning" title="Llegaste al límite de tu plan">
+            Este cuaderno ya tiene el máximo de fuentes de tu plan. Elimina alguna o{' '}
+            <button type="button" className="underline" onClick={() => navigate(paths.plans())}>
+              mejora tu plan
+            </button>
+            .
+          </InlineAlert>
+        ) : null}
         <SegmentedControl
           aria-label="Tipo de fuente"
           options={TABS}

@@ -13,23 +13,25 @@ AI study copilot ("FocusEd Copilot" / MIA) generated with Google AI Studio. Stud
 - `npm run lint` — type-check only (`tsc --noEmit`); no ESLint, no test suite
 - Lockfile is `bun.lock`; README says `npm install`
 
-Env: `GEMINI_API_KEY` in `.env.local`/`.env` (see `.env.example`). `DISABLE_HMR=true` disables HMR/file watching (AI Studio sets this — don't change that logic in `vite.config.ts`).
+Env: `GEMINI_API_KEY` in `.env.local`/`.env` (see `.env.example`); Supabase vars are listed there too (README "Auth local"; `npm run db:start|db:reset|db:stop` use the `supabase` devDependency and need Docker). `DISABLE_HMR=true` disables HMR/file watching (AI Studio sets this — don't change that logic in `vite.config.ts`).
 
 ## Architecture
 
-**Single Express server (`server.ts`)** hosts both the API and the SPA. In dev it mounts Vite in middleware mode; in prod it serves `dist/` with an SPA catch-all. All Gemini calls happen server-side via a shared `GoogleGenAI` client (`@google/genai`, model `gemini-3.8-flash`). The key never reaches the browser.
+**Express app in `server/app.ts`** (exports `app`, no listen) holds every API route. `server.ts` is the local/prod-self-hosted entry: it imports the app, mounts Vite in middleware mode (dev) or serves `dist/` (prod) and listens on :3000. On Vercel `api/index.ts` re-exports the app as a function and `vercel.json` serves `dist/` + rewrites `/api/*`. All Gemini calls happen server-side via a shared `GoogleGenAI` client (`@google/genai`, model `gemini-3.8-flash`). The key never reaches the browser.
 
-API endpoints (all `POST /api/*`, JSON bodies up to 20mb, files sent as base64):
-`extract-file-content`, `process-and-analyze-source`, `analyze-sources`, `generate-artifact`, `refine-artifact`, `chat`, `active-recall`, `support-chat`, `search-grounding`.
+API endpoints (all `POST /api/*`, JSON bodies up to 20mb, files sent as base64; Vercel caps bodies at 4.5 MB so the client limits files to 3 MB):
+`extract-file-content`, `process-and-analyze-source`, `analyze-sources`, `generate-artifact`, `refine-artifact`, `chat`, `active-recall`, `support-chat`, `search-grounding`, `plan`.
+
+**Auth and plans**: Supabase Auth (email + Google). Every `/api` route goes through `requireAuth` (`server/auth.ts`: bearer token → `supabase.auth.getUser`, plan from `profiles`). Without `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` it logs a warning and treats requests as an anonymous `pro` dev user. Plan matrix, prices and quotas live in `src/config/plans.ts` (pure TS, shared by server and client). Server enforces features (`requireFeature` → 403 `PLAN_FEATURE_LOCKED`) and quotas (`increment_usage` SQL fn → 429 `PLAN_QUOTA_EXCEEDED`); count limits (notebooks/sources) are enforced client-side. `profiles.plan` changes only via `POST /api/plan` (service role, simulated checkout). Client calls go through `apiFetch` (`src/services/api.ts`). DB schema/seed in `supabase/`.
 
 **Offline fallbacks are a deliberate pattern**: `ai` is `null` when no API key is set, and most endpoints return heuristic/canned Spanish responses instead of failing (also on Gemini JSON-parse errors). Preserve this when editing endpoints.
 
 **Frontend (`src/`)** — React 19 + Tailwind v4 (via `@tailwindcss/vite`) + `motion` + `lucide-react` + `recharts`. react-router, no state library:
 - `src/app/AppStateContext.tsx` is the state hub (`useAppState`): user/session, folders, notebooks, stats, theme, focus mode. Routes in `src/app/routes.tsx`, shell in `src/app/shell/`.
-- Screens live in `src/features/*` (`library`, `chat`, `sources`, `materials`, `study`, `progress`, `web-search`, `welcome`, `account`, `help`); shared UI in `src/ui`. Features call their `/api/*` endpoints directly with `fetch`.
+- Screens live in `src/features/*` (`library`, `chat`, `sources`, `materials`, `study`, `progress`, `web-search`, `auth`, `plans`, `account`, `help`); shared UI in `src/ui`. Features call their `/api/*` endpoints directly with `fetch`.
 - Domain types live in `src/types/index.ts`; seed data (`INITIAL_FOLDERS`, `INITIAL_NOTEBOOKS`, `INITIAL_USER_STATS`, `INITIAL_STUDENT_PROFILE`) in `src/data/initialData.ts`.
 - `src/services/audioSynthesizer.ts` — Web Audio ambient sounds/warning beeps for focus mode.
 
-**Persistence is client-only (localStorage), no backend DB.** Login picks a `UserType`: `'frecuente'` loads seed/persisted data, `'nuevo'` starts empty (stored in `sessionStorage` key `focused_auth_usertype`). Persisted keys: `focused_folders_frecuente_v2`, `focused_notebooks_frecuente_v2`, `focused_user_stats_frecuente`, `mia_student_profile`, `mia_theme_mode`. Bump the `_vN` suffix if you change the shape of persisted notebooks/folders.
+**Persistence is client-only (localStorage), no app-data backend** (Supabase stores only auth, `profiles` and `usage_counters`). There is no anonymous mode: the session comes from Supabase `onAuthStateChange` (`AppStateContext`). Data keys are scoped by user id with a `_v3` suffix: `focused_folders_<uid>_v3`, `focused_notebooks_<uid>_v3`, `focused_user_stats_<uid>_v3`, `mia_student_profile_<uid>_v3`; `mia_theme_mode` stays global. Demo data (`INITIAL_*`) is preloaded on first login only for seed users (email ending `@mia.test`); other accounts start empty. Bump the `_vN` suffix if you change the shape of persisted notebooks/folders.
 
 Path alias `@/*` → repo root.

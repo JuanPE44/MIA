@@ -50,7 +50,7 @@ export function MaterialCard({notebookId, artifact, onOpen, onAdjust, onPrint, o
         onClick={handleClick}
         title={
           <span className="flex items-center gap-3 pr-10">
-            <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control border border-rule text-strong ${info.tileClass}`}>
+            <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-control border border-rule text-strong" style={{backgroundImage: info.gradient}}>
               <Icon name={info.icon} weight="duotone" className="size-5" />
             </span>
             <span className="flex min-w-0 flex-col">
@@ -76,7 +76,7 @@ export function GeneratingCard({job}: {job: MaterialJob}) {
   return (
     <Card aria-busy="true" className="h-full">
       <div className="flex items-center gap-3">
-        <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-control text-strong ${info.tileClass}`}>
+        <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-control text-strong" style={{backgroundImage: info.gradient}}>
           <Icon name={info.icon} weight="duotone" className="size-5" />
         </span>
         <div className="min-w-0">

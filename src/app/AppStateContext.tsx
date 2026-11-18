@@ -5,7 +5,6 @@ import {
   Notebook,
   Folder,
   UserStudyStats,
-  UserType,
   SourceItem,
   SourceType,
   SourceAnalysis,
@@ -24,6 +23,64 @@ import {
 import { soundManager } from '../services/audioSynthesizer';
 import { AppRoute, parseRoute, paths } from './routes';
 import { useToast } from '../ui/Toast';
+import type { Session } from '@supabase/supabase-js';
+import { supabase } from '../services/supabaseClient';
+import { apiFetch, setApiErrorListener } from '../services/api';
+import { isLimitReached, isPlanTier, planLimit, type PlanTier } from '../config/plans';
+
+/** Accounts ending in this domain are seed users: they get the demo data on first login. */
+const SEED_EMAIL_DOMAIN = '@mia.test';
+
+/** Per-user localStorage keys (shape version v3). The theme key stays global. */
+const storageKeys = (uid: string) => ({
+  folders: `focused_folders_${uid}_v3`,
+  notebooks: `focused_notebooks_${uid}_v3`,
+  stats: `focused_user_stats_${uid}_v3`,
+  profile: `mia_student_profile_${uid}_v3`
+});
+
+const emptyStats = (): UserStudyStats => ({
+  focusMinutesToday: 0,
+  totalFocusHours: 0,
+  currentStreakDays: 1,
+  xpPoints: 0,
+  sessionsCompleted: 0,
+  flashcardsMastered: 0,
+  tamperAttemptsBlocked: 0,
+  weeklyLogs: [
+    { day: 'Lun', fullDay: 'Lunes', date: 'Lun', minutes: 0, targetMinutes: 45, sessions: 0 },
+    { day: 'Mar', fullDay: 'Martes', date: 'Mar', minutes: 0, targetMinutes: 45, sessions: 0 },
+    { day: 'Mié', fullDay: 'Miércoles', date: 'Mié', minutes: 0, targetMinutes: 45, sessions: 0 },
+    { day: 'Jue', fullDay: 'Jueves', date: 'Jue', minutes: 0, targetMinutes: 45, sessions: 0 },
+    { day: 'Vie', fullDay: 'Viernes', date: 'Vie', minutes: 0, targetMinutes: 45, sessions: 0 },
+    { day: 'Sáb', fullDay: 'Sábado', date: 'Sáb', minutes: 0, targetMinutes: 45, sessions: 0 },
+    { day: 'Dom', fullDay: 'Domingo (Hoy)', date: 'Hoy', minutes: 0, targetMinutes: 45, sessions: 0 }
+  ]
+});
+
+const emptyStudentProfile = (name: string): StudentProfile => ({
+  id: 'student',
+  name,
+  degree: '',
+  university: '',
+  academicTerm: '',
+  avatarSeed: name || 'Estudiante'
+});
+
+export interface UserProfile {
+  plan: PlanTier;
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
+function readJson<T>(key: string): T | null {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Thin app-state context (roadmap Revision 2, "thin AppStateContext").
@@ -44,24 +101,72 @@ function useAppStateValue() {
   const routeNotebookId =
     route.kind === 'workspace' || route.kind === 'notebookIndex' ? route.notebookId : null;
 
-  // Authentication State: Always starts on the Login Screen
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [userType, setUserType] = useState<UserType>('frecuente');
+  // Authentication: the session comes from Supabase (`onAuthStateChange`).
+  const [session, setSession] = useState<Session | null>(null);
+  const [authReady, setAuthReady] = useState(!supabase);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const userId = session?.user.id ?? null;
+  const userEmail = session?.user.email ?? null;
+  const isSeedUser = Boolean(userEmail && userEmail.toLowerCase().endsWith(SEED_EMAIL_DOMAIN));
+  const plan: PlanTier = profile?.plan ?? 'free';
+  const currentUser: string | null = session
+    ? profile?.displayName?.trim() || userEmail?.split('@')[0] || 'Estudiante'
+    : null;
 
-  // Student Profile state
-  const [studentProfile, setStudentProfile] = useState<StudentProfile>(() => {
-    try {
-      const saved = localStorage.getItem('mia_student_profile');
-      return saved ? JSON.parse(saved) : INITIAL_STUDENT_PROFILE;
-    } catch {
-      return INITIAL_STUDENT_PROFILE;
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      setSession(data.session);
+      setAuthReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
+      setSession(next);
+      setAuthReady(true);
+      if (event === 'PASSWORD_RECOVERY') setIsPasswordRecovery(true);
+      if (event === 'SIGNED_OUT') setIsPasswordRecovery(false);
+    });
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  /** Reloads `profiles` (plan + display name) for the signed-in user. */
+  const refreshProfile = async () => {
+    if (!supabase || !userId) return;
+    const { data } = await supabase.from('profiles').select('plan, display_name, avatar_url').eq('id', userId).maybeSingle();
+    setProfile({
+      plan: isPlanTier(data?.plan) ? data.plan : 'free',
+      displayName: data?.display_name ?? null,
+      avatarUrl: data?.avatar_url ?? null
+    });
+  };
+
+  // Avatar: own upload -> provider picture (Google) -> null (initials fallback in <Avatar>).
+  const meta = session?.user.user_metadata as Record<string, unknown> | undefined;
+  const metaAvatar = [meta?.avatar_url, meta?.picture].find((v): v is string => typeof v === 'string' && v !== '');
+  const avatarUrl: string | null = profile?.avatarUrl || metaAvatar || null;
+
+  useEffect(() => {
+    if (!userId) {
+      setProfile(null);
+      return;
     }
-  });
+    void refreshProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  // Student Profile state (hydrated per user below)
+  const [studentProfile, setStudentProfile] = useState<StudentProfile>(emptyStudentProfile(''));
 
   const handleUpdateProfile = (updated: StudentProfile) => {
     setStudentProfile(updated);
+    if (!userId) return;
     try {
-      localStorage.setItem('mia_student_profile', JSON.stringify(updated));
+      localStorage.setItem(storageKeys(userId).profile, JSON.stringify(updated));
     } catch {
       // ignore
     }
@@ -85,6 +190,14 @@ function useAppStateValue() {
   const [persistenceError, setPersistenceError] = useState(false);
   const toast = useToast();
   const persistenceToastShown = useRef(false);
+
+  // One toast for every mapped API error (401 / 403 / 429) raised by `apiFetch`.
+  useEffect(() => {
+    setApiErrorListener((err) =>
+      toast.show({ variant: err.status === 401 ? 'danger' : 'warning', message: err.message, duration: 6000 })
+    );
+    return () => setApiErrorListener(null);
+  }, [toast]);
 
   // Chat initial prompt
   const [chatInitialPrompt, setChatInitialPrompt] = useState<string | undefined>(undefined);
@@ -126,163 +239,104 @@ function useAppStateValue() {
     }
   };
 
-  // Ensure login screen is ALWAYS shown first on refresh/load, and clear legacy cache
-  useEffect(() => {
-    sessionStorage.removeItem('focused_auth_user');
-    try {
-      localStorage.removeItem('focused_folders_frecuente');
-      localStorage.removeItem('focused_notebooks_frecuente');
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // Folders & Notebooks state (persisted per userType)
-  const [folders, setFolders] = useState<Folder[]>(() => {
-    try {
-      const savedType = sessionStorage.getItem('focused_auth_usertype');
-      if (savedType === 'nuevo') return [];
-      const saved = localStorage.getItem('focused_folders_frecuente_v2');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return INITIAL_FOLDERS;
-  });
-
-  const [notebooks, setNotebooks] = useState<Notebook[]>(() => {
-    try {
-      const savedType = sessionStorage.getItem('focused_auth_usertype');
-      if (savedType === 'nuevo') return [];
-      const saved = localStorage.getItem('focused_notebooks_frecuente_v2');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return INITIAL_NOTEBOOKS;
-  });
-
-  const [activeNotebookId, setActiveNotebookId] = useState<string | null>(() => {
-    const savedType = sessionStorage.getItem('focused_auth_usertype');
-    if (savedType === 'nuevo') return null;
-    return INITIAL_NOTEBOOKS[0]?.id || null;
-  });
+  // Folders & Notebooks state (persisted per user id, hydrated on login)
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [notebooks, setNotebooks] = useState<Notebook[]>([]);
+  const [activeNotebookId, setActiveNotebookId] = useState<string | null>(null);
+  // Id of the user whose data is currently loaded; persistence only writes for that user.
+  const [dataOwner, setDataOwner] = useState<string | null>(null);
 
   // Pending artifact type when navigating from Sources to Artifacts
   const [pendingArtifactType, setPendingArtifactType] = useState<ArtifactType | null>(null);
 
   // User study statistics
-  const [stats, setStats] = useState<UserStudyStats>(() => {
-    try {
-      const savedType = sessionStorage.getItem('focused_auth_usertype');
-      if (savedType === 'nuevo') {
-        return {
-          focusMinutesToday: 0,
-          totalFocusHours: 0,
-          currentStreakDays: 1,
-          xpPoints: 0,
-          sessionsCompleted: 0,
-          flashcardsMastered: 0,
-          tamperAttemptsBlocked: 0,
-          weeklyLogs: [
-            { day: 'Lun', fullDay: 'Lunes', date: 'Lun', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Mar', fullDay: 'Martes', date: 'Mar', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Mié', fullDay: 'Miércoles', date: 'Mié', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Jue', fullDay: 'Jueves', date: 'Jue', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Vie', fullDay: 'Viernes', date: 'Vie', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Sáb', fullDay: 'Sábado', date: 'Sáb', minutes: 0, targetMinutes: 45, sessions: 0 },
-            { day: 'Dom', fullDay: 'Domingo (Hoy)', date: 'Hoy', minutes: 0, targetMinutes: 45, sessions: 0 }
-          ]
-        };
-      }
-      const saved = localStorage.getItem('focused_user_stats_frecuente');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return INITIAL_USER_STATS;
-  });
+  const [stats, setStats] = useState<UserStudyStats>(emptyStats);
 
-  // Save changes when user is frecuente
+  // Hydrate this user's data (or seed/empty data on first login) when the session user changes.
   useEffect(() => {
-    if (userType === 'frecuente' && currentUser) {
-      try {
-        localStorage.setItem('focused_notebooks_frecuente_v2', JSON.stringify(notebooks));
-        setPersistenceError(false);
-        persistenceToastShown.current = false;
-      } catch {
-        setPersistenceError(true);
-        if (!persistenceToastShown.current) {
-          persistenceToastShown.current = true;
-          toast.show({
-            variant: 'danger',
-            message: 'No se pudo guardar en este navegador. Libera espacio eliminando fuentes grandes.',
-            duration: 10000
-          });
-        }
-      }
-    }
-  }, [notebooks, userType, currentUser]);
-
-  useEffect(() => {
-    if (userType === 'frecuente' && currentUser) {
-      try {
-        localStorage.setItem('focused_folders_frecuente_v2', JSON.stringify(folders));
-      } catch {
-        // ignore
-      }
-    }
-  }, [folders, userType, currentUser]);
-
-  useEffect(() => {
-    if (userType === 'frecuente' && currentUser) {
-      try {
-        localStorage.setItem('focused_user_stats_frecuente', JSON.stringify(stats));
-      } catch {
-        // ignore
-      }
-    }
-  }, [stats, userType, currentUser]);
-
-  // Handle Login with "Usuario nuevo" vs "Usuario frecuente"
-  const handleLoginSuccess = (username: string, type: UserType) => {
-    sessionStorage.setItem('focused_auth_user', username);
-    sessionStorage.setItem('focused_auth_usertype', type);
-    setCurrentUser(username);
-    setUserType(type);
-
-    if (type === 'nuevo') {
-      // Clean slate for new user who has never entered
+    if (!userId) {
       setFolders([]);
       setNotebooks([]);
       setActiveNotebookId(null);
-      setStats({
-        focusMinutesToday: 0,
-        totalFocusHours: 0,
-        currentStreakDays: 1,
-        xpPoints: 0,
-        sessionsCompleted: 0,
-        flashcardsMastered: 0,
-        tamperAttemptsBlocked: 0
-      });
-    } else {
-      // Modeled example data for frequent user
-      setFolders(INITIAL_FOLDERS);
-      setNotebooks(INITIAL_NOTEBOOKS);
-      setActiveNotebookId(INITIAL_NOTEBOOKS[0]?.id || null);
-      setStats(INITIAL_USER_STATS);
+      setStats(emptyStats());
+      setStudentProfile(emptyStudentProfile(''));
+      setDataOwner(null);
+      return;
     }
+    const keys = storageKeys(userId);
+    const savedNotebooks = readJson<Notebook[]>(keys.notebooks);
+    const savedFolders = readJson<Folder[]>(keys.folders);
+    const savedStats = readJson<UserStudyStats>(keys.stats);
+    const savedProfile = readJson<StudentProfile>(keys.profile);
+    const firstLogin = savedNotebooks === null && savedFolders === null;
+    const seedDemo = firstLogin && isSeedUser;
 
-    // Session gate (T4.2 / A3): the Login screen is rendered at the requested
-    // URL, so after "Empezar" the user simply stays there. From `/` the app
-    // continues to Mis cuadernos (`App.tsx` redirects `/` → `/cuadernos`).
+    const nextNotebooks = savedNotebooks ?? (seedDemo ? INITIAL_NOTEBOOKS : []);
+    setFolders(savedFolders ?? (seedDemo ? INITIAL_FOLDERS : []));
+    setNotebooks(nextNotebooks);
+    setActiveNotebookId(nextNotebooks[0]?.id ?? null);
+    setStats(savedStats ?? (isSeedUser ? INITIAL_USER_STATS : emptyStats()));
+    setStudentProfile(
+      savedProfile ??
+        (isSeedUser
+          ? INITIAL_STUDENT_PROFILE
+          : emptyStudentProfile(session?.user.user_metadata?.full_name || userEmail?.split('@')[0] || ''))
+    );
+    setDataOwner(userId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  /** The signed-in user's data is loaded (the UI waits for this before rendering screens). */
+  const dataReady = !userId || dataOwner === userId;
+  const canPersist = Boolean(userId) && dataOwner === userId;
+
+  useEffect(() => {
+    if (!canPersist || !userId) return;
+    try {
+      localStorage.setItem(storageKeys(userId).notebooks, JSON.stringify(notebooks));
+      setPersistenceError(false);
+      persistenceToastShown.current = false;
+    } catch {
+      setPersistenceError(true);
+      if (!persistenceToastShown.current) {
+        persistenceToastShown.current = true;
+        toast.show({
+          variant: 'danger',
+          message: 'No se pudo guardar en este navegador. Libera espacio eliminando fuentes grandes.',
+          duration: 10000
+        });
+      }
+    }
+  }, [notebooks, canPersist, userId]);
+
+  useEffect(() => {
+    if (!canPersist || !userId) return;
+    try {
+      localStorage.setItem(storageKeys(userId).folders, JSON.stringify(folders));
+    } catch {
+      // ignore
+    }
+  }, [folders, canPersist, userId]);
+
+  useEffect(() => {
+    if (!canPersist || !userId) return;
+    try {
+      localStorage.setItem(storageKeys(userId).stats, JSON.stringify(stats));
+    } catch {
+      // ignore
+    }
+  }, [stats, canPersist, userId]);
+
+  const handleLogout = async () => {
+    await supabase?.auth.signOut();
+    navigate(paths.login());
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('focused_auth_user');
-    sessionStorage.removeItem('focused_auth_usertype');
-    setCurrentUser(null);
-    navigate(paths.login());
+  /** Simulated checkout: the server validates the tier and updates `profiles.plan`. */
+  const handleChangePlan = async (next: PlanTier) => {
+    const res = await apiFetch('/api/plan', { method: 'POST', body: JSON.stringify({ plan: next }) });
+    if (!res.ok) throw new Error('plan update failed');
+    await refreshProfile();
   };
 
   const handleResetDemoData = () => {
@@ -292,7 +346,7 @@ function useAppStateValue() {
     setStats(INITIAL_USER_STATS);
     setStudentProfile(INITIAL_STUDENT_PROFILE);
     try {
-      localStorage.removeItem('mia_student_profile');
+      if (userId) localStorage.removeItem(storageKeys(userId).profile);
     } catch {
       // ignore
     }
@@ -319,6 +373,21 @@ function useAppStateValue() {
   useEffect(() => {
     if (routeNotebook) setActiveNotebookId(routeNotebook.id);
   }, [routeNotebook?.id]);
+
+  // Plan count limits (data lives in localStorage, so they are enforced here, client-side).
+  const warnPlanLimit = (message: string) =>
+    toast.show({
+      variant: 'warning',
+      message,
+      action: { label: 'Ver planes', onAction: () => navigate(paths.plans()) },
+      duration: 8000
+    });
+  /** True when `folderId` already holds the maximum notebooks of the current plan. */
+  const isNotebookLimitReached = (folderId: string | null | undefined) =>
+    !!folderId &&
+    isLimitReached(planLimit(plan, 'notebooksPerFolder'), notebooks.filter((n) => n.folderId === folderId).length);
+  const sourceLimitReached =
+    !!activeNotebook && isLimitReached(planLimit(plan, 'sourcesPerNotebook'), activeNotebook.sources.length);
 
   const currentView: 'explorer' | 'workspace' =
     route.kind === 'workspace' && routeNotebook ? 'workspace' : 'explorer';
@@ -350,6 +419,10 @@ function useAppStateValue() {
     setFolders((prev) => [...prev, newFolder]);
   };
 
+  const handleUpdateFolder = (folderId: string, patch: Partial<Pick<Folder, 'name' | 'icon' | 'coverImage'>>) => {
+    setFolders((prev) => prev.map((f) => (f.id === folderId ? { ...f, ...patch } : f)));
+  };
+
   const handleDeleteFolder = (folderId: string) => {
     setFolders((prev) => prev.filter((f) => f.id !== folderId));
     // Eject notebooks in deleted folder so they remain as loose notebooks
@@ -359,6 +432,10 @@ function useAppStateValue() {
   };
 
   const handleCreateNotebook = (newNb: Partial<Notebook>) => {
+    if (isNotebookLimitReached(newNb.folderId)) {
+      warnPlanLimit('Llegaste al límite de cuadernos por carpeta de tu plan.');
+      return;
+    }
     const initialThread: ChatThread = {
       id: `thread-${Date.now()}`,
       title: 'Chat 1',
@@ -412,6 +489,11 @@ function useAppStateValue() {
 
   // Right-click action: Move into folder or eject (leave loose)
   const handleMoveNotebook = (notebookId: string, folderId: string | null) => {
+    const current = notebooks.find((nb) => nb.id === notebookId);
+    if (current?.folderId !== folderId && isNotebookLimitReached(folderId)) {
+      warnPlanLimit('Esa carpeta llegó al límite de cuadernos de tu plan.');
+      return;
+    }
     setNotebooks((prev) =>
       prev.map((nb) => (nb.id === notebookId ? { ...nb, folderId } : nb))
     );
@@ -430,9 +512,8 @@ function useAppStateValue() {
 
     let succeeded = false;
     try {
-      const res = await fetch('/api/process-and-analyze-source', {
+      const res = await apiFetch('/api/process-and-analyze-source', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           source,
           notebookTitle: notebook.title,
@@ -483,6 +564,10 @@ function useAppStateValue() {
 
   const handleAddSource = async (source: SourceItem) => {
     if (!activeNotebook) return;
+    if (sourceLimitReached) {
+      warnPlanLimit('Llegaste al límite de fuentes por cuaderno de tu plan.');
+      return;
+    }
     const initialSource: SourceItem = {
       ...source,
       selectedForChat: source.selectedForChat !== undefined ? source.selectedForChat : true,
@@ -795,9 +880,21 @@ function useAppStateValue() {
     goToSegment,
     goToNotebooks,
     // Session
+    session,
+    authReady,
+    dataReady,
+    isPasswordRecovery,
+    clearPasswordRecovery: () => setIsPasswordRecovery(false),
     currentUser,
-    userType,
-    handleLoginSuccess,
+    userEmail,
+    isSeedUser,
+    plan,
+    sourceLimitReached,
+    isNotebookLimitReached,
+    profile,
+    avatarUrl,
+    refreshProfile,
+    handleChangePlan,
     handleLogout,
     handleResetDemoData,
     // Profile
@@ -823,6 +920,7 @@ function useAppStateValue() {
     activeNotebook,
     handleOpenNotebook,
     handleCreateFolder,
+    handleUpdateFolder,
     handleDeleteFolder,
     handleCreateNotebook,
     handleDeleteNotebook,

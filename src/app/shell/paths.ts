@@ -4,4 +4,5 @@ export const SHELL_PATHS = {
   help: '/ayuda',
   profile: '/cuenta/perfil',
   preferences: '/cuenta/preferencias',
+  plans: '/planes',
 } as const;

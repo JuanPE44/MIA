@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import type {Notebook} from '../../types';
 
 export interface RecallChallenge {
@@ -9,9 +10,8 @@ export interface RecallChallenge {
 
 /** Asks `/api/active-recall` for a question grounded in the notebook sources. Throws on failure. */
 export async function requestChallenge(notebook: Pick<Notebook, 'sources' | 'title'>): Promise<RecallChallenge> {
-  const res = await fetch('/api/active-recall', {
+  const res = await apiFetch('/api/active-recall', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({sources: notebook.sources, notebookTitle: notebook.title}),
   });
   if (!res.ok) throw new Error('active-recall failed');

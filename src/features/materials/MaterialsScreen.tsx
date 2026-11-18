@@ -7,6 +7,7 @@ import {ConfirmDialog, EmptyState, InlineAlert, Reveal, RevealItem, useToast} fr
 import {FailedCard, GeneratingCard, MaterialCard} from './MaterialCard';
 import {CreateMaterialSheet} from './CreateMaterialSheet';
 import {useMaterialJobs} from './MaterialsJobs';
+import {ARTIFACT_FEATURE, ARTIFACT_QUOTA, planHasFeature, planLimit} from '../../config/plans';
 import {MATERIAL_TYPES} from './materialModel';
 import {requestMaterialPrint} from './printMaterial';
 import {TypeTile} from './TypeTile';
@@ -18,18 +19,26 @@ const NO_SOURCES_ID = 'materials-no-sources';
 export function MaterialsScreen() {
   const navigate = useNavigate();
   const toast = useToast();
-  const {activeNotebook, pendingArtifactType, setPendingArtifactType, handleDeleteArtifact} = useAppState();
+  const {activeNotebook, pendingArtifactType, setPendingArtifactType, handleDeleteArtifact, plan} = useAppState();
   const {jobs, retry, dismiss} = useMaterialJobs();
   const [createType, setCreateType] = useState<ArtifactType | null>(null);
   const [deleting, setDeleting] = useState<StudyArtifact | null>(null);
 
   const sources = activeNotebook?.sources ?? [];
 
+  /** Types the current plan does not include (exam model, podcasts on plans without them). */
+  const isLocked = (type: ArtifactType) => {
+    const feature = ARTIFACT_FEATURE[type];
+    if (feature && !planHasFeature(plan, feature)) return true;
+    return ARTIFACT_QUOTA[type] === 'podcasts' && planLimit(plan, 'podcastsPerWeek') === 0;
+  };
+
   useEffect(() => {
     if (!pendingArtifactType) return;
     setPendingArtifactType(null);
-    if (sources.length === 0) return;
+    if (sources.length === 0 || isLocked(pendingArtifactType)) return;
     setCreateType(pendingArtifactType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingArtifactType, setPendingArtifactType, sources.length]);
 
   if (!activeNotebook) return null;
@@ -82,7 +91,8 @@ export function MaterialsScreen() {
                 info={info}
                 disabled={noSources}
                 describedBy={NO_SOURCES_ID}
-                onSelect={setCreateType}
+                locked={isLocked(info.id)}
+                onSelect={(type) => (isLocked(type) ? navigate(paths.plans()) : setCreateType(type))}
               />
             </RevealItem>
           ))}

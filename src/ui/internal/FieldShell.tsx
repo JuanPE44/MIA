@@ -7,6 +7,8 @@ interface FieldShellProps {
   helper?: ReactNode;
   error?: ReactNode;
   counter?: ReactNode;
+  /** Optional control (e.g. a link) shown right-aligned on the label row. */
+  labelAction?: ReactNode;
   children: ReactNode;
 }
 
@@ -20,12 +22,21 @@ export function describedBy(id: string, hasHelper: boolean, hasError: boolean, e
 }
 
 /** Shared label / helper / error layout for TextField and Textarea. */
-export function FieldShell({id, label, helper, error, counter, children}: FieldShellProps) {
+export function FieldShell({id, label, helper, error, counter, labelAction, children}: FieldShellProps) {
   return (
     <div data-mia-ui className="flex flex-col">
-      <label htmlFor={id} className="mb-2 text-label text-strong">
-        {label}
-      </label>
+      {labelAction ? (
+        <div className="mb-2 flex items-baseline justify-between gap-3">
+          <label htmlFor={id} className="text-label text-strong">
+            {label}
+          </label>
+          {labelAction}
+        </div>
+      ) : (
+        <label htmlFor={id} className="mb-2 text-label text-strong">
+          {label}
+        </label>
+      )}
       {children}
       {error ? (
         <p id={errorId(id)} className="mt-1 flex items-start gap-1.5 text-small text-danger">

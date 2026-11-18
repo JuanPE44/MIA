@@ -12,7 +12,7 @@ const THEME_OPTIONS = [
 
 /** Preferencias tab: theme and example-data reset (UX-15: separated from the profile). */
 export function PreferencesPanel() {
-  const {handleResetDemoData} = useAppState();
+  const {handleResetDemoData, isSeedUser} = useAppState();
   const {mode, setMode} = useTheme();
   const toast = useToast();
   const [confirming, setConfirming] = useState(false);
@@ -36,9 +36,11 @@ export function PreferencesPanel() {
           Datos
         </h2>
         <p className="text-body text-default">Tus datos se guardan solo en este navegador.</p>
-        <Button variant="danger-ghost" onClick={() => setConfirming(true)}>
-          Restablecer datos de ejemplo
-        </Button>
+        {isSeedUser ? (
+          <Button variant="danger-ghost" onClick={() => setConfirming(true)}>
+            Restablecer datos de ejemplo
+          </Button>
+        ) : null}
       </section>
 
       <ConfirmDialog

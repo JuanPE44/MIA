@@ -38,6 +38,8 @@ export interface InteractiveCardProps {
    * they keep their own focus stop and are never nested inside the link.
    */
   actions?: ReactNode;
+  /** Full-bleed visual above the title (e.g. a color band); the card then drops its padding. */
+  media?: ReactNode;
   className?: string;
 }
 
@@ -53,6 +55,7 @@ export function InteractiveCard({
   selected,
   children,
   actions,
+  media,
   className,
 }: InteractiveCardProps) {
   const Heading = `h${headingLevel}` as 'h3';
@@ -61,15 +64,8 @@ export function InteractiveCard({
     "after:absolute after:inset-0 after:rounded-card after:content-['']",
     'focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-focus',
   );
-  return (
-    <Card
-      selected={selected}
-      className={cx(
-        'group relative transition-[box-shadow,border-color,translate] duration-[120ms]',
-        'hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset',
-        className,
-      )}
-    >
+  const body = (
+    <>
       <Heading>
         {href ? (
           <a href={href} className={stretched} onClick={onClick}>
@@ -81,7 +77,23 @@ export function InteractiveCard({
           </button>
         )}
       </Heading>
-      {children ? <div className="mt-2">{children}</div> : null}
+      {children ? <div className={media ? 'mt-1' : 'mt-2'}>{children}</div> : null}
+    </>
+  );
+  return (
+    <Card
+      selected={selected}
+      flush={Boolean(media)}
+      className={cx(
+        'group relative transition-[box-shadow,border-color,translate] duration-[120ms]',
+        // No overflow-hidden: it would clip the stretched link's focus ring; media rounds its own top corners.
+        media ? 'flex flex-col' : undefined,
+        'hover:-translate-x-px hover:-translate-y-px hover:border-ink hover:shadow-offset',
+        className,
+      )}
+    >
+      {media}
+      {media ? <div className="p-4 sm:p-5">{body}</div> : body}
       {actions ? <div className="absolute right-2 top-2 z-10">{actions}</div> : null}
     </Card>
   );

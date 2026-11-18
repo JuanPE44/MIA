@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router';
-import { WelcomeScreen } from './features/welcome';
+import { AuthScreen, AuthCallback } from './features/auth';
+import { PlansScreen } from './features/plans';
+import { Spinner } from './ui';
 import { ProgressScreen } from './features/progress';
 import { HelpScreen } from './features/help';
 import { AccountScreen } from './features/account';
@@ -24,7 +26,9 @@ export default function App() {
     activeSegment,
     goToSegment,
     goToNotebooks,
-    currentUser,
+    session,
+    authReady,
+    dataReady,
     isSearchAgentOpen,
     setIsSearchAgentOpen,
     searchAgentInitialQuery,
@@ -63,10 +67,22 @@ export default function App() {
     if (focusWarningToast) toast.show({ message: focusWarningToast, variant: 'warning', duration: 3500 });
   }, [focusWarningToast, toast]);
 
-  // Session gate (T4.2 / A3): no session → Bienvenida at ANY URL. The URL is kept,
-  // so after "Empezar" the requested screen renders. Reload → Bienvenida again.
-  if (!currentUser) {
-    return <WelcomeScreen />;
+  // OAuth / email-confirmation / recovery landing page: handled before the session gate.
+  if (route.kind === 'authCallback') {
+    return <AuthCallback />;
+  }
+
+  // Session gate: no Supabase session → AuthScreen at ANY URL (the URL is kept,
+  // so after signing in the requested screen renders; reload keeps the session).
+  if (!authReady || (session && !dataReady)) {
+    return (
+      <div role="status" aria-label="Cargando" className="flex min-h-screen items-center justify-center bg-page">
+        <Spinner />
+      </div>
+    );
+  }
+  if (!session) {
+    return <AuthScreen />;
   }
 
   // `/` with a session → Mis cuadernos.
@@ -109,6 +125,7 @@ export default function App() {
         {route.kind === 'ayuda' && <HelpScreen />}
         {route.kind === 'perfil' && <AccountScreen tab="perfil" />}
         {route.kind === 'preferencias' && <AccountScreen tab="preferencias" />}
+        {route.kind === 'planes' && <PlansScreen />}
 
         {/* VIEW 2: INTERIOR DEL CUADERNO CON SUS 4 SEGMENTOS (CHAT, FUENTES, ARTEFACTOS, ESTUDIO) */}
         {route.kind === 'workspace' && activeNotebook && !isNotFound && (

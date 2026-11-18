@@ -1,5 +1,6 @@
 import {Highlight, Page, PageHeader, Tabs, type NavTabItem} from '../../ui';
 import {PreferencesPanel} from './PreferencesPanel';
+import {PlanPanel} from './PlanPanel';
 import {ProfilePanel} from './ProfilePanel';
 import {Icon} from '../../ui/Icon';
 
@@ -10,13 +11,20 @@ const ITEMS: NavTabItem[] = [
   {id: 'preferencias', label: 'Preferencias', to: '/cuenta/preferencias', icon: <Icon name="settings" />},
 ];
 
-/** "Cuenta" (S11): Perfil and Preferencias as URL-addressable tabs. No plan labels (UX-28). */
+/** "Cuenta" (S11): Perfil and Preferencias as URL-addressable tabs. Perfil also shows the current plan. */
 export function AccountScreen({tab}: {tab: AccountTab}) {
   return (
     <Page className="space-y-6">
       <PageHeader title={<Highlight trigger="mount">Cuenta</Highlight>} />
       <Tabs items={ITEMS} activeId={tab} aria-label="Secciones de la cuenta" />
-      <div className="max-w-reading">{tab === 'perfil' ? <ProfilePanel /> : <PreferencesPanel />}</div>
+      <div className="max-w-reading">{tab === 'perfil' ? (
+          <div className="space-y-6">
+            <ProfilePanel />
+            <PlanPanel />
+          </div>
+        ) : (
+          <PreferencesPanel />
+        )}</div>
     </Page>
   );
 }

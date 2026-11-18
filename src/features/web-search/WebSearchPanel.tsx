@@ -24,6 +24,7 @@ import {
   type SearchTurn,
 } from './searchModel';
 import {Icon} from '../../ui/Icon';
+import {LockedFeature, usePlan} from '../plans';
 
 interface WebSearchPanelProps {
   /** Prefills the question field (e.g. from the Chat composer). */
@@ -34,7 +35,7 @@ interface WebSearchPanelProps {
  * "Buscar en la web" content (S8). Shared by the standalone dialog and the
  * "Desde la web" tab of the add-source dialog.
  */
-export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
+function WebSearchPanelContent({initialQuery}: WebSearchPanelProps) {
   const {activeNotebook, handleSaveSearchSource} = useAppState();
   const toast = useToast();
   const [mode, setMode] = useState<SearchMode>('general');
@@ -235,4 +236,18 @@ export function WebSearchPanel({initialQuery}: WebSearchPanelProps) {
       ) : null}
     </div>
   );
+}
+
+/** Google-grounded search is a Pro feature; other plans see a locked state. */
+export function WebSearchPanel(props: WebSearchPanelProps) {
+  const {can} = usePlan();
+  if (!can('googleSearch')) {
+    return (
+      <LockedFeature
+        feature="googleSearch"
+        description="Mejora al plan Pro para buscar en la web con Google y guardar los resultados como fuentes."
+      />
+    );
+  }
+  return <WebSearchPanelContent {...props} />;
 }

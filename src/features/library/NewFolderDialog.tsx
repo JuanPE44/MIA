@@ -1,6 +1,7 @@
 import {useId, useRef, useState, type FormEvent} from 'react';
 import {Button, Dialog, IconPicker, TextField} from '../../ui';
-import {FOLDER_COVERS, FOLDER_ICONS} from './libraryModel';
+import {FolderCoverPicker} from './FolderCoverPicker';
+import {FOLDER_ICONS} from './libraryModel';
 
 interface NewFolderDialogProps {
   onClose: () => void;
@@ -10,7 +11,6 @@ interface NewFolderDialogProps {
 /** Mounted only while open, so its state resets on every open. */
 export function NewFolderDialog({onClose, onCreate}: NewFolderDialogProps) {
   const formId = useId();
-  const coverName = useId();
   const nameRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState('');
   const [icon, setIcon] = useState<string>(FOLDER_ICONS[0]);
@@ -32,8 +32,6 @@ export function NewFolderDialog({onClose, onCreate}: NewFolderDialogProps) {
     onCreate(name.trim(), icon, cover || undefined);
     onClose();
   };
-
-  const coverOptions = [{id: '', label: 'Sin portada', src: ''}, ...FOLDER_COVERS.map((c) => ({...c}))];
 
   return (
     <Dialog
@@ -70,32 +68,7 @@ export function NewFolderDialog({onClose, onCreate}: NewFolderDialogProps) {
           autoComplete="off"
         />
         <IconPicker label="Ícono" icons={FOLDER_ICONS} value={icon} onChange={setIcon} />
-        <fieldset>
-          <legend className="mb-2 text-label text-strong">Portada (opcional)</legend>
-          <div className="flex flex-wrap gap-3">
-            {coverOptions.map((c) => {
-              const selected = cover === c.src;
-              return (
-                <label
-                  key={c.id || 'none'}
-                  className={`relative flex min-h-11 w-32 cursor-pointer flex-col overflow-hidden rounded-control border text-small has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${
-                    selected ? 'border-ink bg-primary-tint' : 'border-rule bg-surface hover:border-ink'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name={coverName}
-                    checked={selected}
-                    onChange={() => setCover(c.src)}
-                    className="absolute inset-0 size-full cursor-pointer opacity-0"
-                  />
-                  {c.src ? <img src={c.src} alt="" className="aspect-[16/7] w-full object-cover" /> : null}
-                  <span className="px-2 py-2 text-strong">{c.label}</span>
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
+        <FolderCoverPicker value={cover} onChange={setCover} />
       </form>
     </Dialog>
   );

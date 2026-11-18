@@ -24,6 +24,7 @@ import {
   Clock,
   Code,
   Copy,
+  CreditCard,
   Desktop,
   DotsThreeVertical,
   Eye,
@@ -39,6 +40,7 @@ import {
   FolderSimplePlus,
   GearSix,
   Globe,
+  GoogleLogo,
   GraduationCap,
   Heartbeat,
   Image,
@@ -46,6 +48,7 @@ import {
   Leaf,
   Lightbulb,
   Link,
+  Lock,
   MagnifyingGlass,
   MagnifyingGlassMinus,
   MagnifyingGlassPlus,
@@ -196,6 +199,11 @@ export const ICONS = {
   'shield-check': ShieldCheck,
   'shield-off': ShieldSlash,
   'shield-warning': ShieldWarning,
+
+  // Account / billing
+  lock: Lock,
+  google: GoogleLogo,
+  'credit-card': CreditCard,
 
   presentation: PresentationChart,
   headphones: Headphones,

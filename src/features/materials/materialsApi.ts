@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import type {ArtifactPersonalization, ArtifactType, SourceItem, StudyArtifact} from '../../types';
 import {materialTypeOf} from './materialModel';
 
@@ -10,9 +11,8 @@ export interface GenerateRequest {
 
 /** `POST /api/generate-artifact` (same payload as the legacy component). */
 export async function generateMaterial(req: GenerateRequest): Promise<StudyArtifact> {
-  const res = await fetch('/api/generate-artifact', {
+  const res = await apiFetch('/api/generate-artifact', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       artifactType: req.type,
       personalization: req.personalization,
@@ -48,9 +48,8 @@ export async function refineMaterial(
   comment: string,
   sources: SourceItem[],
 ): Promise<string> {
-  const res = await fetch('/api/refine-artifact', {
+  const res = await apiFetch('/api/refine-artifact', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       currentContent: artifact.summaryText,
       feedbackType: 'custom_comment',

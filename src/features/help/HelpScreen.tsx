@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import {useEffect, useRef, useState, type KeyboardEvent} from 'react';
 import {useAppState} from '../../app/AppStateContext';
 import {Button, Card, Chip, Highlight, IconButton, Page, PageHeader, Reveal, RevealItem, SimulatedBadge, Textarea} from '../../ui';
@@ -37,7 +38,7 @@ function AssistantReply({message}: {message: HelpMessage}) {
 
 /** "Ayuda" (S10): support assistant, session requests and FAQ. */
 export function HelpScreen() {
-  const {currentUser, userType, stats, activeNotebook} = useAppState();
+  const {currentUser, plan, stats, activeNotebook} = useAppState();
   const [messages, setMessages] = useState<HelpMessage[]>(loadMessages);
   const [requests, setRequests] = useState<HelpRequest[]>(loadRequests);
   const [input, setInput] = useState('');
@@ -56,15 +57,14 @@ export function HelpScreen() {
     setLoading(true);
     setFailed(false);
     try {
-      const res = await fetch('/api/support-chat', {
+      const res = await apiFetch('/api/support-chat', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           message: query,
           history: history.map((m) => ({role: m.role, text: m.text})),
           context: {
             username: currentUser || 'Estudiante',
-            userType,
+            plan,
             currentView: 'explorer',
             activeNotebook: activeNotebook
               ? {

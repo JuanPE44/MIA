@@ -9,11 +9,12 @@ import {StatTile} from './StatTile';
 import {WeeklyChart} from './WeeklyChart';
 import {Icon} from '../../ui/Icon';
 import {Highlight, Page, PageHeader, Reveal, RevealItem} from '../../ui';
+import {LockedFeature, usePlan} from '../plans';
 
 const number = new Intl.NumberFormat('es');
 
 /** "Tu progreso" (S9): the one place for study metrics, weekly chart, goal and manual log. */
-export function ProgressScreen() {
+function ProgressContent() {
   const navigate = useNavigate();
   const toast = useToast();
   const {stats, handleUpdateStats, activeNotebook} = useAppState();
@@ -186,6 +187,21 @@ export function ProgressScreen() {
       </section>
       </RevealItem>
     </Reveal>
+    </Page>
+  );
+}
+
+/** Study metrics are a Pro feature: other plans see a locked state with a CTA to /planes. */
+export function ProgressScreen() {
+  const {can} = usePlan();
+  if (can('studyMetrics')) return <ProgressContent />;
+  return (
+    <Page className="space-y-6">
+      <PageHeader title={<>Tu <Highlight trigger="mount" delay={0.15}>progreso</Highlight></>} />
+      <LockedFeature
+        feature="studyMetrics"
+        description="Mejora al plan Pro para ver tu racha, tus minutos de estudio y tu semana."
+      />
     </Page>
   );
 }

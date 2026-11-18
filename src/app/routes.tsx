@@ -25,6 +25,9 @@ export type AppRoute =
   | { kind: 'ayuda' }
   | { kind: 'perfil' }
   | { kind: 'preferencias' }
+  | { kind: 'planes' }
+  // Supabase OAuth / email-confirmation / password-recovery landing page.
+  | { kind: 'authCallback' }
   // `/cuadernos/:notebookId` without section: redirected to its chat.
   | { kind: 'notebookIndex'; notebookId: string }
   | {
@@ -48,6 +51,8 @@ const enc = encodeURIComponent;
 
 export const paths = {
   login: () => '/',
+  plans: () => '/planes',
+  authCallback: () => '/auth/callback',
   notebooks: () => '/cuadernos',
   notebookSegment: (notebookId: string, segment: MainSegment) =>
     `/cuadernos/${enc(notebookId)}/${SEGMENT_SLUGS[segment]}`,
@@ -69,6 +74,8 @@ const ROUTE_TABLE: Array<{ pattern: string; toRoute: (p: Params) => AppRoute }> 
   { pattern: '/ayuda', toRoute: () => ({ kind: 'ayuda' }) },
   { pattern: '/cuenta/perfil', toRoute: () => ({ kind: 'perfil' }) },
   { pattern: '/cuenta/preferencias', toRoute: () => ({ kind: 'preferencias' }) },
+  { pattern: '/planes', toRoute: () => ({ kind: 'planes' }) },
+  { pattern: '/auth/callback', toRoute: () => ({ kind: 'authCallback' }) },
   {
     pattern: '/cuadernos/:notebookId',
     toRoute: (p) => ({ kind: 'notebookIndex', notebookId: p.notebookId! })

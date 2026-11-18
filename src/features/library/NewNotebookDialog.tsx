@@ -1,6 +1,9 @@
 import {useId, useRef, useState, type FormEvent} from 'react';
 import type {Folder, Notebook} from '../../types';
-import {Button, Dialog, IconPicker, Select, Textarea, TextField} from '../../ui';
+import {useNavigate} from 'react-router';
+import {useAppState} from '../../app/AppStateContext';
+import {paths} from '../../app/routes';
+import {Button, Dialog, IconPicker, InlineAlert, Select, Textarea, TextField} from '../../ui';
 import {NOTEBOOK_ICONS} from './libraryModel';
 
 interface NewNotebookDialogProps {
@@ -14,6 +17,8 @@ interface NewNotebookDialogProps {
 /** Mounted only while open, so its state resets on every open. */
 export function NewNotebookDialog({folders, initialFolderId, onClose, onCreate}: NewNotebookDialogProps) {
   const formId = useId();
+  const navigate = useNavigate();
+  const {isNotebookLimitReached} = useAppState();
   const titleRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
@@ -28,8 +33,11 @@ export function NewNotebookDialog({folders, initialFolderId, onClose, onCreate}:
     return !message;
   };
 
+  const limitReached = isNotebookLimitReached(folderId);
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
+    if (limitReached) return;
     if (!validateTitle(title)) {
       titleRef.current?.focus();
       return;
@@ -56,13 +64,27 @@ export function NewNotebookDialog({folders, initialFolderId, onClose, onCreate}:
           <Button variant="secondary" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" form={formId}>
+          <Button
+            type="submit"
+            form={formId}
+            disabled={limitReached}
+            disabledReason={limitReached ? 'Llegaste al límite de cuadernos de esta carpeta' : undefined}
+          >
             Crear cuaderno
           </Button>
         </>
       }
     >
       <form id={formId} noValidate onSubmit={submit} className="flex flex-col gap-4">
+        {limitReached ? (
+          <InlineAlert variant="warning" title="Llegaste al límite de tu plan">
+            Esta carpeta ya tiene el máximo de cuadernos de tu plan. Elige otra carpeta o{' '}
+            <button type="button" className="underline" onClick={() => navigate(paths.plans())}>
+              mejora tu plan
+            </button>
+            .
+          </InlineAlert>
+        ) : null}
         <TextField
           ref={titleRef}
           label="Título (obligatorio)"

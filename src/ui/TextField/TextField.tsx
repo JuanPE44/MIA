@@ -10,6 +10,8 @@ export interface TextFieldProps extends Omit<ComponentProps<'input'>, 'size'> {
   error?: ReactNode;
   leadingIcon?: ReactNode;
   size?: 'md' | 'lg';
+  /** Control shown right-aligned on the label row (e.g. a "forgot password" link). */
+  labelAction?: ReactNode;
 }
 
 export function TextField({
@@ -18,6 +20,7 @@ export function TextField({
   error,
   leadingIcon,
   size = 'md',
+  labelAction,
   id: idProp,
   className,
   ...rest
@@ -27,7 +30,7 @@ export function TextField({
   const invalid = Boolean(error);
 
   return (
-    <FieldShell id={id} label={label} helper={helper} error={error}>
+    <FieldShell id={id} label={label} helper={helper} error={error} labelAction={labelAction}>
       <div className="relative">
         {leadingIcon ? (
           <span

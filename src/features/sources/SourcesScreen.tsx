@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import {useState} from 'react';
 import {useAppState} from '../../app/AppStateContext';
 import type {SourceItem} from '../../types';
@@ -56,9 +57,8 @@ export function SourcesScreen() {
     setSummaryBusy(true);
     setSummaryError(false);
     try {
-      const res = await fetch('/api/analyze-sources', {
+      const res = await apiFetch('/api/analyze-sources', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({sources, notebookTitle: notebook.title}),
       });
       if (!res.ok) throw new Error(`analyze failed: ${res.status}`);

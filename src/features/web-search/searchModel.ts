@@ -1,3 +1,4 @@
+import {apiFetch} from '../../services/api';
 import type {SourceItem} from '../../types';
 
 export type SearchMode = 'general' | 'news' | 'factcheck';
@@ -62,9 +63,8 @@ export async function searchGrounding(
       {role: 'model', text: t.reply as string},
     ])
     .slice(-8);
-  const res = await fetch('/api/search-grounding', {
+  const res = await apiFetch('/api/search-grounding', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({message, history, mode}),
   });
   if (!res.ok) throw new Error(`search failed: ${res.status}`);

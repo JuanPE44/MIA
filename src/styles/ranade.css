@@ -1,0 +1,30 @@
+/* Ranade (Indian Type Foundry, ITF Free Font License) — self-hosted from Fontshare. */
+@font-face {
+  font-family: "Ranade";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("./fonts/ranade-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ranade";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ranade-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Ranade";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fonts/ranade-500.woff2") format("woff2");
+}
+/* Also serves 600 (semibold) requests. */
+@font-face {
+  font-family: "Ranade";
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url("./fonts/ranade-700.woff2") format("woff2");
+}
