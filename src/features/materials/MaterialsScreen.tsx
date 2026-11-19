@@ -33,6 +33,8 @@ export function MaterialsScreen() {
     return ARTIFACT_QUOTA[type] === 'podcasts' && planLimit(plan, 'podcastsPerWeek') === 0;
   };
 
+  const lockedNeed = (type: ArtifactType) => ARTIFACT_FEATURE[type] ?? 'podcasts';
+
   useEffect(() => {
     if (!pendingArtifactType) return;
     setPendingArtifactType(null);
@@ -92,7 +94,7 @@ export function MaterialsScreen() {
                 disabled={noSources}
                 describedBy={NO_SOURCES_ID}
                 locked={isLocked(info.id)}
-                onSelect={(type) => (isLocked(type) ? navigate(paths.plans()) : setCreateType(type))}
+                onSelect={(type) => (isLocked(type) ? navigate(paths.plans(lockedNeed(type))) : setCreateType(type))}
               />
             </RevealItem>
           ))}

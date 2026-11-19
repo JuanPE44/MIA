@@ -1,10 +1,18 @@
 import {useState} from 'react';
+import {useSearchParams} from 'react-router';
 import {useAppState} from '../../app/AppStateContext';
-import {PLAN_LABELS, PLAN_PRICES, PLAN_TIERS, type BillingPeriod, type PlanTier} from '../../config/plans';
+import {
+  PLAN_LABELS,
+  PLAN_PRICES,
+  PLAN_TIERS,
+  cheapestTierFor,
+  isPlanNeed,
+  type BillingPeriod, type PlanTier,
+} from '../../config/plans';
 import {Button, Card, Highlight, Page, PageHeader, SegmentedControl, StatusBadge, useToast} from '../../ui';
 import {Icon} from '../../ui/Icon';
 import {CheckoutDialog} from './CheckoutDialog';
-import {formatUsd, planHighlights} from './planCopy';
+import {NEED_LABELS, formatUsd, planHighlights} from './planCopy';
 
 const PERIOD_OPTIONS = [
   {value: 'monthly' as const, label: 'Mensual'},
@@ -20,6 +28,10 @@ const TAGLINES: Record<PlanTier, string> = {
 /** "Planes" (/planes): compare the three tiers and switch plan through a simulated checkout. */
 export function PlansScreen() {
   const toast = useToast();
+  const [searchParams] = useSearchParams();
+  const needParam = searchParams.get('necesito');
+  const need = isPlanNeed(needParam) ? needParam : null;
+  const needTier = need ? cheapestTierFor(need) : null;
   const {plan, handleChangePlan} = useAppState();
   const [period, setPeriod] = useState<BillingPeriod>('monthly');
   const [checkoutTier, setCheckoutTier] = useState<PlanTier | null>(null);
@@ -45,6 +57,14 @@ export function PlansScreen() {
   return (
     <Page className="flex flex-col gap-8 pb-16">
       <PageHeader title={<>Elige tu <Highlight trigger="mount">plan</Highlight></>} />
+      {need && needTier && needTier !== plan ? (
+        <p
+          data-testid="plan-need"
+          className="max-w-reading rounded-control border border-ink bg-highlight/40 px-4 py-3 text-body text-strong"
+        >
+          Para usar <strong>{NEED_LABELS[need]}</strong> necesitas el plan <strong>{PLAN_LABELS[needTier]}</strong>.
+        </p>
+      ) : null}
       <p className="max-w-reading text-body text-muted">
         Cambia de plan cuando quieras. Por ahora el pago es simulado: no se cobra nada.
       </p>
@@ -65,11 +85,13 @@ export function PlansScreen() {
           const current = tier === plan;
           const perMonth = tier === 'pro' && period === 'annual' ? PLAN_PRICES.pro.annual / 12 : null;
           return (
-            <Card key={tier} selected={current} className="flex flex-col gap-4" aria-label={`Plan ${PLAN_LABELS[tier]}`}>
+            <Card key={tier} selected={current} className={`flex flex-col gap-4${needTier === tier && !current ? ' ring-2 ring-ink' : ''}`} aria-label={`Plan ${PLAN_LABELS[tier]}`}>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="font-display text-h2 text-strong">{PLAN_LABELS[tier]}</h2>
                 {current ? (
                   <StatusBadge variant="success">Plan actual</StatusBadge>
+                ) : needTier === tier ? (
+                  <StatusBadge variant="info">Desbloquea {NEED_LABELS[need!]}</StatusBadge>
                 ) : tier === 'pro' ? (
                   <StatusBadge variant="info">Más completo</StatusBadge>
                 ) : null}

@@ -22,7 +22,7 @@ export function LockedFeature({feature, description, className}: LockedFeaturePr
         title={`${FEATURE_LABELS[feature]} no está en tu plan`}
         description={description ?? 'Mejora tu plan para usar esta función.'}
         action={
-          <Button variant="primary" onClick={() => navigate(paths.plans())}>
+          <Button variant="primary" onClick={() => navigate(paths.plans(feature))}>
             Ver planes
           </Button>
         }

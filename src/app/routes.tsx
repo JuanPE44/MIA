@@ -51,7 +51,8 @@ const enc = encodeURIComponent;
 
 export const paths = {
   login: () => '/',
-  plans: () => '/planes',
+  /** `need` = feature the user tried to use; the plans page explains which plan unlocks it. */
+  plans: (need?: string) => (need ? `/planes?necesito=${enc(need)}` : '/planes'),
   authCallback: () => '/auth/callback',
   notebooks: () => '/cuadernos',
   notebookSegment: (notebookId: string, segment: MainSegment) =>

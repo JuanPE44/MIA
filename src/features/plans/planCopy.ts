@@ -4,10 +4,18 @@ import {
   PLAN_PRICES,
   type BillingPeriod,
   type FeatureKey,
+  type PlanNeed,
   type PlanTier,
 } from '../../config/plans';
 
 const usd = new Intl.NumberFormat('es', {style: 'currency', currency: 'USD'});
+
+/** Short names for what the user tried to use (matches the tile/screen names where they differ). */
+export const NEED_LABELS: Record<PlanNeed, string> = {
+  ...FEATURE_LABELS,
+  examMode: 'Modelo de examen',
+  podcasts: 'Podcasts',
+};
 
 export const formatUsd = (value: number) => usd.format(value);
 

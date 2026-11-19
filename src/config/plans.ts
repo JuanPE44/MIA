@@ -108,6 +108,21 @@ export const FEATURE_LABELS: Record<FeatureKey, string> = {
   supportPersonalizedRecs: 'Soporte con recomendaciones personalizadas',
 };
 
+/** What a locked entry point can ask the plans page to explain: a feature or podcasts access. */
+export type PlanNeed = FeatureKey | 'podcasts';
+
+export const isPlanNeed = (value: unknown): value is PlanNeed =>
+  value === 'podcasts' || (typeof value === 'string' && value in FEATURE_LABELS);
+
+/** Cheapest tier (free < extended < pro) that unlocks `need`, or null if none does. */
+export function cheapestTierFor(need: PlanNeed): PlanTier | null {
+  return (
+    PLAN_TIERS.find((tier) =>
+      need === 'podcasts' ? PLAN_CONFIG[tier].limits.podcastsPerWeek !== 0 : PLAN_CONFIG[tier].features.includes(need),
+    ) ?? null
+  );
+}
+
 /** Quota kinds tracked server-side in `usage_counters`. */
 export type QuotaKind = 'infographics' | 'podcasts';
 
