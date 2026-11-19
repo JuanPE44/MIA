@@ -315,7 +315,7 @@ export function AssistantMessage({
       </div>
     </div>
     {chunks.length > 0 ? (
-      <aside aria-label="Notas al margen" className={`absolute left-full top-0 ml-8 hidden w-60 space-y-3 xl:block ${done ? '' : 'invisible'}`}>
+      <aside aria-label="Notas al margen" className={`absolute left-full top-0 ml-8 hidden w-60 space-y-3 min-[1560px]:block ${done ? '' : 'invisible'}`}>
         {chunks.map((chunk) => (
           <button
             key={chunk.index}

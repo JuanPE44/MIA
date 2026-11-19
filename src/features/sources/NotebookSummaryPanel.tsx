@@ -112,7 +112,7 @@ export function NotebookSummaryPanel({notebook, analyzing, error, onAnalyze}: No
           aria-expanded={open}
           aria-controls={bodyId}
           onClick={toggle}
-          className="min-w-0 flex-1 !justify-start px-0 font-display text-h2"
+          className="min-w-fit flex-1 !justify-start px-0 font-display text-h2"
           leadingIcon={
             <Icon
               name="chevron-down"

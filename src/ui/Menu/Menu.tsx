@@ -178,11 +178,16 @@ function MenuPanel({id, label, items, header, anchor, triggerRef, focusLast, onC
     setPos({top: y, left: x});
   }, [anchor, phone, triggerRef]);
 
+  // Focus the first/last item once the panel is visible (focus() is a no-op while
+  // `visibility: hidden`, which is the state before desktop positioning runs).
+  const focused = useRef(false);
   useEffect(() => {
+    if (focused.current || (!phone && !pos)) return;
+    focused.current = true;
     const list = buttons();
     (focusLast ? list[list.length - 1] : list[0])?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [phone, pos]);
 
   // Outside pointer press closes (focus stays where the user clicked).
   useEffect(() => {

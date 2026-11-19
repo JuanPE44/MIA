@@ -24,7 +24,7 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
         aria-pressed={isSelected}
         onClick={() => onSelect(isSelected ? null : key)}
         className={cx(
-          'relative inline-flex h-8 shrink-0 items-center gap-2 whitespace-nowrap rounded-control border px-3 text-label transition-colors duration-[120ms]',
+          'relative inline-flex h-8 max-w-[16rem] shrink-0 items-center gap-2 whitespace-nowrap rounded-control border px-3 text-label transition-colors duration-[120ms]',
           'pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-[""]',
           isSelected
             ? 'border-ink bg-subtle font-semibold text-strong'
@@ -34,8 +34,8 @@ export function FolderFilter({folders, selected, counts, totalCount, looseCount,
         <Icon name={isSelected ? 'folder-open' : 'folder'} weight={isSelected ? 'fill' : 'regular'} className="size-4" />
         {dot ? <span aria-hidden className={cx('size-2.5 rounded-full border border-ink/40', dot)} /> : null}
         <span className="sr-only">{label}, </span>
-        <span aria-hidden>{label}</span>
-        <span aria-hidden className={cx('font-mono text-small', 'text-muted')}>
+        <span aria-hidden className="min-w-0 truncate" title={label}>{label}</span>
+        <span aria-hidden className={cx('shrink-0 font-mono text-small', 'text-muted')}>
           {count}
         </span>
         <span className="sr-only">{countLabels.notebooks(count)}</span>
