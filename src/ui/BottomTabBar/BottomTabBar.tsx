@@ -19,7 +19,10 @@ export interface BottomTabBarProps {
 function isTextEntry(el: Element | null): boolean {
   if (!el) return false;
   const tag = el.tagName;
-  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (el as HTMLElement).isContentEditable;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (el as HTMLElement).isContentEditable) return true;
+  // A button inside a form that has a text field (e.g. the chat "send" button): keep the bar hidden,
+  // otherwise it reappears on pointerdown, shifts the form and the tap never becomes a click.
+  return tag === 'BUTTON' && Boolean(el.closest('form')?.querySelector('textarea, input:not([type=hidden]):not([type=checkbox]):not([type=radio])'));
 }
 
 /**

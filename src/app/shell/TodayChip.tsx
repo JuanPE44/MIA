@@ -18,7 +18,8 @@ export function TodayChip({compact = false}: {compact?: boolean}) {
   const met = minutes >= goal;
   const days = streak === 1 ? 'día' : 'días';
   const pct = goal > 0 ? Math.min(100, Math.round((minutes / goal) * 100)) : 0;
-  const label = `Hoy ${minutes} de ${goal} minutos, racha de ${streak} ${days}. Ver progreso`;
+  // No aria-label: the accessible name is the visible text plus sr-only context (WCAG 2.5.3 label in name).
+  const hint = 'de racha, ver progreso';
   const link =
     "relative text-strong transition-colors duration-[120ms] pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-2 pointer-coarse:after:content-['']";
 
@@ -38,17 +39,19 @@ export function TodayChip({compact = false}: {compact?: boolean}) {
     return (
       <Link
         to={SHELL_PATHS.progress}
-        aria-label={label}
         className={cx(link, 'inline-flex h-8 items-center gap-2 rounded-small px-1 hover:bg-subtle')}
       >
         <span className="font-mono text-caption uppercase tracking-widest text-muted">Hoy</span>
         <span className="font-mono text-label">
           {minutes}/{goal}
-          <span className="hidden min-[400px]:inline"> min</span>
+          <span className="sr-only min-[400px]:not-sr-only"> min</span>
         </span>
         {bar}
         <Icon name="streak" className="size-4 text-ink" />
         <span className="font-mono text-label">{streak}</span>
+        <span className="sr-only">
+          {days} {hint}
+        </span>
       </Link>
     );
   }
@@ -56,7 +59,6 @@ export function TodayChip({compact = false}: {compact?: boolean}) {
   return (
     <Link
       to={SHELL_PATHS.progress}
-      aria-label={label}
       className={cx(link, 'flex flex-col gap-2 rounded-control border border-rule px-3 py-2.5 hover:border-ink')}
     >
       <span className="font-mono text-caption uppercase tracking-widest text-muted">Hoy</span>
@@ -67,6 +69,7 @@ export function TodayChip({compact = false}: {compact?: boolean}) {
       <span className="flex items-center gap-1.5 text-small text-default">
         <Icon name="streak" className="size-4 text-ink" />
         Racha · {streak} {days}
+        <span className="sr-only">, ver progreso</span>
       </span>
     </Link>
   );

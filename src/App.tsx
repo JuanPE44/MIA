@@ -111,6 +111,17 @@ export default function App() {
         <MaterialViewer />
       ) : (
     <div className="min-h-screen font-sans selection:bg-highlight selection:text-highlight-ink text-strong lg:flex">
+      {/* First tab stop: jumps over the rail/top bar to the main landmark */}
+      <a
+        href="#contenido"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById('contenido')?.focus();
+        }}
+        className="fixed left-3 top-3 z-[100] -translate-y-[200%] rounded-control border border-ink bg-surface px-4 py-2 text-label text-strong transition-transform focus:translate-y-0 motion-reduce:transition-none"
+      >
+        Saltar al contenido
+      </a>
       {/* Desktop rail (lg+); hides itself in Focus mode */}
       <SideRail />
 
@@ -119,7 +130,7 @@ export default function App() {
       <TopBar />
 
       {/* Main Container */}
-      <main className="w-full flex-1 px-4 sm:px-6 lg:px-12 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
+      <main id="contenido" tabIndex={-1} className="w-full flex-1 outline-none px-4 sm:px-6 lg:px-12 pt-6 pb-[calc(var(--mia-bottom-bar,0px)+2rem)]">
         <PageTransition transitionKey={screenKey} lift={false}>
         {/* VIEW 1: EXPLORADOR DE CARPETAS Y CUADERNOS SUELTOS (Shown first upon login!) */}
         {isNotFound && <NotFound />}

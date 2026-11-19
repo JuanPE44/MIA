@@ -364,7 +364,7 @@ export function ChatScreen() {
       <div className="flex flex-col">
       {/* Conversation */}
       <div className="mx-auto flex w-full max-w-[47.5rem] min-w-0 flex-1 flex-col">
-        <h1 className="sr-only">Preguntar: {currentActiveThread.title}</h1>
+        <h2 className="sr-only">Preguntar: {currentActiveThread.title}</h2>
         <div className="min-h-[40vh] flex-1">
           {body}
           <div ref={endRef} className="scroll-mb-48" />

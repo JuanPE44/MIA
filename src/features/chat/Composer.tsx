@@ -47,7 +47,7 @@ export function Composer({
         e.preventDefault();
         if (canSend) onSend();
       }}
-      className="rounded-card border border-rule bg-surface p-2 transition-colors focus-within:border-strong focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-focus/20"
+      className="rounded-card border border-rule bg-surface p-2 transition-colors focus-within:border-strong focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-focus"
     >
       <div className="flex items-end gap-2">
         <div className="min-w-0 flex-1 [&_label]:sr-only [&_textarea]:border-0 [&_textarea]:bg-transparent [&_textarea]:outline-none">
@@ -77,12 +77,13 @@ export function Composer({
           {blocked ? disabledReason : 'Enter envía · Mayús+Enter agrega una línea'}
         </p>
         <div className="flex min-w-0 items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={onOpenSources} aria-label={`Fuentes activas: ${activeSources} de ${totalSources}. Gestionar fuentes`} className="font-mono text-muted!">
+          <Button variant="ghost" size="sm" onClick={onOpenSources} className="font-mono text-muted!">
             <span>
               <span className="max-sm:hidden">Fuentes activas: </span>
               {activeSources}
               <span className="sm:hidden"> fuentes</span>
               <span className="max-sm:hidden"> de {totalSources}</span>
+              <span className="sr-only">, gestionar fuentes</span>
             </span>
           </Button>
           <Button

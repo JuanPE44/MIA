@@ -213,7 +213,7 @@ export function AuthScreen() {
                           mode === 'signin' ? (
                             <button
                               type="button"
-                              className="cursor-pointer text-small text-muted underline-offset-2 hover:text-strong hover:underline"
+                              className="inline-flex min-h-6 cursor-pointer items-center py-1 text-small text-muted pointer-coarse:min-h-11 underline-offset-2 hover:text-strong hover:underline"
                               onClick={() => changeMode('reset')}
                             >
                               ¿Olvidaste tu contraseña?

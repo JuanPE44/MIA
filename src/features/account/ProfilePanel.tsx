@@ -94,9 +94,7 @@ export function ProfilePanel() {
                 ref={fileRef}
                 type="file"
                 accept="image/*"
-                className="sr-only"
-                tabIndex={-1}
-                aria-label="Seleccionar foto de perfil"
+                className="hidden"
                 onChange={onPickPhoto}
               />
               <Button type="button" variant="secondary" disabled={photoBusy} onClick={() => fileRef.current?.click()}>

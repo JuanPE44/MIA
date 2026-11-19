@@ -32,8 +32,9 @@ export function StudyScreen() {
   }));
 
   return (
-    <div className="space-y-6">
-      <h1 className="sr-only">Estudiar</h1>
+    <div className={isFocusModeActive ? 'mx-auto flex w-full flex-col items-center space-y-6 py-4 sm:py-10' : 'space-y-6'}>
+      {/* Focus mode hides the notebook header (the usual h1), so the page title takes over. */}
+      {isFocusModeActive ? <h1 className="sr-only">Estudiar</h1> : <h2 className="sr-only">Estudiar</h2>}
 
       {isFocusModeActive ? null : (
         <div className="flex flex-wrap items-stretch justify-between gap-y-1">
