@@ -7,3 +7,7 @@ coverage/
 .env*
 !.env.example
 .atl/
+
+test-results/
+playwright-report/
+e2e/.auth/
