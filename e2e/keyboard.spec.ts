@@ -15,7 +15,12 @@ async function focusInfo(page: Page) {
     // look at pseudo-element focus rings (after:) too
     const after = getComputedStyle(e, '::after');
     const outlined = (c: CSSStyleDeclaration) => c.outlineStyle !== 'none' && parseFloat(c.outlineWidth) > 0;
-    const shadow = cs.boxShadow !== 'none';
+    let shadow = cs.boxShadow !== 'none';
+    // A wrapper may draw the ring via :focus-within (e.g. the chat composer card around the textarea).
+    for (let p = e.parentElement, i = 0; p && i < 4 && !shadow; p = p.parentElement, i++) {
+      const pc = getComputedStyle(p);
+      if (p.matches(':focus-within') && (outlined(pc) || pc.boxShadow !== 'none')) shadow = true;
+    }
     const id = e.tagName.toLowerCase() + (e.getAttribute('aria-label') ? `[${e.getAttribute('aria-label')}]` : '') + ' "' + (e.innerText || '').trim().slice(0, 25) + '"';
     // ancestors with :focus-within styling can't be detected; include border change as indicator
     return { id, indicator: outlined(cs) || outlined(after) || shadow, offscreen: r.bottom < 0 || r.top > innerHeight, size: [Math.round(r.width), Math.round(r.height)], hidden: r.width === 0 || r.height === 0, key: e.tagName + (e.id || '') + r.x.toFixed(0) + r.y.toFixed(0) };

@@ -1,8 +1,18 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { NB, setTheme, attachCollectors, waitSettled, step, shot, record, domAudit } from './helpers';
 
 const LONG = 'Cuaderno-con-un-nombre-extraordinariamente-largo-sin-espacios-' + 'x'.repeat(120);
 const LONG_WORDS = 'Introducción a la termodinámica estadística aplicada a sistemas fuera del equilibrio y su relación con la teoría de la información '.repeat(3);
+
+/** On phone "Nueva carpeta" lives inside the "Más acciones" menu. */
+async function openNewFolderDialog(page: Page, phone: boolean) {
+  if (phone) {
+    await page.getByRole('button', { name: 'Más acciones' }).click();
+    await page.getByRole('menuitem', { name: 'Nueva carpeta' }).click();
+  } else {
+    await page.getByRole('button', { name: 'Nueva carpeta' }).first().click();
+  }
+}
 
 test.beforeEach(async ({ page }) => { await setTheme(page, 'light'); });
 
@@ -10,7 +20,7 @@ test('very long folder + notebook names do not break layout', async ({ page }, t
   const errors = attachCollectors(page);
   await page.goto('/cuadernos'); await waitSettled(page);
   await step(page, ti, 'create-long-folder', async () => {
-    await page.getByRole('button', { name: 'Nueva carpeta' }).first().click();
+    await openNewFolderDialog(page, ti.project.name === 'phone');
     await page.getByLabel(/Nombre/).fill(LONG);
     await page.getByRole('dialog').getByRole('button', { name: /Crear|Guardar/ }).click();
     await expect(page.getByRole('dialog')).toBeHidden();
@@ -44,7 +54,7 @@ test('very long folder + notebook names do not break layout', async ({ page }, t
 test('empty / whitespace inputs', async ({ page }, ti) => {
   await page.goto('/cuadernos'); await waitSettled(page);
   await step(page, ti, 'folder-whitespace-name', async () => {
-    await page.getByRole('button', { name: 'Nueva carpeta' }).first().click();
+    await openNewFolderDialog(page, ti.project.name === 'phone');
     await page.getByLabel(/Nombre/).fill('   ');
     await page.getByRole('dialog').getByRole('button', { name: /Crear|Guardar/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -71,7 +81,7 @@ test('double-click create does not duplicate', async ({ page }, ti) => {
   await page.goto('/cuadernos'); await waitSettled(page);
   const name = `Doble ${Date.now() % 10000}`;
   await step(page, ti, 'double-click-new-folder', async () => {
-    await page.getByRole('button', { name: 'Nueva carpeta' }).first().click();
+    await openNewFolderDialog(page, ti.project.name === 'phone');
     await page.getByLabel(/Nombre/).fill(name);
     await page.getByRole('dialog').getByRole('button', { name: /Crear|Guardar/ }).dblclick();
     await page.waitForTimeout(800);
@@ -95,7 +105,7 @@ test('reload mid-flow keeps state; back button', async ({ page }, ti) => {
   await step(page, ti, 'reload-keeps-route-and-data', async () => {
     await page.reload(); await waitSettled(page);
     await expect(page).toHaveURL(new RegExp(`${NB}/fuentes`));
-    await expect(page.getByText(/Lean Startup|Canvas/).first()).toBeVisible();
+    await expect(page.locator('main').getByText(/Lean Startup|Canvas/).first()).toBeVisible();
   });
   await step(page, ti, 'chat-message-survives-reload', async () => {
     await page.goto(`/cuadernos/${NB}/chat`); await waitSettled(page);
