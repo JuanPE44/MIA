@@ -79,11 +79,12 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
     if (error || !data.user) {
       return res.status(401).json({error: 'Tu sesión expiró. Vuelve a iniciar sesión.', code: 'UNAUTHENTICATED'});
     }
-    const {data: profile} = await supabase.from('profiles').select('plan').eq('id', data.user.id).maybeSingle();
+    // Simulated billing: the client declares its plan (no real payment exists yet).
+    const declared = req.headers['x-mia-plan'];
     req.user = {
       id: data.user.id,
       email: data.user.email ?? null,
-      plan: isPlanTier(profile?.plan) ? profile.plan : 'free',
+      plan: isPlanTier(declared) ? declared : 'free',
     };
     return next();
   } catch (err) {

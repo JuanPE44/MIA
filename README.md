@@ -29,7 +29,7 @@ Auth (email + Google) and plans (free / extended / pro) use Supabase. Requires D
 4. Seed users (password `MiaTest123!`, email already confirmed): `free@mia.test`, `extended@mia.test`, `pro@mia.test`. They load the demo notebooks on first login; other accounts start empty.
 5. Google OAuth: create an OAuth client in Google Cloud with redirect URI `http://127.0.0.1:54321/auth/v1/callback`, then put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `supabase/.env` before `db:start`.
 
-Plans live in `src/config/plans.ts`. The plan changes only through `POST /api/plan` (simulated checkout, service role) from the `/planes` screen.
+Plans live in `src/config/plans.ts`. Billing is simulated: the plan is stored client-side per user and switched locally from the `/planes` checkout (no network call).
 
 ### Deploy on Vercel
 
