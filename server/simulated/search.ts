@@ -1,4 +1,4 @@
-import {capitalize, hashString, seededRng, shuffle} from './text';
+import {capitalize, hashString, seededRng, shuffle} from './text.js';
 
 interface Result {
   title: string;

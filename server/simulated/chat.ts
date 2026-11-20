@@ -14,7 +14,7 @@ import {
   trimSentence,
   finish,
   type SourceLike,
-} from './text';
+} from './text.js';
 
 export interface ChunkLike {
   sourceTitle: string;

@@ -9,7 +9,7 @@ import {
   type FeatureKey,
   type PlanTier,
   type QuotaKind,
-} from '../src/config/plans';
+} from '../src/config/plans.js';
 
 export interface AuthUser {
   id: string;
