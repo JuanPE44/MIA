@@ -102,9 +102,10 @@ function DialogInner({
         'mia-dialog flex w-full max-w-none flex-col overflow-y-auto border border-rule bg-surface-raised p-0',
         'text-strong shadow-elevation-3 backdrop:bg-scrim',
         phone
-          ? 'mia-anim-sheet mx-0 mb-0 mt-auto max-h-[92vh] rounded-t-card'
+          ? 'mia-anim-sheet mx-0 mb-0 mt-auto max-h-[80dvh] rounded-t-card'
           : cx(
-              'mia-anim-dialog m-auto max-h-[calc(100vh-4rem)] rounded-card',
+              // Height follows the content, capped at 80% of the viewport.
+              'mia-anim-dialog m-auto max-h-[80dvh] rounded-card',
               widths[size],
             ),
       )}
