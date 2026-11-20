@@ -32,6 +32,21 @@ test.describe('layout regressions', () => {
     expect(sw).toBeLessThanOrEqual(iw);
   });
 
+  test('dialog body is not collapsed on a short viewport', async ({ page }) => {
+    // Header + footer used to fill max-height and squeeze the body to ~0.
+    await page.setViewportSize({ width: 1280, height: 260 });
+    await page.goto('/cuadernos'); await waitSettled(page);
+    await page.getByRole('button', { name: 'Nuevo cuaderno' }).first().click();
+    const field = page.getByRole('dialog').getByLabel(/Título/);
+    await expect(field).toBeVisible();
+    // Playwright treats overflow-clipped elements as visible, so measure the scroll body itself.
+    const bodyHeight = await field.evaluate(
+      (el) => (el.closest('dialog > div.overflow-y-auto') as HTMLElement).getBoundingClientRect().height,
+    );
+    expect(bodyHeight, 'dialog body collapsed').toBeGreaterThanOrEqual(120);
+    await expect(page.getByRole('dialog').getByRole('button', { name: /Crear/ })).toBeInViewport();
+  });
+
   test('long folder name chip truncates in library', async ({ page }, ti) => {
     const phone = ti.project.name === 'phone';
     await page.goto('/cuadernos'); await waitSettled(page);
