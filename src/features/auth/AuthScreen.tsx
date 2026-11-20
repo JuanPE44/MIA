@@ -161,7 +161,9 @@ export function AuthScreen() {
           </RevealItem>
 
           <RevealItem>
-            <div className="rounded-card border border-rule bg-surface-raised p-5 shadow-elevation-1 sm:p-8">
+            {/* Min height = signup form, so switching Ingresar ↔ Crear cuenta doesn't resize the card.
+                Still grows for error/notice alerts. Update if signup fields change. */}
+            <div className="min-h-[574px] rounded-card border border-rule bg-surface-raised p-5 shadow-elevation-1 sm:min-h-[598px] sm:p-8">
               {!isSupabaseConfigured ? (
                 <InlineAlert variant="warning">
                   Supabase no está configurado. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en .env.local y
