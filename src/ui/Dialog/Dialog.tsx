@@ -102,7 +102,7 @@ function DialogInner({
         'mia-dialog flex w-full max-w-none flex-col overflow-y-auto border border-rule bg-surface-raised p-0',
         'text-strong shadow-elevation-3 backdrop:bg-scrim',
         phone
-          ? 'mia-anim-sheet mx-0 mb-0 mt-auto max-h-[80dvh] rounded-t-card'
+          ? 'mia-anim-sheet mx-0 mb-0 mt-auto min-h-[70dvh] max-h-[80dvh] rounded-t-card'
           : cx(
               // Height follows the content, capped at 80% of the viewport.
               'mia-anim-dialog m-auto max-h-[80dvh] rounded-card',
@@ -132,9 +132,11 @@ function DialogInner({
           {description}
         </p>
       ) : null}
-      {/* Body scrolls on its own, but never collapses below min-h-32: on short
-          viewports the whole dialog scrolls instead and the footer stays sticky. */}
-      <div className="min-h-32 flex-1 overflow-y-auto px-6 py-4">{children}</div>
+      {/* flex-auto (basis auto): the body sizes to its content, so the dialog grows
+          with it up to the max height; past that it shrinks and scrolls, but never
+          below min-h-32 (on short viewports the whole dialog scrolls instead and
+          the footer stays sticky). */}
+      <div className="min-h-32 flex-auto overflow-y-auto px-6 py-4">{children}</div>
       {footer ? (
         <footer
           className={cx(
