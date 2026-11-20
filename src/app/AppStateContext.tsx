@@ -27,7 +27,7 @@ import { AppRoute, parseRoute, paths } from './routes';
 import { useToast } from '../ui/Toast';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../services/supabaseClient';
-import { apiFetch, setApiErrorListener } from '../services/api';
+import { apiFetch, setApiErrorListener, setApiPlan } from '../services/api';
 import { isLimitReached, isPlanTier, planLimit, type PlanTier } from '../config/plans';
 
 /** Accounts ending in this domain are seed users: they get the demo data on first login. */
@@ -39,6 +39,7 @@ const storageKeys = (uid: string) => ({
   notebooks: `focused_notebooks_${uid}_v3`,
   stats: `focused_user_stats_${uid}_v3`,
   profile: `mia_student_profile_${uid}_v3`,
+  plan: `mia_plan_${uid}_v3`,
   onboarded: `mia_onboarded_${uid}_v3`
 });
 
@@ -71,7 +72,6 @@ const emptyStudentProfile = (name: string): StudentProfile => ({
 });
 
 export interface UserProfile {
-  plan: PlanTier;
   displayName: string | null;
   avatarUrl: string | null;
 }
@@ -112,7 +112,8 @@ function useAppStateValue() {
   const userId = session?.user.id ?? null;
   const userEmail = session?.user.email ?? null;
   const isSeedUser = Boolean(userEmail && userEmail.toLowerCase().endsWith(SEED_EMAIL_DOMAIN));
-  const plan: PlanTier = profile?.plan ?? 'free';
+  // Simulated billing: the plan lives only on the client (per user, localStorage).
+  const [plan, setPlan] = useState<PlanTier>('free');
   const currentUser: string | null = session
     ? profile?.displayName?.trim() || userEmail?.split('@')[0] || 'Estudiante'
     : null;
@@ -137,12 +138,11 @@ function useAppStateValue() {
     };
   }, []);
 
-  /** Reloads `profiles` (plan + display name) for the signed-in user. */
+  /** Reloads `profiles` (display name + avatar) for the signed-in user. */
   const refreshProfile = async () => {
     if (!supabase || !userId) return;
-    const { data } = await supabase.from('profiles').select('plan, display_name, avatar_url').eq('id', userId).maybeSingle();
+    const { data } = await supabase.from('profiles').select('display_name, avatar_url').eq('id', userId).maybeSingle();
     setProfile({
-      plan: isPlanTier(data?.plan) ? data.plan : 'free',
       displayName: data?.display_name ?? null,
       avatarUrl: data?.avatar_url ?? null
     });
@@ -348,11 +348,32 @@ function useAppStateValue() {
     navigate(paths.login());
   };
 
-  /** Simulated checkout: the server validates the tier and updates `profiles.plan`. */
+  // Load the user's simulated plan; 'free' until they "pay".
+  useEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = userId ? localStorage.getItem(storageKeys(userId).plan) : null;
+    } catch {
+      // ignore
+    }
+    setPlan(isPlanTier(stored) ? stored : 'free');
+  }, [userId]);
+
+  // Every /api call declares the plan so server-side gating matches the UI.
+  useEffect(() => {
+    setApiPlan(plan);
+  }, [plan]);
+
+  /** Simulated checkout: no payment and no network, the plan just switches locally. */
   const handleChangePlan = async (next: PlanTier) => {
-    const res = await apiFetch('/api/plan', { method: 'POST', body: JSON.stringify({ plan: next }) });
-    if (!res.ok) throw new Error('plan update failed');
-    await refreshProfile();
+    setPlan(next);
+    setApiPlan(next);
+    if (!userId) return;
+    try {
+      localStorage.setItem(storageKeys(userId).plan, next);
+    } catch {
+      // ignore
+    }
   };
 
   const handleResetDemoData = () => {

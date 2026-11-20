@@ -22,6 +22,13 @@ export function setApiErrorListener(next: ApiErrorListener | null): void {
   listener = next;
 }
 
+let currentPlan: string | null = null;
+
+/** Simulated billing: the client-held plan sent as `X-Mia-Plan` on every call. */
+export function setApiPlan(plan: string | null): void {
+  currentPlan = plan;
+}
+
 async function accessToken(): Promise<string | null> {
   if (!supabase) return null;
   const {data} = await supabase.auth.getSession();
@@ -63,6 +70,7 @@ export async function apiFetch(input: string, init: RequestInit = {}): Promise<R
   const headers = new Headers(init.headers);
   const token = await accessToken();
   if (token) headers.set('Authorization', `Bearer ${token}`);
+  if (currentPlan) headers.set('X-Mia-Plan', currentPlan);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
 
   const res = await fetch(input, {...init, headers});

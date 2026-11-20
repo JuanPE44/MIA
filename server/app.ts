@@ -55,33 +55,6 @@ if (useRealAi) {
 console.log(`[ai] mode: ${useRealAi ? 'real (Gemini)' : 'simulated (no Gemini calls)'}`);
 
 // -------------------------------------------------------------
-// POST /api/plan (SIMULATED CHECKOUT: no real payment is processed)
-// -------------------------------------------------------------
-app.post('/api/plan', async (req, res) => {
-  const {plan} = req.body ?? {};
-  if (!isPlanTier(plan)) {
-    return res.status(400).json({error: 'Plan no válido.'});
-  }
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    if (isProductionRuntime()) {
-      return res.status(503).json({error: 'AUTH_NOT_CONFIGURED'});
-    }
-    // Dev fallback without Supabase: nothing to persist.
-    return res.json({plan});
-  }
-  if (!req.user || req.user.id === 'dev-anonymous') {
-    return res.status(401).json({error: 'Inicia sesión para continuar.', code: 'UNAUTHENTICATED'});
-  }
-  const {error} = await supabase.from('profiles').update({plan}).eq('id', req.user.id);
-  if (error) {
-    console.error('[plan] update failed', error);
-    return res.status(500).json({error: 'No se pudo actualizar tu plan.'});
-  }
-  return res.json({plan});
-});
-
-// -------------------------------------------------------------
 // POST /api/extract-file-content (PROCESAMIENTO REAL DE ARCHIVOS MULTIMODALES)
 // -------------------------------------------------------------
 app.post('/api/extract-file-content', async (req, res) => {
