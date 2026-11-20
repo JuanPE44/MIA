@@ -12,7 +12,7 @@ import {
   finish,
   definitionBody,
   type SourceLike,
-} from './text';
+} from './text.js';
 
 export interface RecallChallenge {
   challengeQuestion: string;
@@ -49,7 +49,7 @@ export function generateRecallChallenge(sources: SourceLike[]): RecallChallenge 
     ];
     return {
       challengeQuestion: questions[Math.floor(Math.random() * questions.length)],
-      expectedKeyPoints: [trimSentence(pair.definition, 130), ...related.map((r) => trimSentence(r, 130))].slice(0, 3),
+      expectedKeyPoints: Array.from(new Set([trimSentence(pair.definition, 130), ...related.map((r) => trimSentence(r, 130))])).slice(0, 3),
       canonicalAnswer: [pair.definition, related[0]].filter(Boolean).map((s) => `${finish(trimSentence(s, 220))}`).join(' '),
       sourceReference: `${pair.source} · ${pair.section}`,
     };
@@ -63,7 +63,7 @@ export function generateRecallChallenge(sources: SourceLike[]): RecallChallenge 
   const subject = term ? `«${shortTerm(term.text)}»` : `«${corpus.title}»`;
   return {
     challengeQuestion: `Explica con tus propias palabras qué dice «${corpus.title}» sobre ${subject} y por qué es relevante.`,
-    expectedKeyPoints: sentences.map((s) => trimSentence(s.text, 130)),
+    expectedKeyPoints: Array.from(new Set(sentences.map((s) => trimSentence(s.text, 130)))),
     canonicalAnswer: sentences.map((s) => `${finish(trimSentence(s.text, 220))}`).join(' ') || 'Revisa tus fuentes para contrastar tu respuesta.',
     sourceReference: sentences[0] ? `${sentences[0].source} · ${sentences[0].section}` : corpus.title,
   };

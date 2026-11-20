@@ -12,7 +12,7 @@ import {
   uniqueBy,
   type Corpus,
   type SourceLike,
-} from './text';
+} from './text.js';
 
 type Importance = 'clave' | 'alta' | 'media';
 

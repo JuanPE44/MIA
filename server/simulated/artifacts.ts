@@ -19,7 +19,7 @@ import {
   uniqueBy,
   type Corpus,
   type SourceLike,
-} from './text';
+} from './text.js';
 
 export interface Personalization {
   quality?: 'bajo' | 'medio' | 'alto' | 'detallista';

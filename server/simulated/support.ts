@@ -1,4 +1,4 @@
-import {norm} from './text';
+import {norm} from './text.js';
 
 export interface SupportContext {
   username: string;
