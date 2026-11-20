@@ -99,7 +99,7 @@ function DialogInner({
         if (dismissible && e.target === ref.current) onClose();
       }}
       className={cx(
-        'mia-dialog flex w-full max-w-none flex-col overflow-hidden border border-rule bg-surface-raised p-0',
+        'mia-dialog flex w-full max-w-none flex-col overflow-y-auto border border-rule bg-surface-raised p-0',
         'text-strong shadow-elevation-3 backdrop:bg-scrim',
         phone
           ? 'mia-anim-sheet mx-0 mb-0 mt-auto max-h-[92vh] rounded-t-card'
@@ -131,11 +131,13 @@ function DialogInner({
           {description}
         </p>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">{children}</div>
+      {/* Body scrolls on its own, but never collapses below min-h-32: on short
+          viewports the whole dialog scrolls instead and the footer stays sticky. */}
+      <div className="min-h-32 flex-1 overflow-y-auto px-6 py-4">{children}</div>
       {footer ? (
         <footer
           className={cx(
-            'flex gap-3 border-t border-hairline px-6 py-4',
+            'sticky bottom-0 flex gap-3 border-t border-hairline bg-surface-raised px-6 py-4',
             phone ? 'flex-col-reverse [&>*]:w-full' : 'justify-end',
           )}
         >
